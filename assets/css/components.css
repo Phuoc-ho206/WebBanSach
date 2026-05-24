@@ -8,12 +8,6 @@
 
 /* ------------------------------------------------------------
    BUTTON — Nút bấm
-   Dùng ở: mọi trang cần hành động của người dùng
-   - Trang chủ / chi tiết sách: "Mua ngay", "Thêm giỏ hàng"
-   - Giỏ hàng / thanh toán: "Đặt hàng", "Tiếp tục mua"
-   - Đăng nhập / đăng ký: "Đăng nhập", "Tạo tài khoản"
-   - Admin: "Thêm sách", "Lưu", "Xóa"
-   ------------------------------------------------------------
    .btn              → class gốc, bắt buộc khi dùng <button> hoặc <a>
    .btn--primary     → hành động chính (Mua ngay, Xác nhận)
    .btn--secondary   → hành động phụ (Xem thêm, Quay lại)
@@ -145,12 +139,6 @@
 
 /* ------------------------------------------------------------
    INPUT / FORM — Ô nhập liệu & biểu mẫu
-   Dùng ở:
-   - Đăng nhập / đăng ký / quên mật khẩu
-   - Trang thanh toán (họ tên, địa chỉ, SĐT)
-   - Admin thêm/sửa sách (tên, giá, mô tả, thể loại)
-   - Tìm kiếm sách trên navbar
-   ------------------------------------------------------------
    .form             → bọc toàn bộ form (login, checkout, admin)
    .form-row          → xếp nhiều field trên cùng 1 hàng (họ + tên)
    .form-group        → 1 label + 1 input
@@ -328,12 +316,6 @@ select.form-control {
 
 /* ------------------------------------------------------------
    CARD — Thẻ hiển thị nội dung
-   Dùng ở:
-   - Trang chủ: danh sách sách nổi bật, sách mới, khuyến mãi
-   - Trang danh mục / tìm kiếm: lưới sản phẩm
-   - Trang chi tiết: sách liên quan, cùng tác giả
-   - Trang tài khoản: lịch sử đơn hàng (dạng card nhỏ)
-   ------------------------------------------------------------
    .card              → thẻ sách đơn lẻ
    .card--interactive → thẻ có thể click/hover (dẫn đến chi tiết sách)
    .card__image       → ảnh bìa sách (tỷ lệ 3:4)
@@ -433,12 +415,6 @@ select.form-control {
 
 /* ------------------------------------------------------------
    BADGE — Nhãn trạng thái / nhãn nhỏ
-   Dùng ở:
-   - Card sách: "Giảm 20%", "Bán chạy", "Mới"
-   - Giỏ hàng: số lượng item trên icon giỏ
-   - Trang đơn hàng: trạng thái (Đang giao, Hoàn thành, Đã hủy)
-   - Admin bảng quản lý: trạng thái kho (Còn hàng / Hết hàng)
-   ------------------------------------------------------------
    .badge--primary    → nhãn mặc định (thể loại sách)
    .badge--secondary  → nhãn nổi bật nhẹ (Best seller)
    .badge--accent     → khuyến mãi, giảm giá
@@ -780,16 +756,12 @@ select.form-control {
 
 /* ------------------------------------------------------------
    ALERT — Thông báo cố định trong trang
-   Dùng ở: hiển thị ngay trên nội dung trang (không tự biến mất)
    - Form đăng ký: lỗi email đã tồn tại → .alert--error
    - Trang thanh toán: cảnh báo hết hàng → .alert--warning
    - Trang đơn hàng: đặt hàng thành công → .alert--success
    - Hướng dẫn / ghi chú → .alert--info
-   ------------------------------------------------------------ */
 
-/* ------------------------------------------------------------
    TOAST — Thông báo nổi góc màn hình
-   Dùng ở: phản hồi tức thì sau hành động (cần JS)
    - Thêm sách vào giỏ → toast--success
    - Xóa khỏi giỏ / lỗi API → toast--error
    - Đặt .toast-container 1 lần ở cuối <body>, JS thêm .toast vào
@@ -917,7 +889,6 @@ select.form-control {
 
 /* ------------------------------------------------------------
    MODAL — Hộp thoại popup
-   Dùng ở: xác nhận hành động hoặc form nhanh (cần JS toggle .is-open)
    - Xác nhận xóa sách (admin) → .modal--sm
    - Xem nhanh thông tin sách → .modal (mặc định)
    - Form thêm/sửa sách (admin) → .modal--lg
@@ -1024,7 +995,6 @@ select.form-control {
 
 /* ------------------------------------------------------------
    PAGINATION — Phân trang
-   Dùng ở: danh sách dài cần chia trang
    - Trang danh mục / tìm kiếm sách
    - Lịch sử đơn hàng (tài khoản)
    - Bảng quản lý sách / đơn hàng (admin)
@@ -1094,7 +1064,6 @@ select.form-control {
 
 /* ------------------------------------------------------------
    TABLE — Bảng dữ liệu
-   Dùng ở: trang admin và trang tài khoản
    - Admin: quản lý sách, đơn hàng, người dùng
    - Tài khoản: lịch sử mua hàng (dạng bảng chi tiết)
    - .table-wrapper: bọc ngoài để scroll ngang trên mobile
