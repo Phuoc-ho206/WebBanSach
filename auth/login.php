@@ -1,77 +1,81 @@
-<?php
-require_once __DIR__ . '/../includes/config.php';
+<!DOCTYPE html>
+<html lang="vi">
 
-$pageTitle = 'Đăng nhập';
-$errors = [];
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Đăng nhập</title>
+    <link rel="stylesheet" href="/WebBanSach/assets/css/variables.css">
+    <link rel="stylesheet" href="/WebBanSach/assets/css/components/form.css">
+    <link rel="stylesheet" href="/WebBanSach/assets/css/components/button.css">
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-background);
+            font-family: var(--font-family-base)
+        }
 
-// Xử lý khi người dùng gửi form (PHP thuần — chưa nối database)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
+            box-sizing: border-box
+        }
 
-    if ($email === '') {
-        $errors['email'] = 'Vui lòng nhập email.';
-    }
-    if ($password === '') {
-        $errors['password'] = 'Vui lòng nhập mật khẩu.';
-    }
+        .auth-card h1 {
+            margin: 0 0 8px;
+            text-align: center;
+            color: var(--color-primary)
+        }
 
-    if ($errors === []) {
-        // kiểm tra tài khoản trong database
-        header('Location: ' . url('index.php'));
-        exit;
-    }
-}
+        .form-group {
+            margin-bottom: 12px
+        }
 
-require_once __DIR__ . '/../includes/header.php';
-?>
+        input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box
+        }
 
-<main class="container" style="max-width: 400px; margin: 2rem auto; padding: 1rem;">
-    <h1>Đăng nhập</h1>
+        .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 12px
+        }
+    </style>
+</head>
 
-    <?php if (!empty($errors)): ?>
-        <div class="alert alert--error" role="alert">
-            Vui lòng kiểm tra lại thông tin đăng nhập.
+<body>
+    <div class="card auth-card">
+        <h1>Đăng nhập</h1>
+        <p style="text-align:center; margin:0 0 16px">Đăng nhập để tiếp tục</p>
+        <form action="/WebBanSach/auth/login.php" method="POST">
+            <div class="form-group">
+                <label for="identity">Email hoặc tên đăng nhập</label>
+                <input id="identity" name="identity" type="text" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+                <input id="password" name="password" type="password" required>
+            </div>
+            <div class="form-group">
+                <label><input type="checkbox" name="remember"> Ghi nhớ đăng nhập</label>
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">Đăng nhập</button>
+                <a class="btn btn-secondary" href="/WebBanSach/auth/register.php">Đăng ký</a>
+            </div>
+        </form>
+        <div style="text-align:center; margin-top:12px">
+            <a href="/WebBanSach/auth/Forgetpassword/email.php">Quên mật khẩu?</a>
         </div>
-    <?php endif; ?>
+    </div>
+</body>
 
-    <form class="form" method="post" action="">
-        <div class="form-group">
-            <label class="form-label form-label--required" for="email">Email</label>
-            <input
-                class="form-control<?= isset($errors['email']) ? ' is-invalid' : '' ?>"
-                type="email"
-                id="email"
-                name="email"
-                value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
-                placeholder="you@example.com"
-                required
-            >
-            <?php if (isset($errors['email'])): ?>
-                <p class="form-error"><?= htmlspecialchars($errors['email']) ?></p>
-            <?php endif; ?>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label form-label--required" for="password">Mật khẩu</label>
-            <input
-                class="form-control<?= isset($errors['password']) ? ' is-invalid' : '' ?>"
-                type="password"
-                id="password"
-                name="password"
-                required
-            >
-            <?php if (isset($errors['password'])): ?>
-                <p class="form-error"><?= htmlspecialchars($errors['password']) ?></p>
-            <?php endif; ?>
-        </div>
-
-        <div class="auth-actions">
-            <button type="submit" class="btn btn--primary">Đăng nhập</button>
-            <a class="btn btn--secondary" href="<?= url('auth/register.php') ?>">Đăng ký</a>
-            <a class="btn btn--accent" href="<?= url('auth/fogetpassword.php') ?>">Quên mật khẩu</a>
-        </div>
-    </form>
-</main>
-
-<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+</html>
