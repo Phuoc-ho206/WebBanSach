@@ -1,0 +1,2 @@
+# Cho phép PATH_INFO trên WAMP (Apache)
+AcceptPathInfo On

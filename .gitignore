@@ -1,0 +1,18 @@
+# Database config (chứa password - KHÔNG đẩy lên git)
+includes/config.php
+
+# User uploaded images
+assets/images/uploads/*
+!assets/images/uploads/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Log
+*.log
+error_log
