@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="/WebBanSach/assets/css/components/form.css">
     <link rel="stylesheet" href="/WebBanSach/assets/css/components/card.css">
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             margin: 0;
             min-height: 100vh;
@@ -18,6 +21,7 @@
             justify-content: center;
             font-family: var(--font-family-base);
             background: var(--color-background);
+            box-sizing: border-box;
         }
 
         .auth-card {
@@ -70,7 +74,7 @@
     <div class="card auth-card">
         <h1>Đăng ký</h1>
         <p>Tạo tài khoản mới của bạn</p>
-        <form action="/WebBanSach/auth/register.php" method="POST">
+        <form action="/WebBanSach/auth/pages/register.php" method="POST">
             <div class="form-group">
                 <label for="username">Tên đăng nhập</label>
                 <input type="text" id="username" name="username" required>
@@ -89,11 +93,11 @@
             </div>
             <div class="actions">
                 <button type="submit" class="btn btn-primary">Đăng ký</button>
-                <a class="btn btn-secondary" href="/WebBanSach/auth/login.php">Quay lại</a>
+                <a class="btn btn-secondary" href="/WebBanSach/auth/pages/login.php">Quay lại</a>
             </div>
         </form>
         <div style="text-align:center; margin-top:12px">
-            <a href="/WebBanSach/auth/fogetpassword.php">Quên mật khẩu?</a>
+            <a href="/WebBanSach/auth/pages/Forgetpassword/index.php">Quên mật khẩu?</a>
         </div>
     </div>
 </body>

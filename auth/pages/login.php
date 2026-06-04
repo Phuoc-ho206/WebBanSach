@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="/WebBanSach/assets/css/variables.css">
     <link rel="stylesheet" href="/WebBanSach/assets/css/components/form.css">
     <link rel="stylesheet" href="/WebBanSach/assets/css/components/button.css">
+    <link rel="stylesheet" href="/WebBanSach/assets/css/components/card.css">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             min-height: 100vh;
@@ -54,8 +59,7 @@
 <body>
     <div class="card auth-card">
         <h1>Đăng nhập</h1>
-        <p style="text-align:center; margin:0 0 16px">Đăng nhập để tiếp tục</p>
-        <form action="/WebBanSach/auth/login.php" method="POST">
+        <form action="/WebBanSach/auth/pages/login.php" method="POST">
             <div class="form-group">
                 <label for="identity">Email hoặc tên đăng nhập</label>
                 <input id="identity" name="identity" type="text" required>
@@ -69,11 +73,11 @@
             </div>
             <div class="actions">
                 <button type="submit" class="btn btn-primary">Đăng nhập</button>
-                <a class="btn btn-secondary" href="/WebBanSach/auth/register.php">Đăng ký</a>
+                <a class="btn btn-secondary" href="/WebBanSach/auth/pages/register.php">Đăng ký</a>
             </div>
         </form>
         <div style="text-align:center; margin-top:12px">
-            <a href="/WebBanSach/auth/Forgetpassword/email.php">Quên mật khẩu?</a>
+            <a href="/WebBanSach/auth/pages/Forgetpassword/index.php">Quên mật khẩu?</a>
         </div>
     </div>
 </body>
