@@ -47,11 +47,53 @@
             box-sizing: border-box
         }
 
-        .actions {
+        .input-row {
             display: flex;
             gap: 8px;
+            align-items: center;
+        }
+
+        .input-row input {
+            width: auto;
+            flex: 1;
+        }
+
+        .input-row .btn,
+        .input-row a.btn {
+            white-space: nowrap;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: stretch;
             justify-content: center;
-            margin-top: 12px
+            margin-top: 12px;
+        }
+
+        .actions .btn,
+        .actions a.btn {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .remember-row .btn,
+        .remember-row a.btn {
+            width: auto;
+            min-width: 0;
+        }
+
+        .remember-row .register-link {
+            margin-left: auto;
         }
     </style>
 </head>
@@ -66,15 +108,22 @@
             </div>
             <div class="form-group">
                 <label for="password">Mật khẩu</label>
-                <input id="password" name="password" type="password" required>
+                <div class="input-row">
+                    <input id="password" name="password" type="password" required>
+
+                </div>
             </div>
-            <div class="remember-group">
-                <input type="checkbox" name="remember" id="remember">
-                <label for="remember">Ghi nhớ đăng nhập</label>
+            <div class="remember-row">
+                <div class="remember-group">
+                    <input type="checkbox" name="remember" id="remember">
+                    <label for="remember">Ghi nhớ đăng nhập</label>
+                </div>
+                <a class="btn btn-secondary register-link" href="/WebBanSach/auth/pages/register.php">Đăng ký</a>
             </div>
             <div class="actions">
                 <button type="submit" class="btn btn-primary">Đăng nhập</button>
-                <a class="btn btn-secondary" href="/WebBanSach/auth/pages/register.php">Đăng ký</a>
+                <button type="submit" class="btn btn-primary" name="google_login">Đăng nhập với Google</button>
+                <button type="submit" class="btn btn-primary" name="facebook_login">Đăng nhập với Facebook</button>
             </div>
         </form>
         <div style="text-align:center; margin-top:12px">

@@ -23,7 +23,7 @@
 }
 
 .remember-group {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 6px;
 }

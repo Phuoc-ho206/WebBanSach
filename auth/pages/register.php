@@ -13,6 +13,7 @@
         * {
             box-sizing: border-box;
         }
+
         body {
             margin: 0;
             min-height: 100vh;
@@ -63,9 +64,17 @@
 
         .actions {
             display: flex;
+            flex-direction: column;
             gap: 8px;
+            align-items: stretch;
             justify-content: center;
-            margin-top: 12px
+            margin-top: 12px;
+        }
+
+        .actions .btn,
+        .actions a.btn {
+            width: 100%;
+            box-sizing: border-box;
         }
     </style>
 </head>
