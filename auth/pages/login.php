@@ -68,8 +68,9 @@
                 <label for="password">Mật khẩu</label>
                 <input id="password" name="password" type="password" required>
             </div>
-            <div class="form-group">
-                <label><input type="checkbox" name="remember"> Ghi nhớ đăng nhập</label>
+            <div class="remember-group">
+                <input type="checkbox" name="remember" id="remember">
+                <label for="remember">Ghi nhớ đăng nhập</label>
             </div>
             <div class="actions">
                 <button type="submit" class="btn btn-primary">Đăng nhập</button>

@@ -24,7 +24,6 @@
             justify-content: center;
             background: var(--color-background);
             font-family: var(--font-family-base);
-            box-sizing: border-box;
         }
 
         .card {

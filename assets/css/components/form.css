@@ -22,6 +22,17 @@
     gap: var(--spacing-xs);
 }
 
+.remember-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.remember-group label {
+    margin: 0;
+    white-space: nowrap;
+}
+
 .form-label {
     font-family: var(--font-family-base);
     font-size: var(--font-size-sm);

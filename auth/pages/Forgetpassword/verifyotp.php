@@ -8,8 +8,6 @@
 
     <style>
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
@@ -20,7 +18,6 @@
             align-items: center;
             background: #f5f5f5;
             font-family: Arial, sans-serif;
-            box-sizing: border-box;
         }
 
         .auth-card {
