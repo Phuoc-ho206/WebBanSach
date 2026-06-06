@@ -1,3 +1,25 @@
+<?php
+session_start();
+require_once '../controller/GoogleAuthController.php';
+require_once '../controller/fbauthcontroller.php';
+
+// Xử lý callback từ Google
+if (isset($_GET['code'])) {
+    $user = googleauthcontroller::handleCallback();
+    if ($user) {
+        $_SESSION['user'] = $user;
+        header('Location: /WebBanSach/index.php');
+        exit;
+    }
+}
+
+$google_login_url = googleauthcontroller::getLoginUrl();
+$facebook_login_url = fbauthcontroller::getLoginUrl();
+?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -9,6 +31,7 @@
     <link rel="stylesheet" href="/WebBanSach/assets/css/components/form.css">
     <link rel="stylesheet" href="/WebBanSach/assets/css/components/button.css">
     <link rel="stylesheet" href="/WebBanSach/assets/css/components/card.css">
+
     <style>
         * {
             box-sizing: border-box;
@@ -122,8 +145,15 @@
             </div>
             <div class="actions">
                 <button type="submit" class="btn btn-primary">Đăng nhập</button>
-                <button type="submit" class="btn btn-primary" name="google_login">Đăng nhập với Google</button>
-                <button type="submit" class="btn btn-primary" name="facebook_login">Đăng nhập với Facebook</button>
+                <a href="<?= $google_login_url ?>" class="btn btn-primary"
+                    style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">
+                    Đăng nhập với Google
+                </a>
+
+                <a href="<?= $facebook_login_url ?>" class="btn btn-primary"
+                    style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">
+                    Đăng nhập với Facebook
+                </a>
             </div>
         </form>
         <div style="text-align:center; margin-top:12px">

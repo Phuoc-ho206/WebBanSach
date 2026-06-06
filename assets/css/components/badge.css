@@ -12,17 +12,17 @@
 }
 
 .badge--primary {
-    background-color: rgba(45, 95, 93, 0.12);
+    background-color: rgba(255, 122, 61, 0.12);
     color: var(--color-primary);
 }
 
 .badge--secondary {
-    background-color: rgba(249, 178, 52, 0.2);
-    color: #8a6200;
+    background-color: rgba(74, 155, 127, 0.15);
+    color: var(--color-secondary);
 }
 
 .badge--accent {
-    background-color: rgba(232, 93, 4, 0.12);
+    background-color: rgba(255, 122, 61, 0.15);
     color: var(--color-accent-dark);
 }
 

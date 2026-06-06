@@ -16,21 +16,23 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #f5f5f5;
+            background: #f5f8fa;
             font-family: Arial, sans-serif;
+            margin: 0;
         }
 
         .auth-card {
             width: 420px;
-            background: white;
+            background: #ffffff;
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 14px;
+            box-shadow: 0 18px 40px rgba(50, 50, 93, 0.08);
+            border: 1px solid #e8e8e8;
         }
 
         h1 {
             text-align: center;
-            color: #0d6efd;
+            color: #ff7a3d;
             margin-bottom: 20px;
         }
 
@@ -43,37 +45,37 @@
         }
 
         .step {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-weight: bold;
-            background: #ddd;
-            color: #666;
+            font-weight: 700;
+            background: #e6e6e6;
+            color: #555;
         }
 
         .step.done {
-            background: #28a745;
-            color: white;
+            background: #4caf50;
+            color: #fff;
         }
 
         .step.active {
-            background: #0d6efd;
-            color: white;
+            background: #ff7a3d;
+            color: #fff;
         }
 
         .step-divider {
             width: 30px;
             height: 2px;
-            background: #ddd;
+            background: #e8e8e8;
         }
 
         .subtitle {
             text-align: center;
-            color: #666;
-            margin-bottom: 25px;
+            color: #6f6f6f;
+            margin-bottom: 24px;
         }
 
         .otp-inputs {
@@ -88,24 +90,31 @@
             height: 50px;
             text-align: center;
             font-size: 22px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
+            border: 2px solid #e8e8e8;
+            border-radius: 10px;
+            transition: border-color 0.2s ease;
         }
 
         .otp-inputs input:focus {
             outline: none;
-            border-color: #0d6efd;
+            border-color: #ff7a3d;
+            box-shadow: 0 0 0 3px rgba(255, 122, 61, 0.12);
         }
 
         .resend-link {
             text-align: center;
             margin-bottom: 20px;
             font-size: 14px;
+            color: #5d5d5d;
         }
 
         .resend-link a {
-            color: #0d6efd;
+            color: #ff7a3d;
             text-decoration: none;
+        }
+
+        .resend-link a:hover {
+            text-decoration: underline;
         }
 
         .actions {
@@ -117,21 +126,35 @@
             flex: 1;
             padding: 12px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             text-decoration: none;
             text-align: center;
             font-size: 14px;
+            font-weight: 600;
+            transition: filter 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
         }
 
         .btn-primary {
-            background: #0d6efd;
-            color: white;
+            background: #ff7a3d;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(0.95);
         }
 
         .btn-secondary {
-            background: #6c757d;
-            color: white;
+            background: #4a9b7f;
+            color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+            filter: brightness(0.92);
         }
     </style>
 </head>
