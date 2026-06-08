@@ -124,6 +124,12 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
 <body>
     <div class="card auth-card">
         <h1>Đăng nhập</h1>
+        <div
+            style="background-color: #e3f2fd; color: #0277bd; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; text-align: center; border: 1px solid #81d4fa;">
+            <strong>Tài khoản Demo:</strong><br>
+            Tên đăng nhập: <code>nguyenvana</code><br>
+            Mật khẩu: <code>123456</code>
+        </div>
         <form action="/WebBanSach/auth/pages/login.php" method="POST">
             <div class="form-group">
                 <label for="identity">Email hoặc tên đăng nhập</label>
@@ -144,14 +150,20 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
                 <a class="btn btn-secondary register-link" href="/WebBanSach/auth/pages/register.php">Đăng ký</a>
             </div>
             <div class="actions">
-                <button type="submit" class="btn btn-primary">Đăng nhập</button>
+                <a href="/WebBanSach/auth/pages/profile.php" class="btn btn-primary"
+                    style="display:flex; align-items:center; justify-content:center; text-decoration: none; font-weight: bold; color: white; background-color: #ff6b1a;">
+                    Đăng nhập</a>
                 <a href="<?= $google_login_url ?>" class="btn btn-primary"
-                    style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">
+                    style="text-align:center; text-decoration:none; font-weight: bold; color: white; display:flex; align-items:center; justify-content:center; background-color: #ef3030ff; gap: 8px;">
+                    <img src="/WebBanSach/assets/images/icon/gg.png" alt="Google"
+                        style="width: 24px; height: 24px; object-fit: contain; background: white; border-radius: 50%; padding: 2px;">
                     Đăng nhập với Google
                 </a>
 
                 <a href="<?= $facebook_login_url ?>" class="btn btn-primary"
-                    style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">
+                    style="text-align:center; text-decoration:none; font-weight: bold; color: white; display:flex; align-items:center; justify-content:center; background-color: #3e24eaff; gap: 8px;">
+                    <img src="/WebBanSach/assets/images/icon/fb.png" alt="Facebook"
+                        style="width: 24px; height: 24px; object-fit: contain;">
                     Đăng nhập với Facebook
                 </a>
             </div>
