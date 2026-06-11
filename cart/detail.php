@@ -42,7 +42,8 @@ include '../includes/header.php';
         <div>
             <h1 class="order-title">Chi tiết đơn hàng #WBS-954021</h1>
             <p style="color: var(--color-text-light); margin: var(--spacing-xs) 0 0 0; font-size: var(--font-size-sm);">
-                Đặt ngày: 07/06/2026 14:30 | Trạng thái: <span class="badge badge--info" style="font-size: 0.7rem; vertical-align: middle;">Đang giao hàng</span>
+                Đặt ngày: 07/06/2026 14:30 | Trạng thái: <span class="badge badge--info"
+                    style="font-size: 0.7rem; vertical-align: middle;">Đang giao hàng</span>
             </p>
         </div>
         <div>
@@ -56,7 +57,7 @@ include '../includes/header.php';
     <div class="order-detail-layout">
         <!-- Left Column: Details -->
         <div class="order-detail-main">
-            
+
             <!-- Section 1: Customer info -->
             <div class="detail-section-card">
                 <h2 class="detail-section-title">
@@ -73,7 +74,8 @@ include '../includes/header.php';
                     </li>
                     <li class="info-details-item">
                         <span class="info-details-label">Địa chỉ nhận hàng:</span>
-                        <span class="info-details-value">123 Đường ABC, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh, Việt Nam</span>
+                        <span class="info-details-value">123 Đường ABC, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh, Việt
+                            Nam</span>
                     </li>
                 </ul>
             </div>
@@ -90,7 +92,8 @@ include '../includes/header.php';
                     </li>
                     <li class="info-details-item">
                         <span class="info-details-label">Trạng thái thanh toán:</span>
-                        <span class="info-details-value"><span class="badge badge--warning">Chờ thanh toán khi nhận hàng</span></span>
+                        <span class="info-details-value"><span class="badge badge--warning">Chờ thanh toán khi nhận
+                                hàng</span></span>
                     </li>
                     <li class="info-details-item">
                         <span class="info-details-label">Đơn vị vận chuyển:</span>
@@ -98,7 +101,8 @@ include '../includes/header.php';
                     </li>
                     <li class="info-details-item">
                         <span class="info-details-label">Mã vận đơn:</span>
-                        <span class="info-details-value" style="color: var(--color-primary); font-family: monospace; font-size: var(--font-size-md);">GHN-492104820</span>
+                        <span class="info-details-value"
+                            style="color: var(--color-primary); font-family: monospace; font-size: var(--font-size-md);">GHN-492104820</span>
                     </li>
                 </ul>
             </div>
@@ -122,27 +126,35 @@ include '../includes/header.php';
                             <tr>
                                 <td>
                                     <div class="detail-product-link">
-                                        <svg class="detail-product-img" width="50" height="68" viewBox="0 0 64 86" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <rect width="64" height="86" rx="4" fill="url(#paint0_linear_d1)"/>
-                                            <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3"/>
-                                            <text x="12" y="32" fill="#fff" font-family="Arial" font-size="5" font-weight="bold">SÚNG, VI TRÙNG</text>
-                                            <text x="12" y="38" fill="#fff" font-family="Arial" font-size="5" font-weight="bold">VÀ THÉP</text>
+                                        <svg class="detail-product-img" width="50" height="68" viewBox="0 0 64 86"
+                                            fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="64" height="86" rx="4" fill="url(#paint0_linear_d1)" />
+                                            <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3" />
+                                            <text x="12" y="32" fill="#fff" font-family="Arial" font-size="5"
+                                                font-weight="bold">SÚNG, VI TRÙNG</text>
+                                            <text x="12" y="38" fill="#fff" font-family="Arial" font-size="5"
+                                                font-weight="bold">VÀ THÉP</text>
                                             <defs>
-                                                <linearGradient id="paint0_linear_d1" x1="0" y1="0" x2="64" y2="86" gradientUnits="userSpaceOnUse">
-                                                    <stop stop-color="#1565c0"/>
-                                                    <stop offset="1" stop-color="#0d47a1"/>
+                                                <linearGradient id="paint0_linear_d1" x1="0" y1="0" x2="64" y2="86"
+                                                    gradientUnits="userSpaceOnUse">
+                                                    <stop stop-color="#1565c0" />
+                                                    <stop offset="1" stop-color="#0d47a1" />
                                                 </linearGradient>
                                             </defs>
                                         </svg>
                                         <div>
                                             <div class="detail-product-name">Súng, Vi Trùng Và Thép (Tái Bản 2023)</div>
-                                            <div style="font-size: 0.75rem; color: var(--color-text-light); margin-top: 2px;">Tác giả: Jared Diamond</div>
+                                            <div
+                                                style="font-size: 0.75rem; color: var(--color-text-light); margin-top: 2px;">
+                                                Tác giả: Jared Diamond</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>185.000 đ</td>
                                 <td>1</td>
-                                <td style="text-align: right; font-weight: var(--font-weight-bold); color: var(--color-text);">185.000 đ</td>
+                                <td
+                                    style="text-align: right; font-weight: var(--font-weight-bold); color: var(--color-text);">
+                                    185.000 đ</td>
                             </tr>
                         </tbody>
                     </table>
@@ -155,12 +167,12 @@ include '../includes/header.php';
         <div class="order-detail-sidebar">
             <div class="detail-summary-card">
                 <h2 class="detail-summary-title">Tóm tắt thanh toán</h2>
-                
+
                 <div class="detail-summary-row">
                     <span>Giá trị sản phẩm</span>
                     <span>185.000 đ</span>
                 </div>
-                
+
                 <div class="detail-summary-row">
                     <span>Phí vận chuyển</span>
                     <span>30.000 đ</span>
@@ -196,9 +208,10 @@ include '../includes/header.php';
 
 <!-- Script to toggle navbar on mobile -->
 <script>
-    document.querySelector('.navbar__toggle').addEventListener('click', function() {
+    document.querySelector('.navbar__toggle').addEventListener('click', function () {
         document.querySelector('.navbar').classList.toggle('is-open');
     });
 </script>
 </body>
+
 </html>
