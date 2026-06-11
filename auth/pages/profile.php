@@ -2,6 +2,37 @@
 require_once '../../includes/config.php';
 $pageTitle = 'Hồ sơ cá nhân';
 include '../../includes/header.php';
+// if (!isset($_SESSION['profile'])) {
+//     $_SESSION['profile'] = [
+//         'username' => 'nguyenvana',
+//         'full_name' => 'Nguyễn Văn A',
+//         'email' => 'nguyenvana@email.com',
+//         'phone' => '090 123 4567',
+//         'address' => '123 Đường ABC, Quận 1, TP. Hồ Chí Minh'
+//     ];
+// }
+
+// $isUpdated = false;
+// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//     $_SESSION['profile']['username'] = $_POST['username'] ?? $_SESSION['profile']['username'];
+//     $_SESSION['profile']['full_name'] = $_POST['full_name'] ?? $_SESSION['profile']['full_name'];
+//     $_SESSION['profile']['email'] = $_POST['email'] ?? $_SESSION['profile']['email'];
+//     $_SESSION['profile']['phone'] = $_POST['phone'] ?? $_SESSION['profile']['phone'];
+//     $_SESSION['profile']['address'] = $_POST['address'] ?? $_SESSION['profile']['address'];
+//     $isUpdated = true;
+// }
+
+// $profile = $_SESSION['profile'];
+
+// // Tính từ viết tắt từ họ và tên
+// $words = explode(' ', $profile['full_name']);
+// $initials = '';
+// if (count($words) >= 2) {
+//     $initials = mb_substr($words[0], 0, 1) . mb_substr(end($words), 0, 1);
+// } else {
+//     $initials = mb_substr($profile['full_name'], 0, 2);
+// }
+// $initials = mb_strtoupper($initials);
 ?>
 
 <style>
