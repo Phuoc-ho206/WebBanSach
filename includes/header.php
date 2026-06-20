@@ -38,7 +38,6 @@ if (isset($conn)) {
     <link rel="stylesheet" href="<?= asset('css/components/pagination.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/table.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/spinner.css') ?>">
-
     <?php if (isset($extraCss)): ?>
         <?php foreach ((array) $extraCss as $css): ?>
             <link rel="stylesheet" href="<?= asset($css) ?>">
