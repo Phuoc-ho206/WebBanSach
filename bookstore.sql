@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 18, 2026 at 12:04 AM
+-- Generation Time: Jun 21, 2026 at 06:04 PM
 -- Server version: 8.4.7
 -- PHP Version: 8.3.28
 
@@ -38,17 +38,24 @@ CREATE TABLE IF NOT EXISTS `address` (
   `FullAddress` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `IsDefault` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`AddressID`),
-  KEY `CustomerID` (`CustomerID`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_address_user` (`CustomerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `address`
 --
 
 INSERT INTO `address` (`AddressID`, `CustomerID`, `ReceiverName`, `Phone`, `FullAddress`, `IsDefault`) VALUES
-(1, 2, 'Trần Thị B', '0987654321', '123 Đường Lê Lợi, Quận 1, TP.HCM', 1),
-(2, 2, 'Trần Thị B (Công ty)', '0987654321', 'Tòa nhà Bitexco, Quận 1, TP.HCM', 0),
-(3, 3, 'Lê Văn C', '0912345678', '456 Đường Trần Phú, Quận Ba Đình, Hà Nội', 1);
+(1, 2, 'Trần Khách Hàng 1', '0912345678', '123 Nguyễn Trãi, Quận 1, TP.HCM', 1),
+(2, 3, 'Lê Khách Hàng 2', '0923456789', '456 Lê Lợi, Quận 1, TP.HCM', 1),
+(3, 6, 'Vũ Khách Hàng 3', '0956789012', '789 Điện Biên Phủ, Bình Thạnh, TP.HCM', 1),
+(4, 7, 'Đặng Khách Hàng 4', '0967890123', '12 Cách Mạng Tháng 8, Quận 3, TP.HCM', 1),
+(5, 8, 'Bùi Khách Hàng 5', '0978901234', '34 Xuân Thủy, Cầu Giấy, Hà Nội', 1),
+(6, 9, 'Đỗ Khách Hàng 6', '0989012345', '56 Nguyễn Chí Thanh, Đống Đa, Hà Nội', 1),
+(7, 10, 'Hồ Khách Hàng 7', '0990123456', '78 Bạch Đằng, Hải Châu, Đà Nẵng', 1),
+(8, 2, 'Trần Khách Hàng 1', '0911111111', 'Tòa nhà Bitexco, Quận 1, TP.HCM (Công ty)', 0),
+(9, 3, 'Người nhận hộ', '0922222222', '11 Nguyễn Đình Chiểu, Quận 3, TP.HCM', 0),
+(10, 6, 'Vũ Khách Hàng 3', '0933333333', 'Ký túc xá ĐHQG, Thủ Đức, TP.HCM', 0);
 
 -- --------------------------------------------------------
 
@@ -63,16 +70,24 @@ CREATE TABLE IF NOT EXISTS `cart` (
   `CreatedDate` datetime DEFAULT CURRENT_TIMESTAMP,
   `Status` enum('Active','Abandoned','Completed') COLLATE utf8mb4_unicode_ci DEFAULT 'Active',
   PRIMARY KEY (`CartID`),
-  KEY `CustomerID` (`CustomerID`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_cart_user` (`CustomerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `cart`
 --
 
 INSERT INTO `cart` (`CartID`, `CustomerID`, `CreatedDate`, `Status`) VALUES
-(1, 2, '2026-06-17 01:14:24', 'Active'),
-(2, 3, '2026-06-17 01:14:24', 'Abandoned');
+(1, 2, '2026-04-01 08:40:00', 'Completed'),
+(2, 3, '2026-04-02 09:20:00', 'Completed'),
+(3, 6, '2026-04-05 10:15:00', 'Active'),
+(4, 7, '2026-04-08 09:10:00', 'Completed'),
+(5, 8, '2026-04-09 16:30:00', 'Abandoned'),
+(6, 9, '2026-04-10 19:45:00', 'Active'),
+(7, 10, '2026-04-11 15:00:00', 'Completed'),
+(8, 2, '2026-04-15 08:00:00', 'Active'),
+(9, 3, '2026-04-16 11:20:00', 'Abandoned'),
+(10, 6, '2026-04-17 14:00:00', 'Active');
 
 -- --------------------------------------------------------
 
@@ -86,17 +101,24 @@ CREATE TABLE IF NOT EXISTS `cart_detail` (
   `ProductID` int NOT NULL,
   `Quantity` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`CartID`,`ProductID`),
-  KEY `ProductID` (`ProductID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_cartdetail_product` (`ProductID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `cart_detail`
 --
 
 INSERT INTO `cart_detail` (`CartID`, `ProductID`, `Quantity`) VALUES
-(1, 1, 2),
-(1, 2, 1),
-(2, 2, 1);
+(1, 1, 1),
+(1, 4, 1),
+(2, 2, 2),
+(2, 5, 1),
+(3, 8, 1),
+(4, 3, 1),
+(5, 9, 1),
+(6, 6, 5),
+(7, 7, 1),
+(8, 10, 1);
 
 -- --------------------------------------------------------
 
@@ -110,16 +132,23 @@ CREATE TABLE IF NOT EXISTS `category` (
   `CategoryName` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `Description` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`CategoryID`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `category`
 --
 
 INSERT INTO `category` (`CategoryID`, `CategoryName`, `Description`) VALUES
-(1, 'Văn học', 'Sách tiểu thuyết, truyện ngắn, tản văn'),
-(2, 'Công nghệ thông tin', 'Sách lập trình, khoa học máy tính, AI'),
-(3, 'Kinh tế', 'Sách quản trị kinh doanh, đầu tư, tài chính');
+(1, 'Văn học Việt Nam', 'Tiểu thuyết, truyện ngắn trong nước'),
+(2, 'Văn học Nước ngoài', 'Tiểu thuyết, truyện dịch'),
+(3, 'Kinh tế', 'Sách kinh doanh, quản trị, đầu tư'),
+(4, 'Tâm lý - Kỹ năng sống', 'Sách phát triển bản thân'),
+(5, 'Khoa học Công nghệ', 'Sách CNTT, mạng máy tính, lập trình'),
+(6, 'Thiếu nhi', 'Truyện tranh, sách khám phá cho trẻ em'),
+(7, 'Lịch sử', 'Sách về các triều đại, sự kiện lịch sử'),
+(8, 'Triết học', 'Sách tư tưởng, triết học Mác-Lênin, phương Tây'),
+(9, 'Ngoại ngữ', 'Sách học tiếng Anh, Nhật, Hàn...'),
+(10, 'Giáo trình', 'Tài liệu học tập cấp Đại học');
 
 -- --------------------------------------------------------
 
@@ -135,16 +164,24 @@ CREATE TABLE IF NOT EXISTS `delivery` (
   `DeliveryDate` datetime DEFAULT NULL,
   `ShippingFee` decimal(10,2) DEFAULT '0.00',
   PRIMARY KEY (`DeliveryID`),
-  KEY `OrderID` (`OrderID`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_delivery_order` (`OrderID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `delivery`
 --
 
 INSERT INTO `delivery` (`DeliveryID`, `OrderID`, `DeliveryStatus`, `DeliveryDate`, `ShippingFee`) VALUES
-(1, 1, 'Delivered', '2026-06-16 14:00:00', 30000.00),
-(2, 2, 'Preparing', NULL, 40000.00);
+(1, 1, 'Delivered', '2026-04-03 14:00:00', 30000.00),
+(2, 2, 'Delivered', '2026-04-04 10:30:00', 35000.00),
+(3, 3, 'Shipping', NULL, 30000.00),
+(4, 4, 'Preparing', NULL, 40000.00),
+(5, 5, 'Failed', NULL, 30000.00),
+(6, 6, 'Preparing', NULL, 30000.00),
+(7, 7, 'Shipping', NULL, 35000.00),
+(8, 8, 'Preparing', NULL, 40000.00),
+(9, 9, 'Preparing', NULL, 30000.00),
+(10, 10, 'Preparing', NULL, 45000.00);
 
 -- --------------------------------------------------------
 
@@ -161,17 +198,24 @@ CREATE TABLE IF NOT EXISTS `image` (
   `IsThumbnail` tinyint(1) DEFAULT '0',
   `SortOrder` int DEFAULT '0',
   PRIMARY KEY (`ImageID`),
-  KEY `ProductID` (`ProductID`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_image_product` (`ProductID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `image`
 --
 
 INSERT INTO `image` (`ImageID`, `ProductID`, `ImageURL`, `AltText`, `IsThumbnail`, `SortOrder`) VALUES
-(1, 1, '/images/nha-gia-kim.jpg', 'Bìa sách Nhà Giả Kim', 1, 1),
-(2, 2, '/images/clean-code.jpg', 'Bìa sách Clean Code', 1, 1),
-(3, 3, '/images/nghi-giau-lam-giau.jpg', 'Bìa sách Nghĩ Giàu Làm Giàu', 1, 1);
+(1, 1, '/images/matbiec_thumb.jpg', 'Bìa sách Mắt Biếc', 1, 1),
+(2, 1, '/images/matbiec_back.jpg', 'Mặt sau sách Mắt Biếc', 0, 2),
+(3, 2, '/images/nhagiakim_thumb.jpg', 'Bìa sách Nhà Giả Kim', 1, 1),
+(4, 3, '/images/richdad_thumb.jpg', 'Bìa sách Cha Giàu Cha Nghèo', 1, 1),
+(5, 4, '/images/dacnhantam_thumb.jpg', 'Bìa sách Đắc Nhân Tâm', 1, 1),
+(6, 5, '/images/cleancode_thumb.jpg', 'Bìa sách Clean Code', 1, 1),
+(7, 6, '/images/doremon1_thumb.jpg', 'Bìa sách Doraemon Tập 1', 1, 1),
+(8, 7, '/images/daiviet_thumb.jpg', 'Bìa sách Đại Việt Sử Ký Toàn Thư', 1, 1),
+(9, 8, '/images/triethoc_thumb.jpg', 'Bìa sách Triết học Mác-Lênin', 1, 1),
+(10, 9, '/images/hacknao_thumb.jpg', 'Bìa sách Hack Não 1500', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -189,17 +233,25 @@ CREATE TABLE IF NOT EXISTS `order` (
   `OrderStatus` enum('Pending','Processing','Shipped','Delivered','Cancelled') COLLATE utf8mb4_unicode_ci DEFAULT 'Pending',
   `TotalAmount` decimal(15,2) NOT NULL,
   PRIMARY KEY (`OrderID`),
-  KEY `CustomerID` (`CustomerID`),
-  KEY `VoucherID` (`VoucherID`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_order_user` (`CustomerID`),
+  KEY `fk_order_voucher` (`VoucherID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `order`
 --
 
 INSERT INTO `order` (`OrderID`, `CustomerID`, `VoucherID`, `OrderDate`, `ShippingAddress`, `OrderStatus`, `TotalAmount`) VALUES
-(1, 2, 1, '2026-06-17 01:14:24', '123 Đường Lê Lợi, Quận 1, TP.HCM', 'Delivered', 450000.00),
-(2, 3, NULL, '2026-06-17 01:14:24', '456 Đường Trần Phú, Quận Ba Đình, Hà Nội', 'Processing', 250000.00);
+(1, 2, 2, '2026-04-01 09:00:00', '123 Nguyễn Trãi, Quận 1, TP.HCM', 'Delivered', 145000.00),
+(2, 3, NULL, '2026-04-02 09:45:00', '456 Lê Lợi, Quận 1, TP.HCM', 'Delivered', 500000.00),
+(3, 7, 5, '2026-04-08 09:30:00', '12 Cách Mạng Tháng 8, Quận 3, TP.HCM', 'Shipped', 70000.00),
+(4, 10, 1, '2026-04-11 15:15:00', '78 Bạch Đằng, Hải Châu, Đà Nẵng', 'Processing', 350000.00),
+(5, 2, NULL, '2026-04-12 10:00:00', 'Tòa nhà Bitexco, Quận 1, TP.HCM', 'Cancelled', 85000.00),
+(6, 6, 8, '2026-04-13 14:20:00', '789 Điện Biên Phủ, Bình Thạnh, TP.HCM', 'Pending', 120000.00),
+(7, 8, NULL, '2026-04-14 16:00:00', '34 Xuân Thủy, Cầu Giấy, Hà Nội', 'Shipped', 90000.00),
+(8, 9, 3, '2026-04-15 19:30:00', '56 Nguyễn Chí Thanh, Đống Đa, Hà Nội', 'Processing', 345000.00),
+(9, 3, NULL, '2026-04-16 11:00:00', '11 Nguyễn Đình Chiểu, Quận 3, TP.HCM', 'Pending', 65000.00),
+(10, 10, 2, '2026-04-18 08:30:00', '78 Bạch Đằng, Hải Châu, Đà Nẵng', 'Pending', 200000.00);
 
 -- --------------------------------------------------------
 
@@ -212,19 +264,27 @@ CREATE TABLE IF NOT EXISTS `order_detail` (
   `OrderID` int NOT NULL,
   `ProductID` int NOT NULL,
   `Quantity` int NOT NULL,
+  `Price` int NOT NULL DEFAULT '0',
   `UnitPrice` decimal(15,2) NOT NULL,
   PRIMARY KEY (`OrderID`,`ProductID`),
-  KEY `ProductID` (`ProductID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_orderdetail_product` (`ProductID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `order_detail`
 --
 
-INSERT INTO `order_detail` (`OrderID`, `ProductID`, `Quantity`, `UnitPrice`) VALUES
-(1, 1, 2, 120000.00),
-(1, 2, 1, 310000.00),
-(2, 2, 1, 250000.00);
+INSERT INTO `order_detail` (`OrderID`, `ProductID`, `Quantity`, `Price`, `UnitPrice`) VALUES
+(1, 1, 1, 85000, 0.00),
+(1, 4, 1, 90000, 0.00),
+(2, 2, 2, 75000, 0.00),
+(2, 5, 1, 350000, 0.00),
+(3, 3, 1, 110000, 0.00),
+(4, 7, 1, 450000, 0.00),
+(5, 1, 1, 85000, 0.00),
+(6, 1, 1, 85000, 0.00),
+(7, 4, 1, 90000, 0.00),
+(8, 9, 1, 395000, 0.00);
 
 -- --------------------------------------------------------
 
@@ -240,16 +300,24 @@ CREATE TABLE IF NOT EXISTS `payment` (
   `PaymentStatus` enum('Pending','Completed','Failed','Refunded') COLLATE utf8mb4_unicode_ci DEFAULT 'Pending',
   `PaymentDate` datetime DEFAULT NULL,
   PRIMARY KEY (`PaymentID`),
-  KEY `OrderID` (`OrderID`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_payment_order` (`OrderID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `payment`
 --
 
 INSERT INTO `payment` (`PaymentID`, `OrderID`, `PaymentMethod`, `PaymentStatus`, `PaymentDate`) VALUES
-(1, 1, 'Credit Card', 'Completed', '2026-06-15 10:30:00'),
-(2, 2, 'COD', 'Pending', NULL);
+(1, 1, 'VNPay', 'Completed', '2026-04-01 09:05:00'),
+(2, 2, 'COD', 'Completed', '2026-04-04 10:30:00'),
+(3, 3, 'MoMo', 'Completed', '2026-04-08 09:35:00'),
+(4, 4, 'Credit Card', 'Completed', '2026-04-11 15:20:00'),
+(5, 5, 'VNPay', 'Refunded', '2026-04-12 11:00:00'),
+(6, 6, 'COD', 'Pending', NULL),
+(7, 7, 'Bank Transfer', 'Completed', '2026-04-14 16:10:00'),
+(8, 8, 'ZaloPay', 'Completed', '2026-04-15 19:35:00'),
+(9, 9, 'COD', 'Pending', NULL),
+(10, 10, 'VNPay', 'Pending', NULL);
 
 -- --------------------------------------------------------
 
@@ -262,21 +330,30 @@ CREATE TABLE IF NOT EXISTS `product` (
   `ProductID` int NOT NULL AUTO_INCREMENT,
   `CategoryID` int DEFAULT NULL,
   `ProductName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Price` int NOT NULL DEFAULT '0',
   `Quantity` int DEFAULT '0',
   `Description` text COLLATE utf8mb4_unicode_ci,
+  `Publisher` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'AlphaBooks',
   `Status` enum('Còn hàng','Hết hàng') COLLATE utf8mb4_unicode_ci DEFAULT 'Còn hàng',
   PRIMARY KEY (`ProductID`),
-  KEY `CategoryID` (`CategoryID`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_product_category` (`CategoryID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `product`
 --
 
-INSERT INTO `product` (`ProductID`, `CategoryID`, `ProductName`, `Quantity`, `Description`, `Status`) VALUES
-(1, 1, 'Nhà Giả Kim', 50, 'Tiểu thuyết kinh điển của Paulo Coelho', 'Còn hàng'),
-(2, 2, 'Clean Code', 20, 'Sách hay về viết mã sạch của Robert C. Martin', 'Còn hàng'),
-(3, 3, 'Nghĩ Giàu Làm Giàu', 0, 'Sách phát triển bản thân và kinh tế', 'Hết hàng');
+INSERT INTO `product` (`ProductID`, `CategoryID`, `ProductName`, `Price`, `Quantity`, `Description`, `Publisher`, `Status`) VALUES
+(1, 1, 'Mắt Biếc', 85000, 150, 'Tiểu thuyết của Nguyễn Nhật Ánh', 'AlphaBooks', 'Còn hàng'),
+(2, 2, 'Nhà Giả Kim', 75000, 200, 'Tiểu thuyết của Paulo Coelho', 'AlphaBooks', 'Còn hàng'),
+(3, 3, 'Cha Giàu Cha Nghèo', 110000, 50, 'Sách tài chính cá nhân', 'AlphaBooks', 'Còn hàng'),
+(4, 4, 'Đắc Nhân Tâm', 90000, 300, 'Sách kỹ năng giao tiếp', 'AlphaBooks', 'Còn hàng'),
+(5, 5, 'Clean Code', 350000, 20, 'Kỹ thuật viết mã sạch', 'AlphaBooks', 'Còn hàng'),
+(6, 6, 'Doraemon Tập 1', 20000, 500, 'Truyện tranh thiếu nhi', 'AlphaBooks', 'Còn hàng'),
+(7, 7, 'Đại Việt Sử Ký Toàn Thư', 450000, 10, 'Lịch sử Việt Nam', 'AlphaBooks', 'Còn hàng'),
+(8, 8, 'Giáo trình Triết học Mác-Lênin', 65000, 100, 'Giáo trình đại học chuẩn', 'AlphaBooks', 'Còn hàng'),
+(9, 9, 'Hack Não 1500 Từ Tiếng Anh', 395000, 80, 'Sách học từ vựng hiệu quả', 'AlphaBooks', 'Còn hàng'),
+(10, 5, 'Computer Networking: A Top-Down Approach', 550000, 0, 'Giáo trình mạng máy tính', 'AlphaBooks', 'Hết hàng');
 
 -- --------------------------------------------------------
 
@@ -292,15 +369,23 @@ CREATE TABLE IF NOT EXISTS `promotion` (
   `StartDate` datetime DEFAULT NULL,
   `EndDate` datetime DEFAULT NULL,
   PRIMARY KEY (`PromotionID`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `promotion`
 --
 
 INSERT INTO `promotion` (`PromotionID`, `PromotionName`, `DiscountPercent`, `StartDate`, `EndDate`) VALUES
-(1, 'Mùa Hè Sôi Động 2026', 15.00, '2026-06-01 00:00:00', '2026-06-30 23:59:59'),
-(2, 'Back to School', 10.00, '2026-08-15 00:00:00', '2026-09-15 23:59:59');
+(1, 'Summer Sale', 15.00, '2026-06-01 00:00:00', '2026-06-30 00:00:00'),
+(2, 'Back to School', 20.00, '2026-08-15 00:00:00', '2026-09-15 00:00:00'),
+(3, 'Black Friday', 50.00, '2026-11-20 00:00:00', '2026-11-30 00:00:00'),
+(4, 'Flash Sale Tháng 4', 10.00, '2026-04-01 00:00:00', '2026-04-05 00:00:00'),
+(5, 'Mừng tuổi mới', 25.00, '2026-01-01 00:00:00', '2026-01-10 00:00:00'),
+(6, 'Giải phóng miền Nam', 30.00, '2026-04-28 00:00:00', '2026-05-02 00:00:00'),
+(7, 'Quốc tế Phụ nữ', 15.00, '2026-03-05 00:00:00', '2026-03-10 00:00:00'),
+(8, 'Trung Thu Yêu Thương', 10.00, '2026-09-10 00:00:00', '2026-09-20 00:00:00'),
+(9, 'Clearance Sale', 40.00, '2026-12-15 00:00:00', '2026-12-31 00:00:00'),
+(10, 'Happy Weekend', 5.00, '2026-05-08 00:00:00', '2026-05-10 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -317,8 +402,8 @@ CREATE TABLE IF NOT EXISTS `review` (
   `Comment` text COLLATE utf8mb4_unicode_ci,
   `ReviewDate` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`ReviewID`),
-  KEY `CustomerID` (`CustomerID`),
-  KEY `ProductID` (`ProductID`)
+  KEY `fk_review_user` (`CustomerID`),
+  KEY `fk_review_product` (`ProductID`)
 ) ;
 
 --
@@ -326,8 +411,16 @@ CREATE TABLE IF NOT EXISTS `review` (
 --
 
 INSERT INTO `review` (`ReviewID`, `CustomerID`, `ProductID`, `Rating`, `Comment`, `ReviewDate`) VALUES
-(1, 2, 1, 5, 'Sách rất hay, giao hàng siêu nhanh. Sẽ ủng hộ shop tiếp!', '2026-06-17 01:14:25'),
-(2, 2, 2, 4, 'Nội dung bổ ích nhưng bìa hơi móp một chút xíu.', '2026-06-17 01:14:25');
+(1, 2, 1, 5, 'Sách rất hay và cảm động!', '2026-04-05 10:00:00'),
+(2, 3, 2, 5, 'Nội dung truyền cảm hứng tuyệt vời.', '2026-04-06 11:30:00'),
+(3, 6, 3, 4, 'Kiến thức tài chính thực tế, dễ hiểu.', '2026-04-07 14:15:00'),
+(4, 7, 5, 5, 'Cuốn sách bắt buộc phải có cho lập trình viên.', '2026-04-08 09:20:00'),
+(5, 8, 8, 4, 'Giáo trình chuẩn, giao hàng bọc cẩn thận.', '2026-04-09 16:45:00'),
+(6, 9, 6, 5, 'Tuổi thơ ùa về, giấy in đẹp.', '2026-04-10 20:00:00'),
+(7, 10, 9, 3, 'Học cũng khá ổn nhưng cần kiên trì.', '2026-04-11 15:10:00'),
+(8, 2, 4, 5, 'Đọc đi đọc lại vẫn thấy đúng.', '2026-04-12 08:05:00'),
+(9, 3, 7, 5, 'Sách bọc bìa cứng rất xịn xò, đáng tiền.', '2026-04-13 19:30:00'),
+(10, 6, 1, 4, 'Truyện hơi buồn nhưng văn phong mượt mà.', '2026-04-14 21:00:00');
 
 -- --------------------------------------------------------
 
@@ -341,15 +434,23 @@ CREATE TABLE IF NOT EXISTS `role` (
   `RoleName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `Description` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`RoleID`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `role`
 --
 
 INSERT INTO `role` (`RoleID`, `RoleName`, `Description`) VALUES
-(1, 'Admin', 'Quản trị viên toàn quyền hệ thống'),
-(2, 'Customer', 'Khách hàng mua sắm trên hệ thống');
+(1, 'Admin', 'Quản trị viên hệ thống'),
+(2, 'Customer', 'Khách hàng mua sách'),
+(3, 'Manager', 'Quản lý cửa hàng'),
+(4, 'Staff', 'Nhân viên bán hàng'),
+(5, 'Shipper', 'Nhân viên giao hàng'),
+(6, 'Accountant', 'Nhân viên kế toán'),
+(7, 'Editor', 'Biên tập viên nội dung'),
+(8, 'Marketing', 'Nhân viên Marketing'),
+(9, 'Support', 'Nhân viên chăm sóc khách hàng'),
+(10, 'Guest', 'Người dùng vãng lai');
 
 -- --------------------------------------------------------
 
@@ -368,17 +469,24 @@ CREATE TABLE IF NOT EXISTS `user` (
   `Phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`CustomerID`),
   UNIQUE KEY `Email` (`Email`),
-  KEY `RoleID` (`RoleID`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_user_role` (`RoleID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `user`
 --
 
 INSERT INTO `user` (`CustomerID`, `RoleID`, `LastName`, `FirstName`, `Email`, `Password`, `Phone`) VALUES
-(1, 1, 'Nguyễn', 'Văn A', 'admin@bookstore.com', '$2y$10$dummyhashedpassword1', '0901234567'),
-(2, 2, 'Trần', 'Thị B', 'khachhang1@gmail.com', '$2y$10$dummyhashedpassword2', '0987654321'),
-(3, 2, 'Lê', 'Văn C', 'khachhang2@gmail.com', '$2y$10$dummyhashedpassword3', '0912345678');
+(1, 1, 'Nguyễn', 'Quản Trị', 'admin@bookstore.vn', 'hashed_pass_1', '0901234567'),
+(2, 2, 'Trần', 'Khách Hàng 1', 'khach1@gmail.com', 'hashed_pass_2', '0912345678'),
+(3, 2, 'Lê', 'Khách Hàng 2', 'khach2@gmail.com', 'hashed_pass_3', '0923456789'),
+(4, 4, 'Phạm', 'Nhân Viên', 'staff1@bookstore.vn', 'hashed_pass_4', '0934567890'),
+(5, 5, 'Hoàng', 'Giao Hàng', 'shipper@bookstore.vn', 'hashed_pass_5', '0945678901'),
+(6, 2, 'Vũ', 'Khách Hàng 3', 'khach3@gmail.com', 'hashed_pass_6', '0956789012'),
+(7, 2, 'Đặng', 'Khách Hàng 4', 'khach4@gmail.com', 'hashed_pass_7', '0967890123'),
+(8, 2, 'Bùi', 'Khách Hàng 5', 'khach5@gmail.com', 'hashed_pass_8', '0978901234'),
+(9, 2, 'Đỗ', 'Khách Hàng 6', 'khach6@gmail.com', 'hashed_pass_9', '0989012345'),
+(10, 2, 'Hồ', 'Khách Hàng 7', 'khach7@gmail.com', 'hashed_pass_10', '0990123456');
 
 -- --------------------------------------------------------
 
@@ -393,18 +501,24 @@ CREATE TABLE IF NOT EXISTS `user_log` (
   `Action` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `LogDate` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`LogID`),
-  KEY `CustomerID` (`CustomerID`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_userlog_user` (`CustomerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `user_log`
 --
 
 INSERT INTO `user_log` (`LogID`, `CustomerID`, `Action`, `LogDate`) VALUES
-(1, 2, 'User logged in', '2026-06-17 01:14:25'),
-(2, 2, 'User added product 1 to cart', '2026-06-17 01:14:25'),
-(3, 2, 'User placed order ID 1', '2026-06-17 01:14:25'),
-(4, 1, 'Admin updated product stock', '2026-06-17 01:14:25');
+(1, 2, 'Đăng nhập hệ thống', '2026-04-01 08:30:00'),
+(2, 2, 'Xem sản phẩm ID 1', '2026-04-01 08:35:00'),
+(3, 3, 'Đăng nhập hệ thống', '2026-04-02 09:15:00'),
+(4, 3, 'Thêm sản phẩm ID 5 vào giỏ', '2026-04-02 09:20:00'),
+(5, 6, 'Cập nhật địa chỉ giao hàng', '2026-04-03 10:00:00'),
+(6, 7, 'Đăng xuất', '2026-04-03 10:45:00'),
+(7, 8, 'Thanh toán đơn hàng', '2026-04-04 14:20:00'),
+(8, 1, 'Cập nhật giá sản phẩm ID 10', '2026-04-04 15:00:00'),
+(9, 9, 'Đăng ký tài khoản mới', '2026-04-05 11:11:00'),
+(10, 10, 'Áp dụng voucher NEWUSER100', '2026-04-05 11:20:00');
 
 -- --------------------------------------------------------
 
@@ -420,15 +534,103 @@ CREATE TABLE IF NOT EXISTS `voucher` (
   `ExpiredDate` datetime DEFAULT NULL,
   PRIMARY KEY (`VoucherID`),
   UNIQUE KEY `VoucherCode` (`VoucherCode`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `voucher`
 --
 
 INSERT INTO `voucher` (`VoucherID`, `VoucherCode`, `DiscountValue`, `ExpiredDate`) VALUES
-(1, 'WELCOME100K', 100000.00, '2026-12-31 23:59:59'),
-(2, 'FREESHIP50K', 50000.00, '2026-12-31 23:59:59');
+(1, 'NEWUSER100', 100000.00, '2026-12-31 00:00:00'),
+(2, 'FREESHIP', 30000.00, '2026-06-30 00:00:00'),
+(3, 'GIAM50K', 50000.00, '2026-05-01 00:00:00'),
+(4, 'BOOKLOVE', 20000.00, '2026-08-01 00:00:00'),
+(5, 'STUDENT', 40000.00, '2026-10-01 00:00:00'),
+(6, 'VIPONLY', 200000.00, '2026-12-31 00:00:00'),
+(7, 'SALEALL', 15000.00, '2026-07-01 00:00:00'),
+(8, 'WEEKEND', 25000.00, '2026-05-31 00:00:00'),
+(9, 'NIGHTOWL', 35000.00, '2026-04-30 00:00:00'),
+(10, 'BIRTHDAY', 100000.00, '2026-12-31 00:00:00');
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `address`
+--
+ALTER TABLE `address`
+  ADD CONSTRAINT `fk_address_user` FOREIGN KEY (`CustomerID`) REFERENCES `user` (`CustomerID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `cart`
+--
+ALTER TABLE `cart`
+  ADD CONSTRAINT `fk_cart_user` FOREIGN KEY (`CustomerID`) REFERENCES `user` (`CustomerID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `cart_detail`
+--
+ALTER TABLE `cart_detail`
+  ADD CONSTRAINT `fk_cartdetail_cart` FOREIGN KEY (`CartID`) REFERENCES `cart` (`CartID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_cartdetail_product` FOREIGN KEY (`ProductID`) REFERENCES `product` (`ProductID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `delivery`
+--
+ALTER TABLE `delivery`
+  ADD CONSTRAINT `fk_delivery_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `image`
+--
+ALTER TABLE `image`
+  ADD CONSTRAINT `fk_image_product` FOREIGN KEY (`ProductID`) REFERENCES `product` (`ProductID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `order`
+--
+ALTER TABLE `order`
+  ADD CONSTRAINT `fk_order_user` FOREIGN KEY (`CustomerID`) REFERENCES `user` (`CustomerID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_order_voucher` FOREIGN KEY (`VoucherID`) REFERENCES `voucher` (`VoucherID`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `order_detail`
+--
+ALTER TABLE `order_detail`
+  ADD CONSTRAINT `fk_orderdetail_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_orderdetail_product` FOREIGN KEY (`ProductID`) REFERENCES `product` (`ProductID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `payment`
+--
+ALTER TABLE `payment`
+  ADD CONSTRAINT `fk_payment_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `product`
+--
+ALTER TABLE `product`
+  ADD CONSTRAINT `fk_product_category` FOREIGN KEY (`CategoryID`) REFERENCES `category` (`CategoryID`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `review`
+--
+ALTER TABLE `review`
+  ADD CONSTRAINT `fk_review_product` FOREIGN KEY (`ProductID`) REFERENCES `product` (`ProductID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_review_user` FOREIGN KEY (`CustomerID`) REFERENCES `user` (`CustomerID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user`
+--
+ALTER TABLE `user`
+  ADD CONSTRAINT `fk_user_role` FOREIGN KEY (`RoleID`) REFERENCES `role` (`RoleID`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `user_log`
+--
+ALTER TABLE `user_log`
+  ADD CONSTRAINT `fk_userlog_user` FOREIGN KEY (`CustomerID`) REFERENCES `user` (`CustomerID`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
