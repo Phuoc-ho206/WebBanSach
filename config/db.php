@@ -25,14 +25,16 @@ $conn->set_charset("utf8mb4");
 
 // Hàm tạo đường dẫn tĩnh cho assets (CSS, JS, Images)
 if (!function_exists('asset')) {
-    function asset($path) {
+    function asset($path)
+    {
         return '/WebBanSach/assets/' . ltrim($path, '/');
     }
 }
 
 // Hàm tạo đường dẫn absolute cho các trang
 if (!function_exists('url')) {
-    function url($path = '') {
+    function url($path = '')
+    {
         return '/WebBanSach/' . ltrim($path, '/');
     }
 }
