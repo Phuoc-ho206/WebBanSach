@@ -1,7 +1,37 @@
 <?php
 session_start();
+require_once '../controller/authcontroller.php';
 require_once '../controller/GoogleAuthController.php';
 require_once '../controller/fbauthcontroller.php';
+
+// Nếu đã đăng nhập → về trang chủ
+if (isset($_SESSION['user'])) {
+    header('Location: /WebBanSach/index.php');
+    exit;
+}
+
+// Xử lý đăng nhập bằng form
+$error = '';
+$success = $_SESSION['success'] ?? '';
+unset($_SESSION['success']);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $identity = $_POST['identity'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    if (empty($identity) || empty($password)) {
+        $error = 'Vui lòng nhập đầy đủ thông tin đăng nhập.';
+    } else {
+        $user = AuthController::login($identity, $password);
+        if ($user) {
+            $_SESSION['user'] = $user;
+            header('Location: /WebBanSach/index.php');
+            exit;
+        } else {
+            $error = 'Tên đăng nhập hoặc mật khẩu không đúng.';
+        }
+    }
+}
 
 // Xử lý callback từ Google
 if (isset($_GET['code'])) {
@@ -124,6 +154,18 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
 <body>
     <div class="card auth-card">
         <h1>Đăng nhập</h1>
+        <?php if ($error): ?>
+            <div
+                style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; text-align: center; border: 1px solid #f5c6cb;">
+                <?= htmlspecialchars($error) ?>
+            </div>
+        <?php endif; ?>
+        <?php if ($success): ?>
+            <div
+                style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; text-align: center; border: 1px solid #c3e6cb;">
+                <?= htmlspecialchars($success) ?>
+            </div>
+        <?php endif; ?>
         <div
             style="background-color: #e3f2fd; color: #0277bd; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; text-align: center; border: 1px solid #81d4fa;">
             <strong>Tài khoản Demo:</strong><br>
@@ -150,9 +192,9 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
                 <a class="btn btn-secondary register-link" href="/WebBanSach/auth/pages/register.php">Đăng ký</a>
             </div>
             <div class="actions">
-                <a href="/WebBanSach/auth/pages/profile.php" class="btn btn-primary"
-                    style="display:flex; align-items:center; justify-content:center; text-decoration: none; font-weight: bold; color: white; background-color: #ff6b1a;">
-                    Đăng nhập</a>
+                <button type="submit" class="btn btn-primary"
+                    style="display:flex; align-items:center; justify-content:center; font-weight: bold; color: white; background-color: #ff6b1a; border: none; cursor: pointer;">
+                    Đăng nhập</button>
                 <a href="<?= $google_login_url ?>" class="btn btn-primary"
                     style="text-align:center; text-decoration:none; font-weight: bold; color: white; display:flex; align-items:center; justify-content:center; background-color: #ef3030ff; gap: 8px;">
                     <img src="/WebBanSach/assets/images/icon/gg.png" alt="Google"
