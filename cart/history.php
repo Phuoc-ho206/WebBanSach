@@ -1,5 +1,5 @@
 <?php
-require_once '../includes/config.php';
+require_once '../config/db.php';
 $pageTitle = 'Lịch sử đơn hàng';
 $extraCss = ['css/cart.css'];
 include '../includes/header.php';

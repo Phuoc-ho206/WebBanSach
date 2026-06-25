@@ -1,10 +1,9 @@
 <?php
-require_once '../includes/config.php';
+require_once '../config/db.php';
 $pageTitle = 'Theo dõi đơn hàng #WBS-954021';
 $extraCss = ['css/cart.css'];
 include '../includes/header.php';
 ?>
-
 <!-- Main Content -->
 <main class="order-container">
     <!-- Breadcrumbs -->
