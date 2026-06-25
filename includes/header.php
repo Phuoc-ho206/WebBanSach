@@ -9,7 +9,7 @@ $pageTitle = $pageTitle ?? 'WebBanSach';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?></title>
-    <link rel="stylesheet" href="<?= asset('css/variables.css') ?>">
+    <link rel="stylesheet" href="/WebBanSach/assets/css/variables.css">
 
     <!-- Layout -->
     <link rel="stylesheet" href="<?= asset('css/components/navbar.css') ?>">
@@ -26,7 +26,7 @@ $pageTitle = $pageTitle ?? 'WebBanSach';
     <link rel="stylesheet" href="<?= asset('css/components/table.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/components/spinner.css') ?>">
     <?php if (isset($extraCss)): ?>
-        <?php foreach ((array)$extraCss as $css): ?>
+        <?php foreach ((array) $extraCss as $css): ?>
             <link rel="stylesheet" href="<?= asset($css) ?>">
         <?php endforeach; ?>
     <?php endif; ?>
