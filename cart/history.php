@@ -5,27 +5,6 @@ $extraCss = ['css/cart.css'];
 include '../includes/header.php';
 ?>
 
-<!-- Header / Navbar -->
-<header class="navbar">
-    <a href="<?= url('/') ?>" class="navbar__brand">
-        <span style="color: var(--color-primary); font-size: 1.8rem; font-weight: 800;">📚 WebBanSach</span>
-    </a>
-    <button class="navbar__toggle" aria-label="Toggle Navigation">☰</button>
-    <ul class="navbar__menu">
-        <li class="navbar__item"><a href="<?= url('/') ?>" class="navbar__link">Trang chủ</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Cửa hàng</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Tin tức</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Giới thiệu</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Liên hệ</a></li>
-    </ul>
-    <div class="navbar__actions">
-        <a href="#" class="btn btn--ghost btn--sm" style="position: relative;">
-            🛒 Giỏ hàng
-            <span class="badge badge--primary" style="position: absolute; top: -5px; right: -5px;">3</span>
-        </a>
-        <a href="<?= url('auth/pages/profile.php') ?>" class="btn btn--primary btn--sm">Tài khoản</a>
-    </div>
-</header>
 
 <!-- Main Content -->
 <main class="order-container">
@@ -69,15 +48,18 @@ include '../includes/header.php';
             <div class="order-card__products">
                 <!-- Product 1 -->
                 <a href="detail.php" class="order-card__product">
-                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o1)"/>
-                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3"/>
-                        <text x="12" y="36" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">ĐẮC NHÂN</text>
+                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o1)" />
+                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3" />
+                        <text x="12" y="36" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">ĐẮC
+                            NHÂN</text>
                         <text x="12" y="44" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">TÂM</text>
                         <defs>
-                            <linearGradient id="paint0_linear_o1" x1="0" y1="0" x2="64" y2="86" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#4A9B7F"/>
-                                <stop offset="1" stop-color="#2D5F5D"/>
+                            <linearGradient id="paint0_linear_o1" x1="0" y1="0" x2="64" y2="86"
+                                gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#4A9B7F" />
+                                <stop offset="1" stop-color="#2D5F5D" />
                             </linearGradient>
                         </defs>
                     </svg>
@@ -93,15 +75,18 @@ include '../includes/header.php';
 
                 <!-- Product 2 -->
                 <a href="detail.php" class="order-card__product">
-                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o2)"/>
-                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3"/>
-                        <text x="12" y="36" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">NHÀ GIẢ</text>
+                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o2)" />
+                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3" />
+                        <text x="12" y="36" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">NHÀ
+                            GIẢ</text>
                         <text x="12" y="44" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">KIM</text>
                         <defs>
-                            <linearGradient id="paint0_linear_o2" x1="0" y1="0" x2="64" y2="86" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#FF7A3D"/>
-                                <stop offset="1" stop-color="#E05B1E"/>
+                            <linearGradient id="paint0_linear_o2" x1="0" y1="0" x2="64" y2="86"
+                                gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#FF7A3D" />
+                                <stop offset="1" stop-color="#E05B1E" />
                             </linearGradient>
                         </defs>
                     </svg>
@@ -142,15 +127,19 @@ include '../includes/header.php';
             <div class="order-card__products">
                 <!-- Product 1 -->
                 <a href="detail.php" class="order-card__product">
-                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o3)"/>
-                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3"/>
-                        <text x="12" y="32" fill="#fff" font-family="Arial" font-size="5" font-weight="bold">SÚNG, VI TRÙNG</text>
-                        <text x="12" y="38" fill="#fff" font-family="Arial" font-size="5" font-weight="bold">VÀ THÉP</text>
+                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o3)" />
+                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3" />
+                        <text x="12" y="32" fill="#fff" font-family="Arial" font-size="5" font-weight="bold">SÚNG, VI
+                            TRÙNG</text>
+                        <text x="12" y="38" fill="#fff" font-family="Arial" font-size="5" font-weight="bold">VÀ
+                            THÉP</text>
                         <defs>
-                            <linearGradient id="paint0_linear_o3" x1="0" y1="0" x2="64" y2="86" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#1565c0"/>
-                                <stop offset="1" stop-color="#0d47a1"/>
+                            <linearGradient id="paint0_linear_o3" x1="0" y1="0" x2="64" y2="86"
+                                gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#1565c0" />
+                                <stop offset="1" stop-color="#0d47a1" />
                             </linearGradient>
                         </defs>
                     </svg>
@@ -191,15 +180,19 @@ include '../includes/header.php';
             <div class="order-card__products">
                 <!-- Product 1 -->
                 <a href="detail.php" class="order-card__product">
-                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o4)"/>
-                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3"/>
-                        <text x="12" y="36" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">TƯ DUY NHANH</text>
-                        <text x="12" y="44" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">& CHẬM</text>
+                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o4)" />
+                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3" />
+                        <text x="12" y="36" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">TƯ DUY
+                            NHANH</text>
+                        <text x="12" y="44" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">&
+                            CHẬM</text>
                         <defs>
-                            <linearGradient id="paint0_linear_o4" x1="0" y1="0" x2="64" y2="86" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#E63946"/>
-                                <stop offset="1" stop-color="#9A031E"/>
+                            <linearGradient id="paint0_linear_o4" x1="0" y1="0" x2="64" y2="86"
+                                gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#E63946" />
+                                <stop offset="1" stop-color="#9A031E" />
                             </linearGradient>
                         </defs>
                     </svg>
@@ -232,7 +225,7 @@ include '../includes/header.php';
 
 <!-- Script to toggle navbar on mobile -->
 <script>
-    document.querySelector('.navbar__toggle').addEventListener('click', function() {
+    document.querySelector('.navbar__toggle').addEventListener('click', function () {
         document.querySelector('.navbar').classList.toggle('is-open');
     });
 
@@ -243,7 +236,7 @@ include '../includes/header.php';
             e.preventDefault();
             tabs.forEach(t => t.classList.remove('is-active'));
             tab.classList.add('is-active');
-            
+
             // Demo filtering feedback
             const status = tab.getAttribute('href').split('=')[1];
             const cards = document.querySelectorAll('.order-card');
@@ -264,4 +257,5 @@ include '../includes/header.php';
     });
 </script>
 </body>
+
 </html>

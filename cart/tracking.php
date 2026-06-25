@@ -5,7 +5,7 @@ $extraCss = ['css/cart.css'];
 include '../includes/header.php';
 ?>
 
-<!-- Header / Navbar -->
+<!-- Header / Navbar
 <header class="navbar">
     <a href="<?= url('/') ?>" class="navbar__brand">
         <span style="color: var(--color-primary); font-size: 1.8rem; font-weight: 800;">📚 WebBanSach</span>
@@ -25,7 +25,7 @@ include '../includes/header.php';
         </a>
         <a href="<?= url('auth/pages/profile.php') ?>" class="btn btn--primary btn--sm">Tài khoản</a>
     </div>
-</header>
+</header> -->
 
 <!-- Main Content -->
 <main class="order-container">
@@ -51,7 +51,8 @@ include '../includes/header.php';
             </div>
             <div>
                 <div class="tracking-info-item__label">Mã vận đơn</div>
-                <div class="tracking-info-item__value" style="color: var(--color-primary); font-family: monospace;">GHN-492104820</div>
+                <div class="tracking-info-item__value" style="color: var(--color-primary); font-family: monospace;">
+                    GHN-492104820</div>
             </div>
             <div>
                 <div class="tracking-info-item__label">Thời gian giao dự kiến</div>
@@ -65,12 +66,13 @@ include '../includes/header.php';
 
     <!-- Detailed Journey Timeline -->
     <div class="timeline-card">
-        <h2 style="font-size: var(--font-size-lg); margin-top: 0; margin-bottom: var(--spacing-lg); font-weight: var(--font-weight-bold); border-bottom: 2px solid var(--color-background); padding-bottom: var(--spacing-sm);">
+        <h2
+            style="font-size: var(--font-size-lg); margin-top: 0; margin-bottom: var(--spacing-lg); font-weight: var(--font-weight-bold); border-bottom: 2px solid var(--color-background); padding-bottom: var(--spacing-sm);">
             📍 Trạng thái vận chuyển chi tiết
         </h2>
 
         <div class="timeline">
-            
+
             <!-- Step 6: Delivered (Inactive) -->
             <div class="timeline-item">
                 <div class="timeline-badge">✓</div>
@@ -91,7 +93,8 @@ include '../includes/header.php';
                         <h3 class="timeline-title">Shipper đang giao hàng</h3>
                         <span class="timeline-time">Dự kiến: 09/06/2026</span>
                     </div>
-                    <p class="timeline-desc">Nhân viên giao hàng sẽ nhận hàng từ bưu cục phát và tiến hành liên hệ, giao đến tay khách hàng.</p>
+                    <p class="timeline-desc">Nhân viên giao hàng sẽ nhận hàng từ bưu cục phát và tiến hành liên hệ, giao
+                        đến tay khách hàng.</p>
                 </div>
             </div>
 
@@ -103,7 +106,8 @@ include '../includes/header.php';
                         <h3 class="timeline-title">Đơn hàng đang trung chuyển</h3>
                         <span class="timeline-time">08/06/2026 08:30</span>
                     </div>
-                    <p class="timeline-desc">Hàng đã rời bưu cục trung chuyển Quận 1 SOC, đang được trung chuyển tới bưu cục phát gần địa chỉ giao hàng.</p>
+                    <p class="timeline-desc">Hàng đã rời bưu cục trung chuyển Quận 1 SOC, đang được trung chuyển tới bưu
+                        cục phát gần địa chỉ giao hàng.</p>
                 </div>
             </div>
 
@@ -115,7 +119,8 @@ include '../includes/header.php';
                         <h3 class="timeline-title">Đã nhập kho phân loại hàng</h3>
                         <span class="timeline-time">07/06/2026 18:20</span>
                     </div>
-                    <p class="timeline-desc">Đơn hàng được tiếp nhận tại bưu cục gốc Quận 1 SOC và phân loại thành công.</p>
+                    <p class="timeline-desc">Đơn hàng được tiếp nhận tại bưu cục gốc Quận 1 SOC và phân loại thành công.
+                    </p>
                 </div>
             </div>
 
@@ -127,7 +132,8 @@ include '../includes/header.php';
                         <h3 class="timeline-title">Nhân viên vận chuyển đã lấy hàng</h3>
                         <span class="timeline-time">07/06/2026 16:00</span>
                     </div>
-                    <p class="timeline-desc">Shipper GHN đã đến cửa hàng lấy gói sản phẩm và cập nhật trạng thái lên hệ thống.</p>
+                    <p class="timeline-desc">Shipper GHN đã đến cửa hàng lấy gói sản phẩm và cập nhật trạng thái lên hệ
+                        thống.</p>
                 </div>
             </div>
 
@@ -139,14 +145,16 @@ include '../includes/header.php';
                         <h3 class="timeline-title">Đặt hàng thành công</h3>
                         <span class="timeline-time">07/06/2026 14:30</span>
                     </div>
-                    <p class="timeline-desc">Đơn hàng #WBS-954021 được ghi nhận thành công trên hệ thống. Phương thức thanh toán được chọn là COD.</p>
+                    <p class="timeline-desc">Đơn hàng #WBS-954021 được ghi nhận thành công trên hệ thống. Phương thức
+                        thanh toán được chọn là COD.</p>
                 </div>
             </div>
 
         </div>
 
         <!-- Page actions -->
-        <div style="display: flex; gap: var(--spacing-md); justify-content: center; margin-top: var(--spacing-xl); border-top: 1px solid var(--color-border); padding-top: var(--spacing-lg);">
+        <div
+            style="display: flex; gap: var(--spacing-md); justify-content: center; margin-top: var(--spacing-xl); border-top: 1px solid var(--color-border); padding-top: var(--spacing-lg);">
             <a href="detail.php" class="btn btn--outline">
                 📄 Xem chi tiết đơn hàng
             </a>
@@ -161,9 +169,10 @@ include '../includes/header.php';
 
 <!-- Script to toggle navbar on mobile -->
 <script>
-    document.querySelector('.navbar__toggle').addEventListener('click', function() {
+    document.querySelector('.navbar__toggle').addEventListener('click', function () {
         document.querySelector('.navbar').classList.toggle('is-open');
     });
 </script>
 </body>
+
 </html>

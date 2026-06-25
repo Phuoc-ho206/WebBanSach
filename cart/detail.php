@@ -5,7 +5,7 @@ $extraCss = ['css/cart.css'];
 include '../includes/header.php';
 ?>
 
-<!-- Header / Navbar -->
+<!-- Header / Navbar
 <header class="navbar">
     <a href="<?= url('/') ?>" class="navbar__brand">
         <span style="color: var(--color-primary); font-size: 1.8rem; font-weight: 800;">📚 WebBanSach</span>
@@ -25,7 +25,7 @@ include '../includes/header.php';
         </a>
         <a href="<?= url('auth/pages/profile.php') ?>" class="btn btn--primary btn--sm">Tài khoản</a>
     </div>
-</header>
+</header> -->
 
 <!-- Main Content -->
 <main class="order-container">
