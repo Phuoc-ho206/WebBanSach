@@ -230,4 +230,3 @@ if (isset($conn)) {
             document.querySelector('.navbar').classList.toggle('is-open');
         }
     </script>
-    >>>>>>> 8399a490937719bf47c6fa431463539229b6ebad
