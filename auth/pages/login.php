@@ -100,6 +100,19 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
             box-sizing: border-box
         }
 
+        .remember-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .remember-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+            padding: 0;
+        }
+
         .input-row {
             display: flex;
             gap: 8px;
