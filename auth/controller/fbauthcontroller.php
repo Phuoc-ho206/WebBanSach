@@ -68,7 +68,7 @@ class fbauthcontroller
     private static function saveOrUpdateUser($userData)
     {
         // Kết nối database
-        $conn = new mysqli('localhost', 'root', '', 'websach'); // Thay 'websach' bằng tên database của bạn
+        $conn = new mysqli('localhost', 'root', '', 'bookstore');
 
         if ($conn->connect_error) {
             return false;
