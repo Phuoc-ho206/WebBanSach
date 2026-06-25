@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // 2. Check email tồn tại
         try {
-            $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt = $conn->prepare("SELECT CustomerId FROM user WHERE email = ?");
             $stmt->bind_param("s", $email);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -196,7 +196,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="subtitle">Nhập email để nhận mã OTP</p>
 
         <?php if ($error): ?>
-            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+            <div class="alert alert-danger">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
         <?php endif; ?>
 
         <form method="POST">
