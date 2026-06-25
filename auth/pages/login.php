@@ -4,6 +4,13 @@ require_once '../controller/authcontroller.php';
 require_once '../controller/GoogleAuthController.php';
 require_once '../controller/fbauthcontroller.php';
 
+// Xử lý logout
+if (isset($_POST['action']) && $_POST['action'] === 'logout') {
+    AuthController::logout();
+    header('Location: /WebBanSach/index.php');
+    exit;
+}
+
 // Nếu đã đăng nhập → về trang chủ
 if (isset($_SESSION['user'])) {
     header('Location: /WebBanSach/index.php');
@@ -16,7 +23,7 @@ $success = $_SESSION['success'] ?? '';
 unset($_SESSION['success']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $identity = $_POST['identity'] ?? '';
+    $identity = trim($_POST['identity'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if (empty($identity) || empty($password)) {
@@ -46,9 +53,6 @@ if (isset($_GET['code'])) {
 $google_login_url = googleauthcontroller::getLoginUrl();
 $facebook_login_url = fbauthcontroller::getLoginUrl();
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="vi">

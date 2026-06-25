@@ -1,38 +1,71 @@
 <?php
+session_start();
+
+// Kiểm tra đã login chưa
+if (!isset($_SESSION['user'])) {
+    header('Location: /WebBanSach/auth/pages/login.php');
+    exit;
+}
+
 require_once '../../config/db.php';
+require_once '../../auth/controller/profilecontroller.php';
+
 $pageTitle = 'Hồ sơ cá nhân';
 include '../../includes/header.php';
-// if (!isset($_SESSION['profile'])) {
-//     $_SESSION['profile'] = [
-//         'username' => 'nguyenvana',
-//         'full_name' => 'Nguyễn Văn A',
-//         'email' => 'nguyenvana@email.com',
-//         'phone' => '090 123 4567',
-//         'address' => '123 Đường ABC, Quận 1, TP. Hồ Chí Minh'
-//     ];
-// }
 
-// $isUpdated = false;
-// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-//     $_SESSION['profile']['username'] = $_POST['username'] ?? $_SESSION['profile']['username'];
-//     $_SESSION['profile']['full_name'] = $_POST['full_name'] ?? $_SESSION['profile']['full_name'];
-//     $_SESSION['profile']['email'] = $_POST['email'] ?? $_SESSION['profile']['email'];
-//     $_SESSION['profile']['phone'] = $_POST['phone'] ?? $_SESSION['profile']['phone'];
-//     $_SESSION['profile']['address'] = $_POST['address'] ?? $_SESSION['profile']['address'];
-//     $isUpdated = true;
-// }
+$userId = $_SESSION['user']['id'];
+$error = '';
+$success = $_SESSION['success'] ?? '';
+unset($_SESSION['success']);
 
-// $profile = $_SESSION['profile'];
+// Load user data từ DB
+$profileController = new ProfileController();
+$userData = $profileController->getUserProfile($userId);
 
-// // Tính từ viết tắt từ họ và tên
-// $words = explode(' ', $profile['full_name']);
-// $initials = '';
-// if (count($words) >= 2) {
-//     $initials = mb_substr($words[0], 0, 1) . mb_substr(end($words), 0, 1);
-// } else {
-//     $initials = mb_substr($profile['full_name'], 0, 2);
-// }
-// $initials = mb_strtoupper($initials);
+// Nếu không load được data từ DB, dùng data từ session
+if (!$userData) {
+    $userData = $_SESSION['user'];
+}
+
+// Xử lý POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = [
+        'username' => trim($_POST['username'] ?? ''),
+        'full_name' => trim($_POST['full_name'] ?? ''),
+        'email' => trim($_POST['email'] ?? ''),
+        'phone' => trim($_POST['phone'] ?? ''),
+        'address' => trim($_POST['address'] ?? ''),
+        'current_password' => $_POST['current_password'] ?? '',
+        'new_password' => $_POST['new_password'] ?? '',
+        'confirm_password' => $_POST['confirm_password'] ?? ''
+    ];
+
+    // Kiểm tra xem có đổi mật khẩu không
+    if (!empty($data['current_password']) || !empty($data['new_password']) || !empty($data['confirm_password'])) {
+        // Có đổi mật khẩu
+        $result = $profileController->changePassword(
+            $userId,
+            $data['current_password'],
+            $data['new_password'],
+            $data['confirm_password']
+        );
+    } else {
+        // Chỉ cập nhật thông tin cá nhân
+        $result = $profileController->updateProfile($userId, $data);
+    }
+
+    if ($result['success']) {
+        $_SESSION['success'] = $result['message'];
+        // Reload user data
+        $userData = $profileController->getUserProfile($userId);
+        // Update session
+        $_SESSION['user'] = array_merge($_SESSION['user'], $userData);
+        header('Location: /WebBanSach/auth/pages/profile.php');
+        exit;
+    } else {
+        $error = $result['message'];
+    }
+}
 ?>
 
 <style>
@@ -182,10 +215,26 @@ include '../../includes/header.php';
         <h1>Hồ sơ cá nhân</h1>
         <p>Quản lý thông tin tài khoản của bạn</p>
 
+        <?php if ($error): ?>
+            <div
+                style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 16px; border: 1px solid #f5c6cb;">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($success): ?>
+            <div
+                style="background-color: #d4edda; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 16px; border: 1px solid #c3e6cb;">
+                <?php echo htmlspecialchars($success); ?>
+            </div>
+        <?php endif; ?>
+
         <div class="profile-header">
-            <div class="profile-avatar" aria-hidden="true">NP</div>
-            <h2 class="profile-name">Nguyễn Văn A</h2>
-            <p class="profile-email">nguyenvana@email.com</p>
+            <div class="profile-avatar" aria-hidden="true">
+                <?php echo strtoupper(substr($userData['full_name'] ?? 'U', 0, 2)); ?>
+            </div>
+            <h2 class="profile-name"><?php echo htmlspecialchars($userData['full_name'] ?? 'User'); ?></h2>
+            <p class="profile-email"><?php echo htmlspecialchars($userData['email'] ?? ''); ?></p>
         </div>
 
         <form action="/WebBanSach/auth/pages/profile.php" method="POST">
@@ -193,26 +242,30 @@ include '../../includes/header.php';
                 <h3 class="section-title">Thông tin cá nhân</h3>
                 <div class="form-group">
                     <label for="username">Tên đăng nhập</label>
-                    <input type="text" id="username" name="username" value="nguyenvana" required>
+                    <input type="text" id="username" name="username"
+                        value="<?php echo htmlspecialchars($userData['username'] ?? ''); ?>" required>
                 </div>
                 <div class="form-group">
                     <label for="full_name">Họ và tên</label>
-                    <input type="text" id="full_name" name="full_name" value="Nguyễn Văn A" required>
+                    <input type="text" id="full_name" name="full_name"
+                        value="<?php echo htmlspecialchars($userData['full_name'] ?? ''); ?>" required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" value="nguyenvana@email.com" required>
+                        <input type="email" id="email" name="email"
+                            value="<?php echo htmlspecialchars($userData['email'] ?? ''); ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="phone">Số điện thoại</label>
-                        <input type="tel" id="phone" name="phone" value="0901234567">
+                        <input type="tel" id="phone" name="phone"
+                            value="<?php echo htmlspecialchars($userData['phone'] ?? ''); ?>">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="address">Địa chỉ giao hàng</label>
                     <textarea id="address" name="address"
-                        placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố">123 Đường ABC, Quận 1, TP. Hồ Chí Minh</textarea>
+                        placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"><?php echo htmlspecialchars($userData['address'] ?? ''); ?></textarea>
                 </div>
             </section>
 
@@ -243,8 +296,13 @@ include '../../includes/header.php';
         </form>
 
         <div class="profile-links">
-            <a href="/WebBanSach/auth/pages/login.php">Đăng xuất</a>
+            <a href="/WebBanSach/auth/pages/login.php?action=logout"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Đăng xuất</a>
         </div>
+
+        <form id="logout-form" action="/WebBanSach/auth/pages/login.php" method="POST" style="display: none;">
+            <input type="hidden" name="action" value="logout">
+        </form>
     </div>
 </body>
 

@@ -1,3 +1,37 @@
+<?php
+session_start();
+require_once '../../../config/db.php';
+require_once '../../../auth/controller/forgetpasswordcontroller.php';
+
+$error = '';
+$email = $_SESSION['reset_email'] ?? '';
+
+// Kiểm tra có email trong session không
+if (empty($email)) {
+    header('Location: /WebBanSach/auth/pages/Forgetpassword/index.php');
+    exit;
+}
+
+// Xử lý verify OTP
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $otp = ($_GET['otp1'] ?? '') . ($_GET['otp2'] ?? '') .
+        ($_GET['otp3'] ?? '') . ($_GET['otp4'] ?? '') .
+        ($_GET['otp5'] ?? '') . ($_GET['otp6'] ?? '');
+
+    $forgetPasswordController = new ForgetPasswordController();
+    $result = $forgetPasswordController->verifyOTP($email, $otp);
+
+    if ($result['success']) {
+        // Lưu verified email vào session
+        $_SESSION['verified_email'] = $email;
+        // Redirect sang reset password
+        header('Location: /WebBanSach/auth/pages/Forgetpassword/reset.php');
+        exit;
+    } else {
+        $error = $result['message'];
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -177,12 +211,14 @@
             Nhập mã OTP đã được gửi đến email của bạn
         </p>
 
-        <p style="text-align:center; color:#555; margin-bottom:16px;">
-            OTP ví dụ đã được cài sẵn: <strong>123456</strong><br>
-            Nhập OTP này rồi nhấn Xác nhận để chuyển sang màn hình đặt lại mật khẩu.
-        </p>
+        <?php if ($error): ?>
+            <div
+                style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 16px; border: 1px solid #f5c6cb; text-align: center;">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php endif; ?>
 
-        <form action="reset.php" method="GET">
+        <form action="verifyotp.php" method="GET">
             <div class="otp-inputs">
                 <input type="text" maxlength="1" name="otp1" value="1">
                 <input type="text" maxlength="1" name="otp2" value="2">
