@@ -1,31 +1,11 @@
 <?php
-require_once '../includes/config.php';
+require_once '../config/db.php';
 $pageTitle = 'Chi tiết đơn hàng #WBS-954021';
 $extraCss = ['css/cart.css'];
 include '../includes/header.php';
 ?>
 
-<!-- Header / Navbar
-<header class="navbar">
-    <a href="<?= url('/') ?>" class="navbar__brand">
-        <span style="color: var(--color-primary); font-size: 1.8rem; font-weight: 800;">📚 WebBanSach</span>
-    </a>
-    <button class="navbar__toggle" aria-label="Toggle Navigation">☰</button>
-    <ul class="navbar__menu">
-        <li class="navbar__item"><a href="<?= url('/') ?>" class="navbar__link">Trang chủ</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Cửa hàng</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Tin tức</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Giới thiệu</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Liên hệ</a></li>
-    </ul>
-    <div class="navbar__actions">
-        <a href="#" class="btn btn--ghost btn--sm" style="position: relative;">
-            🛒 Giỏ hàng
-            <span class="badge badge--primary" style="position: absolute; top: -5px; right: -5px;">3</span>
-        </a>
-        <a href="<?= url('auth/pages/profile.php') ?>" class="btn btn--primary btn--sm">Tài khoản</a>
-    </div>
-</header> -->
+
 
 <!-- Main Content -->
 <main class="order-container">
