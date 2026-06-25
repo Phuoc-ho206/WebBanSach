@@ -135,10 +135,14 @@ $products = $conn->query($sql_products);
                         </div>
                         
                         <div class="card__footer">
-                            <a href="detail.php?id=<?= $product['ProductID'] ?>" class="btn btn--outline btn--sm" style="flex: 1; text-align: center;">Chi tiết</a>
-                            <button class="btn btn--primary btn--sm" style="flex: 1;" <?= $product['Status'] == 'Hết hàng' ? 'disabled' : '' ?>>
-                                🛒 Thêm
-                            </button>
+                            <a href="detail.php?id=<?= $product['ProductID'] ?>" class="btn btn--outline btn--sm" style="flex: 1; text-align: center; line-height: 28px;">Chi tiết</a>
+                            <form action="../cart/add.php" method="POST" style="flex: 1; margin: 0; display: flex;">
+                                <input type="hidden" name="product_id" value="<?= $product['ProductID'] ?>">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn--primary btn--sm" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;" <?= $product['Status'] == 'Hết hàng' ? 'disabled' : '' ?>>
+                                    <i class="fa-solid fa-cart-plus"></i> Thêm
+                                </button>
+                            </form>
                         </div>
                     </div>
                 <?php endwhile; ?>

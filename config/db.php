@@ -1,14 +1,17 @@
 <?php
 
+// Tải các biến môi trường từ .env
+require_once __DIR__ . '/env.php';
+
 // Bắt đầu session nếu chưa có
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$host = 'localhost';
-$username = 'root'; // Mặc định của WAMP
-$password = '';     // Mặc định của WAMP không có password
-$dbname = 'bookstore';
+$host = env('DB_HOST');
+$username = env('DB_USER');
+$password = env('DB_PASS');
+$dbname = env('DB_NAME');
 
 // Tạo kết nối
 $conn = new mysqli($host, $username, $password, $dbname);

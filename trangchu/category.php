@@ -193,7 +193,7 @@ $publishers_query = $conn->query("SELECT DISTINCT Publisher FROM product WHERE P
             <button type="submit" class="btn btn--primary" style="padding: 8px 24px; font-weight: bold;">Lọc kết quả</button>
             
             <?php if ($minPrice > 0 || $maxPrice > 0 || !empty($publisher)): ?>
-                <a href="category.php<?= $categoryId > 0 ? '?id='.$categoryId : '' ?>" class="btn btn--ghost" style="padding: 8px;">Xóa lọc ✖</a>
+                <a href="category.php<?= $categoryId > 0 ? '?id='.$categoryId : '' ?>" class="btn btn--ghost" style="padding: 8px; display: inline-flex; align-items: center; gap: 4px;">Xóa lọc <i class="fa-solid fa-xmark"></i></a>
             <?php endif; ?>
         </form>
     </div>
@@ -226,16 +226,20 @@ $publishers_query = $conn->query("SELECT DISTINCT Publisher FROM product WHERE P
                     </div>
                     
                     <div class="card__footer">
-                        <a href="detail.php?id=<?= $product['ProductID'] ?>" class="btn btn--outline btn--sm" style="flex: 1; text-align: center;">Chi tiết</a>
-                        <button class="btn btn--primary btn--sm" style="flex: 1;" <?= $product['Status'] == 'Hết hàng' ? 'disabled' : '' ?>>
-                            🛒 Thêm
-                        </button>
+                        <a href="detail.php?id=<?= $product['ProductID'] ?>" class="btn btn--outline btn--sm" style="flex: 1; text-align: center; line-height: 28px;">Chi tiết</a>
+                        <form action="../cart/add.php" method="POST" style="flex: 1; margin: 0; display: flex;">
+                            <input type="hidden" name="product_id" value="<?= $product['ProductID'] ?>">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn--primary btn--sm" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px;" <?= $product['Status'] == 'Hết hàng' ? 'disabled' : '' ?>>
+                                <i class="fa-solid fa-cart-plus"></i> Thêm
+                            </button>
+                        </form>
                     </div>
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
             <div style="grid-column: 1 / -1; text-align: center; padding: 60px var(--spacing-md); background: var(--color-background); border-radius: var(--border-radius-lg);">
-                <span style="font-size: 3rem;">🔍</span>
+                <i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; color: var(--color-text-light); display: block; margin-bottom: 12px;"></i>
                 <h3 style="margin: var(--spacing-sm) 0; color: var(--color-text);">Không tìm thấy sách phù hợp với bộ lọc</h3>
                 <p style="color: var(--color-text-light); margin-bottom: var(--spacing-md);">Vui lòng thử điều chỉnh lại khoảng giá hoặc chọn thương hiệu khác.</p>
                 <a href="category.php<?= $categoryId > 0 ? '?id='.$categoryId : '' ?>" class="btn btn--primary">Xóa bộ lọc</a>

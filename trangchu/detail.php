@@ -114,7 +114,7 @@ include '../includes/header.php';
 
                 <div style="flex: 1;">
                     <button type="submit" class="btn btn--primary" style="width: 100%; height: 40px; font-weight: bold; font-size: 1rem;" <?= $product['Status'] == 'Hết hàng' ? 'disabled' : '' ?>>
-                        🛒 Thêm vào giỏ hàng
+                        <i class="fa-solid fa-cart-plus" style="margin-right: 8px;"></i>Thêm vào giỏ hàng
                     </button>
                 </div>
             </form>
