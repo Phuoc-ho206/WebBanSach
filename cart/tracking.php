@@ -5,7 +5,6 @@ $extraCss = ['css/cart.css'];
 include '../includes/header.php';
 ?>
 
-
 <!-- Main Content -->
 <main class="order-container">
     <!-- Breadcrumbs -->
