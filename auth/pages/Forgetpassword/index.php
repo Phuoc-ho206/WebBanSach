@@ -1,3 +1,88 @@
+<?php
+session_start();
+require_once '../../../config/db.php';
+require_once '../../../vendor/PHPMailer/src/PHPMailer.php';
+require_once '../../../vendor/PHPMailer/src/SMTP.php';
+require_once '../../../vendor/PHPMailer/src/Exception.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+$error = '';
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+
+    // 1. Validate email
+    if (empty($email)) {
+        $error = 'Vui lòng nhập email';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Email không hợp lệ';
+    } else {
+        // 2. Check email tồn tại
+        try {
+            $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 0) {
+                $error = 'Email không tồn tại trong hệ thống';
+            } else {
+                // 3. Tạo OTP
+                $otp = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+
+                // 4. Lưu vào DB
+                $expiresAt = date('Y-m-d H:i:s', strtotime('+30 minutes'));
+                $stmt = $conn->prepare("INSERT INTO password_reset_tokens (email, token, expires_at) VALUES (?, ?, ?)");
+                $stmt->bind_param("sss", $email, $otp, $expiresAt);
+
+                if ($stmt->execute()) {
+                    // 5. Gửi email
+                    $mail = new PHPMailer(true);
+                    try {
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.gmail.com';
+                        $mail->SMTPAuth = true;
+                        $mail->Username = 'phlminh666@gmail.com';
+                        $mail->Password = 'jywn cgxe gbiv nahp'; // ← Thay mật khẩu
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                        $mail->Port = 587;
+                        $mail->CharSet = 'UTF-8';
+
+                        $mail->setFrom('phlminh666@gmail.com', 'WebBanSach');
+                        $mail->addAddress($email);
+                        $mail->Subject = 'Mã OTP Reset Mật Khẩu';
+                        $mail->Body = "
+                            <h2>Reset mật khẩu</h2>
+                            <p>Mã OTP của bạn:</p>
+                            <h3 style='color: red;'>{$otp}</h3>
+                            <p>Mã này có hiệu lực trong 30 phút</p>
+                        ";
+                        $mail->isHTML(true);
+
+                        $mail->send();
+
+                        // 6. Lưu email vào session + redirect
+                        $_SESSION['reset_email'] = $email;
+                        header('Location: /WebBanSach/auth/pages/Forgetpassword/verifyotp.php');
+                        exit();
+
+                    } catch (Exception $e) {
+                        $error = 'Lỗi gửi email: ' . $mail->ErrorInfo;
+                    }
+                } else {
+                    $error = 'Lỗi hệ thống';
+                }
+            }
+            $stmt->close();
+        } catch (Exception $e) {
+            $error = 'Lỗi: ' . $e->getMessage();
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -50,7 +135,6 @@
             margin-top: 16px
         }
 
-        /* Steps */
         .steps {
             display: flex;
             justify-content: center;
@@ -76,18 +160,6 @@
             color: #fff
         }
 
-        .step.done {
-            background: var(--color-success, #4caf50);
-            color: #fff
-        }
-
-        .step-divider {
-            align-self: center;
-            height: 2px;
-            width: 24px;
-            background: #e0e0e0
-        }
-
         .subtitle {
             text-align: center;
             margin: 0 0 16px;
@@ -106,12 +178,6 @@
             color: #721c24;
             border: 1px solid #f5c6cb
         }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb
-        }
     </style>
 </head>
 
@@ -119,7 +185,6 @@
     <div class="card auth-card">
         <h1>Quên mật khẩu</h1>
 
-        <!-- Step indicators -->
         <div class="steps">
             <div class="step active">1</div>
             <div class="step-divider"></div>
@@ -128,13 +193,17 @@
             <div class="step">3</div>
         </div>
 
-        <!-- Bước 1: Nhập email -->
         <p class="subtitle">Nhập email để nhận mã OTP</p>
 
-        <form method="POST" action="/WebBanSach/auth/pages/Forgetpassword/verifyotp.php">
+        <?php if ($error): ?>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+
+        <form method="POST">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input id="email" name="email" type="email" placeholder="example@email.com" required>
+                <input id="email" name="email" type="email" placeholder="example@email.com" required
+                    value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
             </div>
             <div class="actions">
                 <button type="submit" class="btn btn-primary">Gửi mã OTP</button>
