@@ -1,68 +1,39 @@
+<?php
+require_once 'data.php';
+require_once 'partials.php';
+
+$editUser = isset($_GET['edit']) ? findItem('admin_users', $_GET['edit']) : null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $action = $_POST['action'] ?? '';
+
+  if ($action === 'save') {
+    $id = $_POST['id'] !== '' ? (int) $_POST['id'] : nextId($_SESSION['admin_users']);
+    saveItem('admin_users', ['id' => $id, 'name' => trim($_POST['name']), 'email' => trim($_POST['email']), 'role' => trim($_POST['role']), 'status' => trim($_POST['status'])]);
+  }
+
+  if ($action === 'delete') {
+    deleteItem('admin_users', $_POST['id']);
+  }
+
+  redirectTo('users.php');
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Quản lý người dùng</title>
-  <link rel="stylesheet" href="../assets/css/admin.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý người dùng</title><?= adminCssLinks() ?>
 </head>
 <body>
-  <div class="admin-layout">
-    <aside class="sidebar">
-      <h2>Book Admin</h2>
-      <a href="index.php">Dashboard</a>
-      <a href="products.php">Sản phẩm</a>
-      <a href="categories.php">Danh mục</a>
-      <a href="orders.php">Đơn hàng</a>
-      <a href="users.php" class="active">Người dùng</a>
-      <a href="coupons.php">Mã giảm giá</a>
-    </aside>
-
-    <main class="content">
-      <div class="topbar">
-        <h1>Quản lý người dùng</h1>
-        <button class="btn">Thêm người dùng</button>
-      </div>
-
-      <div class="table-box">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Họ tên</th>
-              <th>Email</th>
-              <th>Vai trò</th>
-              <th>Trạng thái</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Admin</td>
-              <td>admin@gmail.com</td>
-              <td>Quản trị viên</td>
-              <td><span class="status active">Hoạt động</span></td>
-              <td class="actions">
-                <button class="btn">Sửa</button>
-                <button class="btn danger">Khóa</button>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Nguyễn Văn A</td>
-              <td>vana@gmail.com</td>
-              <td>Khách hàng</td>
-              <td><span class="status active">Hoạt động</span></td>
-              <td class="actions">
-                <button class="btn">Sửa</button>
-                <button class="btn danger">Khóa</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+  <div class="app-layout">
+    <?php adminSidebar(); ?>
+    <main class="page-content">
+      <header class="page-header"><div><h1>Quản lý người dùng</h1><p>Thêm, sửa, xóa người dùng</p></div></header>
+      <form method="post" class="card"><input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= h($editUser['id'] ?? '') ?>"><div class="card__body form"><div class="form-row"><div class="form-group"><label class="form-label">Họ tên</label><input class="form-control" name="name" value="<?= h($editUser['name'] ?? '') ?>" required></div><div class="form-group"><label class="form-label">Email</label><input class="form-control" type="email" name="email" value="<?= h($editUser['email'] ?? '') ?>" required></div></div><div class="form-row"><div class="form-group"><label class="form-label">Vai trò</label><select class="form-control" name="role"><?php foreach (['Quản trị viên', 'Nhân viên', 'Khách hàng'] as $role): ?><option value="<?= h($role) ?>" <?= ($editUser['role'] ?? 'Khách hàng') === $role ? 'selected' : '' ?>><?= h($role) ?></option><?php endforeach; ?></select></div><div class="form-group"><label class="form-label">Trạng thái</label><select class="form-control" name="status"><?php foreach (['Hoạt động', 'Đã khóa'] as $status): ?><option value="<?= h($status) ?>" <?= ($editUser['status'] ?? 'Hoạt động') === $status ? 'selected' : '' ?>><?= h($status) ?></option><?php endforeach; ?></select></div></div><div class="btn-group"><button class="btn btn--primary" type="submit"><?= $editUser ? 'Cập nhật người dùng' : 'Thêm người dùng' ?></button><?php if ($editUser): ?><a class="btn btn--ghost" href="users.php">Hủy sửa</a><?php endif; ?></div></div></form>
+      <div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Họ tên</th><th>Email</th><th>Vai trò</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody><?php foreach ($_SESSION['admin_users'] as $user): ?><tr><td><?= h($user['id']) ?></td><td><?= h($user['name']) ?></td><td><?= h($user['email']) ?></td><td><?= h($user['role']) ?></td><td><span class="badge <?= badgeClass($user['status']) ?>"><?= h($user['status']) ?></span></td><td class="table__actions"><a class="btn btn--sm btn--outline" href="users.php?edit=<?= h($user['id']) ?>">Sửa</a><form method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= h($user['id']) ?>"><button class="btn btn--sm btn--danger" type="submit">Xóa</button></form></td></tr><?php endforeach; ?></tbody></table></div>
     </main>
   </div>
-  <script src="../assets/js/admin.js"></script>
 </body>
 </html>
