@@ -1,97 +1,91 @@
-:root {
+/* 1. Nhúng phông chữ Montserrat từ Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
 
-    --color-primary-dark: #1e4241;
-    /* Xanh đậm  */
-    --color-primary: #2d5f5d;
-    /* Xanh trung bình - màu chủ đạo */
-    --color-secondary: #f9b234;
-    /* Vàng ấm - nhấn nổi bật */
+:root {
+    /* ==========================================================================
+       BỘ MÀU CHỦ ĐẠO MỚI (TONE CAM ALPHABOOKS)
+       ========================================================================== */
+    --color-primary-dark: #cc4a00;
+    /* Cam đậm - dùng cho trạng thái hover hoặc viền tối */
+    
+    --color-primary: #f37022;
+    /* Cam chuẩn AlphaBooks - dùng cho nút bấm, viền, màu nổi bật */
+    
+    --color-secondary: #ffb703;
+    /* Vàng ấm - màu nhấn phụ */
+    
     --color-accent: #e85d04;
-    /* Cam - nút, điểm nhấn */
+    /* Cam đỏ - điểm nhấn nổi bật */
+    
     --color-accent-dark: #c44d03;
-    /* Cam đậm  */
-    --color-background: #f8f9fa;
-    /* Nền sáng tổng thể */
+    /* Cam đỏ sẫm */
+    
+    --color-background: #fff5eb;
+    /* Nền sáng tổng thể màu cam nhạt */
+    
+    /* ==========================================================================
+       CÁC MÀU CƠ BẢN GIỮ NGUYÊN
+       ========================================================================== */
     --color-surface: #ffffff;
     /* Nền thẻ, khu vực nội dung */
+    
     --color-border: #e0e0e0;
     /* Viền trung tính */
+    
     --color-text: #222831;
     /* Chữ chính */
+    
     --color-text-light: #6c757d;
     /* Chữ phụ, mô tả */
+    
     --color-success: #4caf50;
-    /* Thành công */
     --color-error: #e63946;
-    /* Lỗi, cảnh báo đỏ */
     --color-warning: #ffb703;
-    /* Cảnh báo vàng */
     --color-info: #2196f3;
-    /* Thông tin, nhắc nhở */
 
-
-    /* Typography - Biến chữ */
-    --font-family-base: 'Segoe UI', 'Roboto', Arial, sans-serif;
-    /* Font chữ chính cho toàn trang */
+    /* ==========================================================================
+       TYPOGRAPHY (FONT CHỮ - ĐÃ ĐỔI SANG MONTSERRAT)
+       ========================================================================== */
+    --font-family-base: 'Montserrat', sans-serif;
+    
     --font-size-base: 16px;
-    /* Cỡ chữ mặc định */
     --font-size-lg: 1.25rem;
-    /* Cỡ chữ lớn, tiêu đề phụ */
     --font-size-md: 1rem;
-    /* Cỡ chữ trung bình, nội dung */
     --font-size-sm: 0.875rem;
-    /* Cỡ chữ nhỏ, chú thích */
     --font-size-xl: 1.5rem;
-    /* Cỡ chữ lớn cho tiêu đề chính */
     --font-size-xxl: 2rem;
-    /* Cỡ chữ rất lớn, banner */
+    
     --font-weight-normal: 400;
-    /* Độ đậm chữ thường */
     --font-weight-bold: 600;
-    /* Độ đậm chữ nổi bật */
     --line-height-base: 1.6;
-    /* Độ cao dòng mặc định */
 
-
-    /* Spacing - Khoảng cách */
+    /* ==========================================================================
+       SPACING (KHOẢNG CÁCH)
+       ========================================================================== */
     --spacing-xxs: 2px;
-    /* Khoảng cách siêu nhỏ, viền hoặc icon nhỏ */
     --spacing-xs: 4px;
-    /* Khoảng cách rất nhỏ, giữa các icon hoặc chữ nhỏ */
     --spacing-sm: 8px;
-    /* Khoảng cách nhỏ, giữa các nút hoặc mục nhỏ */
     --spacing-md: 16px;
-    /* Khoảng cách trung bình, giữa các phần nội dung */
     --spacing-lg: 24px;
-    /* Khoảng cách lớn, giữa các section */
     --spacing-xl: 40px;
-    /* Khoảng cách rất lớn, lề ngoài cùng */
     --spacing-xxl: 64px;
-    /* Khoảng cách cực lớn, banner hoặc phân cách lớn */
 
-
-    /* Border & Shadow - Viền & Đổ bóng */
+    /* ==========================================================================
+       BORDER & SHADOW
+       ========================================================================== */
     --border-radius-sm: 4px;
-    /* Bo góc nhỏ cho input, nút nhỏ */
     --border-radius: 6px;
-    /* Bo góc mặc định cho thẻ, card */
     --border-radius-lg: 12px;
-    /* Bo góc lớn cho banner, modal */
     --border-width: 1px;
-    /* Độ dày viền mặc định */
+    
     --box-shadow-sm: 0 1px 3px rgba(44, 62, 80, 0.08);
-    /* Đổ bóng nhẹ cho nút, input */
     --box-shadow-md: 0 4px 12px rgba(44, 62, 80, 0.12);
-    /* Đổ bóng trung bình cho card, popup nhỏ */
     --box-shadow-lg: 0 8px 24px rgba(44, 62, 80, 0.16);
-    /* Đổ bóng lớn cho modal, banner */
 
-
-    /* Transition - Hiệu ứng chuyển động */
+    /* ==========================================================================
+       TRANSITION
+       ========================================================================== */
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    /* Hiệu ứng nhanh cho hover, click */
     --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    /* Hiệu ứng mặc định cho chuyển trạng thái */
     --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    /* Hiệu ứng chậm cho modal, overlay */
 }

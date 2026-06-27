@@ -4,11 +4,9 @@
 <footer class="footer">
     <div class="footer__grid">
 
-        <!-- Cột 1: Thương hiệu -->
         <div>
             <div class="footer__brand">Web bán sách</div>
-            <p class="footer__desc">Nơi mang đến những cuốn sách hay nhất với giá tốt nhất. Đọc sách — mở rộng thế giới.
-            </p>
+            <p class="footer__desc">Nơi mang đến những cuốn sách hay nhất với giá tốt nhất. Đọc sách — mở rộng thế giới.</p>
             <div class="footer__social">
                 <a href="#" class="footer__social-link" aria-label="Facebook">f</a>
                 <a href="#" class="footer__social-link" aria-label="Zalo">Z</a>
@@ -16,19 +14,6 @@
             </div>
         </div>
 
-        <!-- Cột 2: Danh mục -->
-        <div>
-            <div class="footer__title">Danh mục</div>
-            <ul class="footer__links">
-                <li><a href="#" class="footer__link">Văn học</a></li>
-                <li><a href="#" class="footer__link">Kinh tế</a></li>
-                <li><a href="#" class="footer__link">Kỹ năng sống</a></li>
-                <li><a href="#" class="footer__link">Thiếu nhi</a></li>
-                <li><a href="#" class="footer__link">Khoa học</a></li>
-            </ul>
-        </div>
-
-        <!-- Cột 3: Hỗ trợ -->
         <div>
             <div class="footer__title">Hỗ trợ</div>
             <ul class="footer__links">
@@ -39,7 +24,6 @@
             </ul>
         </div>
 
-        <!-- Cột 4: Liên hệ -->
         <div>
             <div class="footer__title">Liên hệ</div>
             <ul class="footer__links">
@@ -52,7 +36,10 @@
     </div>
 
     <div class="footer__bottom">
-        <span>© <?= date('Y') ?> WebBanSach. All rights reserved.</span>
-        <span>Thiết kế bởi nhóm WebBanSach</span>
+        <div>&copy; 2026 WebBanSach. Tất cả các quyền được bảo lưu.</div>
+        <div style="display: flex; gap: var(--spacing-md);">
+            <a href="#" style="color: inherit; text-decoration: none;">Điều khoản</a>
+            <a href="#" style="color: inherit; text-decoration: none;">Bảo mật</a>
+        </div>
     </div>
 </footer>

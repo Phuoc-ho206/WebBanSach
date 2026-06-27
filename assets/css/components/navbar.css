@@ -109,7 +109,7 @@
     position: absolute;
     top: -4px;
     right: -4px;
-    background-color: #f26522;
+    background-color: #f37022;
     color: white;
     font-size: 0.75rem;
     font-weight: bold;
@@ -123,12 +123,12 @@
 }
 
 /* ==========================================================================
-   2. NAVBAR PHỤ MÀU XANH (CHỨA ĐIỀU HƯỚNG & MEGA MENU)
+   2. NAVBAR PHỤ MÀU CAM (PHONG CÁCH ALPHABOOKS & ĐÃ GẮN ICON + BANNER)
    ========================================================================== */
 .orange-bar {
-    background-color: #1b4943; /* Màu xanh rêu đậm chuẩn đồng bộ theo ảnh giao diện */
+    background-color: #f37022; /* Màu cam chuẩn chủ đạo của Alpha Books */
     color: var(--color-surface);
-    border-bottom: 2px solid #123530;
+    border-bottom: 2px solid #d95300;
 }
 
 .orange-bar-container {
@@ -145,7 +145,6 @@
     z-index: 999;
 }
 
-/* Đã sửa đổi: Mặc định trong suốt để hòa vào nền xanh điều hướng */
 .category-dropdown-header {
     background-color: transparent;
     padding: 14px var(--spacing-md);
@@ -159,9 +158,9 @@
     transition: background-color var(--transition-fast) ease;
 }
 
-/* Khi di chuyển chuột vào: Khối bọc danh mục và tiêu đề chuyển sang màu cam rực rỡ */
+/* Khi di chuột vào danh mục chính trên thanh menu */
 .category-dropdown-wrapper:hover .category-dropdown-header {
-    background-color: #e65c00;
+    background-color: #d95300; /* Màu cam đậm khi hover */
 }
 
 .category-sidebar-list {
@@ -176,15 +175,12 @@
     margin: 0;
     padding: 0;
     box-shadow: var(--box-shadow-md);
-    
-    /* Mặc định luôn luôn ẩn ở mọi trang (bao gồm cả trang chủ) */
     opacity: 0;
     visibility: hidden;
     transform: translateY(5px);
     transition: opacity var(--transition-fast), visibility var(--transition-fast), transform var(--transition-fast);
 }
 
-/* Chỉ hiển thị danh sách cây danh mục khi rê chuột vào khối wrapper */
 .category-dropdown-wrapper:hover .category-sidebar-list {
     opacity: 1;
     visibility: visible;
@@ -207,25 +203,33 @@
     transition: all var(--transition-fast);
 }
 
+/* Khối CSS định hình kích thước cho hình ảnh icon danh mục dọc */
+.category-menu-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
 .category-sidebar-list > li:hover > a {
-    background-color: var(--color-primary);
+    background-color: #f37022; /* Đổi nền dòng danh mục sang màu cam khi chọn */
     color: white;
     padding-left: 20px;
 }
 
-/* Bảng hiển thị Mega Menu đa cột con */
+/* Bảng hiển thị Mega Menu đa cột được thiết kế lại rộng 780px để chừa chỗ cho cột ảnh quảng cáo */
 .category-submenu {
     position: absolute;
     top: 0;
     left: 100%;
-    width: 540px;
+    width: 780px; 
     min-height: 100%;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     box-shadow: var(--box-shadow-lg);
     padding: var(--spacing-lg);
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1.3fr; /* Cột thứ 3 rộng rãi để hiển thị banner quảng cáo */
     gap: var(--spacing-lg);
     align-content: start;
     opacity: 0;
@@ -242,11 +246,11 @@
 
 .category-submenu-title {
     grid-column: 1 / -1;
-    color: var(--color-primary);
+    color: #d95300; /* Tiêu đề danh mục con màu cam đậm */
     font-size: var(--font-size-md);
     font-weight: var(--font-weight-bold);
     text-transform: uppercase;
-    border-bottom: 2px solid var(--color-primary);
+    border-bottom: 2px solid #d95300;
     padding-bottom: 6px;
     margin-bottom: var(--spacing-xs);
 }
@@ -275,7 +279,7 @@
 }
 
 .category-submenu-list a:hover {
-    color: var(--color-primary);
+    color: #f37022; /* Màu chữ cam khi hover liên kết con */
     padding-left: 4px;
 }
 
@@ -292,16 +296,15 @@
     text-decoration: none;
     font-size: 0.95rem;
     font-weight: var(--font-weight-medium);
-    padding: 14px 0;
+    padding: 14px 16px;
     display: flex;
-    transition: all 0.3s ease; /* Thêm transition để đổi màu mượt */
+    transition: all 0.3s ease;
 }
-/* Hiệu ứng khi di chuột vào */
-.top-bar-menu a:hover {
-    background-color: #d95300; /* Màu cam đậm */
 
+/* Hiệu ứng khi di chuột vào các liên kết menu ngang */
 .top-bar-menu a:hover {
-    opacity: 0.85;
+    background-color: #d95300; /* Nền cam đậm đồng bộ */
+    opacity: 1;
 }
 
 /* RESPONSIVE */
