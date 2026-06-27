@@ -32,6 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = AuthController::login($identity, $password);
         if ($user) {
             $_SESSION['user'] = $user;
+            if (isset($_POST['remember']) && $_POST['remember'] === 'on') {
+                setcookie(
+                    'login_identity',
+                    $identity,
+                    time() + (30 * 24 * 60 * 60), // 30 ngày
+                    '/',
+                    '',
+                    true,  // https only
+                    true   // httponly
+                );
+            }
             header('Location: /WebBanSach/index.php');
             exit;
         } else {
@@ -77,7 +88,8 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--color-background);
+            background: var(--color-background) url('/WebBanSach/assets/images/uploads/background_login.jpg') no-repeat center center fixed;
+            background-size: cover;
             font-family: var(--font-family-base)
         }
 
@@ -183,21 +195,15 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
                 <?= htmlspecialchars($success) ?>
             </div>
         <?php endif; ?>
-        <div
-            style="background-color: #e3f2fd; color: #0277bd; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; text-align: center; border: 1px solid #81d4fa;">
-            <strong>Tài khoản Demo:</strong><br>
-            Tên đăng nhập: <code>nguyenvana</code><br>
-            Mật khẩu: <code>123456</code>
-        </div>
         <form action="/WebBanSach/auth/pages/login.php" method="POST">
             <div class="form-group">
                 <label for="identity">Email hoặc tên đăng nhập</label>
-                <input id="identity" name="identity" type="text" required>
+                <input id="identity" name="identity" type="text" required placeholder="Tên đăng nhập hoặc email">
             </div>
             <div class="form-group">
                 <label for="password">Mật khẩu</label>
                 <div class="input-row">
-                    <input id="password" name="password" type="password" required>
+                    <input id="password" name="password" type="password" required placeholder="Mật khẩu">
 
                 </div>
             </div>

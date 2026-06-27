@@ -4,6 +4,7 @@
  * AuthController — Xử lý login / logout.
  */
 
+require_once __DIR__ . '/../models/Customer.php';
 class AuthController
 {
     private $customerModel;

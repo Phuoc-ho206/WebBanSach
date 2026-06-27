@@ -50,7 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #f5f8fa;
+            background: #f5f8fa url('/WebBanSach/assets/images/uploads/background_login.jpg') no-repeat center center fixed;
+            background-size: cover;
             font-family: Arial, sans-serif;
             margin: 0;
         }
