@@ -9,13 +9,13 @@ function activeClass($page) {
 
 function adminCssLinks() {
   return '
-  <link rel="stylesheet" href="../assets/css/variables.css">
-  <link rel="stylesheet" href="../assets/css/components/button.css">
-  <link rel="stylesheet" href="../assets/css/components/badge.css">
-  <link rel="stylesheet" href="../assets/css/components/card.css">
-  <link rel="stylesheet" href="../assets/css/components/form.css">
-  <link rel="stylesheet" href="../assets/css/components/navbar.css">
-  <link rel="stylesheet" href="../assets/css/components/table.css">';
+  <link rel="stylesheet" href="../assets/css/variables.css?v=3">
+  <link rel="stylesheet" href="../assets/css/components/button.css?v=3">
+  <link rel="stylesheet" href="../assets/css/components/badge.css?v=3">
+  <link rel="stylesheet" href="../assets/css/components/card.css?v=3">
+  <link rel="stylesheet" href="../assets/css/components/form.css?v=3">
+  <link rel="stylesheet" href="../assets/css/components/navbar.css?v=3">
+  <link rel="stylesheet" href="../assets/css/components/table.css?v=3">';
 }
 
 function badgeClass($status) {
