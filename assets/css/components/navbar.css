@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. HEADER TOP (LOGO, TÌM KIẾM, NÚT CHỨC NĂNG)
+   1. HEADER TOP (LOGO, TÌM KIẾM, NÚT CHỨC NĂNG - MÀU TRẮNG)
    ========================================================================== */
 .header-top {
     background-color: var(--color-surface);
@@ -123,12 +123,12 @@
 }
 
 /* ==========================================================================
-   2. NAVBAR PHỤ MÀU CAM (ORANGE BAR & MEGA MENU)
+   2. NAVBAR PHỤ MÀU XANH (CHỨA ĐIỀU HƯỚNG & MEGA MENU)
    ========================================================================== */
 .orange-bar {
-    background-color: var(--color-primary);
+    background-color: #1b4943; /* Màu xanh rêu đậm chuẩn đồng bộ theo ảnh giao diện */
     color: var(--color-surface);
-    border-bottom: 2px solid #d95300;
+    border-bottom: 2px solid #123530;
 }
 
 .orange-bar-container {
@@ -145,8 +145,9 @@
     z-index: 999;
 }
 
+/* Đã sửa đổi: Mặc định trong suốt để hòa vào nền xanh điều hướng */
 .category-dropdown-header {
-    background-color: #e65c00;
+    background-color: transparent;
     padding: 14px var(--spacing-md);
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-md);
@@ -155,6 +156,12 @@
     align-items: center;
     gap: var(--spacing-sm);
     letter-spacing: 0.5px;
+    transition: background-color var(--transition-fast) ease;
+}
+
+/* Khi di chuyển chuột vào: Khối bọc danh mục và tiêu đề chuyển sang màu cam rực rỡ */
+.category-dropdown-wrapper:hover .category-dropdown-header {
+    background-color: #e65c00;
 }
 
 .category-sidebar-list {
@@ -169,14 +176,16 @@
     margin: 0;
     padding: 0;
     box-shadow: var(--box-shadow-md);
+    
+    /* Mặc định luôn luôn ẩn ở mọi trang (bao gồm cả trang chủ) */
     opacity: 0;
     visibility: hidden;
     transform: translateY(5px);
     transition: opacity var(--transition-fast), visibility var(--transition-fast), transform var(--transition-fast);
 }
 
-.category-dropdown-wrapper:hover .category-sidebar-list,
-.category-dropdown-wrapper.always-open .category-sidebar-list {
+/* Chỉ hiển thị danh sách cây danh mục khi rê chuột vào khối wrapper */
+.category-dropdown-wrapper:hover .category-sidebar-list {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
@@ -204,6 +213,7 @@
     padding-left: 20px;
 }
 
+/* Bảng hiển thị Mega Menu đa cột con */
 .category-submenu {
     position: absolute;
     top: 0;
@@ -283,9 +293,12 @@
     font-size: 0.95rem;
     font-weight: var(--font-weight-medium);
     padding: 14px 0;
-    display: block;
-    transition: opacity var(--transition-fast);
+    display: flex;
+    transition: all 0.3s ease; /* Thêm transition để đổi màu mượt */
 }
+/* Hiệu ứng khi di chuột vào */
+.top-bar-menu a:hover {
+    background-color: #d95300; /* Màu cam đậm */
 
 .top-bar-menu a:hover {
     opacity: 0.85;

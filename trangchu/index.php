@@ -1,14 +1,14 @@
 <?php
 require_once '../config/db.php';
 
-// ĐÁNH DẤU CỜ ĐỂ BUNG SẴN DANH MỤC TRÊN TRANG CHỦ
+// Vẫn giữ lại cờ trang chủ nhưng menu giờ đây sẽ được CSS điều khiển đóng hoàn toàn
 $isHomepage = true;
 
 $pageTitle = 'Trang chủ - Hệ Thống Bán Sách Trực Tuyến';
 $extraCss = ['css/components/card.css', 'css/components/button.css', 'css/components/badge.css', 'css/components/form.css'];
 include '../includes/header.php';
 
-// Thực hiện câu lệnh truy vấn sản phẩm mới (Đã bổ sung cột Price và kết nối bảng ảnh an toàn)
+// Thực hiện câu lệnh truy vấn sản phẩm mới cập nhật
 $sql_products = "
     SELECT p.ProductID, p.ProductName, p.Price, p.Status, c.CategoryName, i.ImageURL 
     FROM product p
@@ -21,24 +21,15 @@ $products = $conn->query($sql_products);
 ?>
 
 <style>
-    /* BỐ CỤC KHỐI HERO BANNER HAI CỘT */
+    /* Đã sửa đổi: Loại bỏ hoàn toàn chia cột bất đối xứng, cho phép banner mở rộng tối đa */
     .homepage-layout {
         max-width: 1200px;
         margin: var(--spacing-lg) auto;
         padding: 0 var(--spacing-md);
-        display: grid;
-        grid-template-columns: 260px 1fr;
-        gap: var(--spacing-md);
-    }
-
-    .sidebar-placeholder {
-        width: 260px;
-        height: 100%;
-        min-height: 380px;
     }
 
     .homepage-banner {
-        border-radius: var(--border-radius);
+        border-radius: var(--border-radius-lg);
         overflow: hidden;
         background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
         display: flex;
@@ -73,28 +64,15 @@ $products = $conn->query($sql_products);
         color: var(--color-text);
         margin: 0;
     }
-
-    @media (max-width: 768px) {
-        .homepage-layout {
-            grid-template-columns: 1fr;
-        }
-        .sidebar-placeholder {
-            display: none; /* Ẩn khoảng trống trên mobile vì danh mục đã chuyển thành dropdown ẩn */
-        }
-    }
 </style>
 
 <main>
     <div class="homepage-layout">
-        <div class="sidebar-placeholder"></div>
-
-        <!-- CỘT PHẢI: BANNER CHÍNH CỦA TRANG CHỦ -->
         <div class="homepage-banner">
             <div>
                 <h1 style="font-size: 2.6rem; margin: 0 0 var(--spacing-sm); font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.15);">Khơi Nguồn Tri Thức</h1>
                 <p style="font-size: 1.15rem; margin-bottom: var(--spacing-xl); opacity: 0.95;">Khám phá hàng ngàn đầu sách chọn lọc tinh hoa cùng WebBanSach</p>
                 
-                <!-- Đã thay thế ô tìm kiếm thừa bằng Nút bấm điều hướng -->
                 <a href="category.php" class="btn btn--primary" style="background-color: white; color: var(--color-primary); border-radius: 999px; padding: 12px 36px; font-size: 1.1rem; font-weight: 900; box-shadow: var(--box-shadow-md); text-decoration: none; display: inline-block;">
                     MUA SẮM NGAY
                 </a>

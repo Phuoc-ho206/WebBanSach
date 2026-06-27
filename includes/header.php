@@ -104,7 +104,7 @@ if (isset($conn)) {
     <div class="orange-bar">
         <div class="orange-bar-container">
             
-            <div class="category-dropdown-wrapper <?= (isset($isHomepage) && $isHomepage) ? 'always-open' : '' ?>">
+            <div class="category-dropdown-wrapper">
                 <div class="category-dropdown-header">
                     ☰ TẤT CẢ DANH MỤC
                 </div>
@@ -114,7 +114,6 @@ if (isset($conn)) {
                         <?php foreach ($global_categories as $cat): 
                             $catName = $cat['CategoryName'];
                             
-                            // Phân loại mảng dữ liệu MEGA MENU tự động theo tên
                             $subTopics = []; $authors = [];
                             if (stripos($catName, 'Kinh tế') !== false || stripos($catName, 'Tài chính') !== false) {
                                 $subTopics = ['Quản trị lãnh đạo', 'Marketing - Bán hàng', 'Tài chính cá nhân', 'Khởi nghiệp'];
@@ -169,7 +168,7 @@ if (isset($conn)) {
             </div>
 
             <ul class="top-bar-menu">
-                <li><a href="#">Giới thiệu</a></li>
+                <li><a href="<?= url('trangchu/gioithieu.php') ?>">Giới thiệu</a></li>
                 <li><a href="#">Tin tức</a></li>
                 <li><a href="#">Review sách</a></li>
                 <li><a href="#">Hợp tác</a></li>
@@ -178,9 +177,3 @@ if (isset($conn)) {
 
         </div>
     </div>
-
-    <script>
-        function toggleMobileMenu() {
-            document.querySelector('.navbar').classList.toggle('is-open');
-        }
-    </script>
