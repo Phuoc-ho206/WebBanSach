@@ -8,10 +8,18 @@ if ($productId <= 0) {
 }
 
 $sql_product = "
-    SELECT p.ProductID, p.ProductName, p.Price, p.Description, p.Status, c.CategoryName, i.ImageURL 
+    SELECT p.ProductID, p.ProductName, p.Price, p.Description, p.Status, c.CategoryName, i.ImageURL,
+           ap.DiscountRate, ap.PromotionName
     FROM product p
     LEFT JOIN category c ON p.CategoryID = c.CategoryID
     LEFT JOIN image i ON p.ProductID = i.ProductID AND i.IsThumbnail = 1
+    LEFT JOIN (
+        SELECT pd.ProductID, MAX(pd.DiscountRate) AS DiscountRate, MIN(pr.PromotionName) AS PromotionName
+        FROM promotion_detail pd
+        JOIN promotion pr ON pd.PromotionID = pr.PromotionID
+        WHERE NOW() BETWEEN COALESCE(pd.StartDate, pr.StartDate) AND COALESCE(pd.EndDate, pr.EndDate)
+        GROUP BY pd.ProductID
+    ) ap ON p.ProductID = ap.ProductID
     WHERE p.ProductID = ?
 ";
 
@@ -91,7 +99,24 @@ include '../includes/header.php';
                 </div>
             </div>
 
-            <div class="product-detail-price"><?= number_format($product['Price'], 0, ',', '.') ?> đ</div>
+            <?php 
+            $originalPrice = $product['Price'];
+            $discountRate = isset($product['DiscountRate']) ? floatval($product['DiscountRate']) : 0;
+            $discountedPrice = $originalPrice - ($originalPrice * $discountRate / 100);
+            ?>
+
+            <?php if ($discountRate > 0): ?>
+                <div style="display: flex; align-items: baseline; gap: var(--spacing-md); margin: var(--spacing-xs) 0;">
+                    <div class="product-detail-price" style="margin: 0;"><?= number_format($discountedPrice, 0, ',', '.') ?> đ</div>
+                    <div style="text-decoration: line-through; color: var(--color-text-light); font-size: 1.2rem;"><?= number_format($originalPrice, 0, ',', '.') ?> đ</div>
+                    <span class="badge" style="background-color: var(--color-primary); color: white; font-weight: bold; font-size: 0.95rem; padding: 4px 10px; border-radius: var(--border-radius-sm);">-<?= number_format($discountRate, 0) ?>%</span>
+                </div>
+                <div style="color: #2e7d32; font-weight: bold; font-size: 0.95rem; margin-top: -6px; margin-bottom: var(--spacing-sm);">
+                    <i class="fa-solid fa-tags"></i> Áp dụng chương trình: <?= htmlspecialchars($product['PromotionName']) ?>
+                </div>
+            <?php else: ?>
+                <div class="product-detail-price"><?= number_format($originalPrice, 0, ',', '.') ?> đ</div>
+            <?php endif; ?>
 
             <div class="product-description-box">
                 <h4 style="margin: 0 0 var(--spacing-xs) 0; color: var(--color-text);">Tóm tắt nội dung tác phẩm:</h4>

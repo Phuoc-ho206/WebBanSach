@@ -25,6 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = AuthController::login($identity, $password);
         if ($user) {
             $_SESSION['user'] = $user;
+            // Đồng bộ giỏ hàng khi đăng nhập thành công
+            require_once '../../config/db.php';
+            sync_cart_to_db($conn, $user['id']);
             header('Location: /WebBanSach/index.php');
             exit;
         } else {
@@ -38,6 +41,9 @@ if (isset($_GET['code'])) {
     $user = googleauthcontroller::handleCallback();
     if ($user) {
         $_SESSION['user'] = $user;
+        // Đồng bộ giỏ hàng khi đăng nhập bằng Google thành công
+        require_once '../../config/db.php';
+        sync_cart_to_db($conn, $user['id']);
         header('Location: /WebBanSach/index.php');
         exit;
     }

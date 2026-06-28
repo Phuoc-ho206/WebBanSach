@@ -67,10 +67,28 @@ if ($isValidSignature && $orderId > 0) {
             $stmtOrder->execute();
             $stmtOrder->close();
 
+            // Đọc CustomerID từ đơn hàng để tìm và đánh dấu giỏ hàng của họ thành Completed
+            $stmtGetCust = $conn->prepare("SELECT CustomerID FROM `order` WHERE OrderID = ?");
+            $stmtGetCust->bind_param("i", $orderId);
+            $stmtGetCust->execute();
+            $resCust = $stmtGetCust->get_result();
+            if ($resCust->num_rows > 0) {
+                $orderRow = $resCust->fetch_assoc();
+                $orderCustId = $orderRow['CustomerID'];
+                if ($orderCustId !== null && $orderCustId > 0) {
+                    $stmtCompleteCart = $conn->prepare("UPDATE cart SET Status = 'Completed' WHERE CustomerID = ? AND Status = 'Active'");
+                    $stmtCompleteCart->bind_param("i", $orderCustId);
+                    $stmtCompleteCart->execute();
+                    $stmtCompleteCart->close();
+                }
+            }
+            $stmtGetCust->close();
+
             $conn->commit();
             
-            // Xóa giỏ hàng khi thanh toán thành công
+            // Xóa giỏ hàng và voucher khi thanh toán thành công
             unset($_SESSION['cart']);
+            unset($_SESSION['applied_voucher']);
             $_SESSION['success_order_id'] = $orderId;
         } catch (Exception $e) {
             $conn->rollback();
@@ -105,6 +123,24 @@ if ($isValidSignature && $orderId > 0) {
             }
             $stmtRestoreStock->close();
             $stmtDetails->close();
+
+            // 4. Hoàn lại trạng thái voucher trong database (nếu có)
+            $stmtGetVoucher = $conn->prepare("SELECT CustomerID, VoucherID FROM `order` WHERE OrderID = ?");
+            $stmtGetVoucher->bind_param("i", $orderId);
+            $stmtGetVoucher->execute();
+            $resVoucher = $stmtGetVoucher->get_result();
+            if ($resVoucher->num_rows > 0) {
+                $orderRow = $resVoucher->fetch_assoc();
+                $custVal = $orderRow['CustomerID'];
+                $vouchVal = $orderRow['VoucherID'];
+                if ($custVal !== null && $vouchVal !== null) {
+                    $stmtRevertVoucher = $conn->prepare("UPDATE voucher_detail SET UsedStatus = 0 WHERE CustomerID = ? AND VoucherID = ?");
+                    $stmtRevertVoucher->bind_param("ii", $custVal, $vouchVal);
+                    $stmtRevertVoucher->execute();
+                    $stmtRevertVoucher->close();
+                }
+            }
+            $stmtGetVoucher->close();
 
             $conn->commit();
         } catch (Exception $e) {

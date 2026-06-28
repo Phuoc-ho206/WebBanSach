@@ -26,10 +26,18 @@ include '../includes/header.php';
 
 // XÂY DỰNG CÂU LỆNH TRUY VẤN LỌC SẢN PHẨM (FILTER LOGIC)
 $sql_products = "
-    SELECT p.ProductID, p.ProductName, p.Price, p.Status, p.Publisher, c.CategoryName, i.ImageURL 
+    SELECT p.ProductID, p.ProductName, p.Price, p.Status, p.Publisher, c.CategoryName, i.ImageURL,
+           ap.DiscountRate, ap.PromotionName
     FROM product p
     LEFT JOIN category c ON p.CategoryID = c.CategoryID
     LEFT JOIN image i ON p.ProductID = i.ProductID AND i.IsThumbnail = 1
+    LEFT JOIN (
+        SELECT pd.ProductID, MAX(pd.DiscountRate) AS DiscountRate, MIN(pr.PromotionName) AS PromotionName
+        FROM promotion_detail pd
+        JOIN promotion pr ON pd.PromotionID = pr.PromotionID
+        WHERE NOW() BETWEEN COALESCE(pd.StartDate, pr.StartDate) AND COALESCE(pd.EndDate, pr.EndDate)
+        GROUP BY pd.ProductID
+    ) ap ON p.ProductID = ap.ProductID
     WHERE 1=1
 ";
 
@@ -214,15 +222,34 @@ $publishers_query = $conn->query("SELECT DISTINCT Publisher FROM product WHERE P
                         
                         <p class="card__subtitle" style="margin-top: 4px;">Hãng: <span style="color: var(--color-primary); font-weight: bold;"><?= htmlspecialchars($product['Publisher'] ?? 'Chưa rõ') ?></span></p>
                         
-                        <div class="card__price">
-                            <?= number_format($product['Price'], 0, ',', '.') ?> đ
-                        </div> 
-                        
-                        <?php if($product['Status'] == 'Hết hàng'): ?>
-                            <span class="badge badge--error" style="width: fit-content; margin-top: 8px;">Hết hàng</span>
+                        <?php 
+                        $originalPrice = $product['Price'];
+                        $discountRate = isset($product['DiscountRate']) ? floatval($product['DiscountRate']) : 0;
+                        $discountedPrice = $originalPrice - ($originalPrice * $discountRate / 100);
+                        ?>
+
+                        <?php if ($discountRate > 0): ?>
+                            <div class="card__price" style="display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px;">
+                                <span style="color: var(--color-primary); font-weight: bold;"><?= number_format($discountedPrice, 0, ',', '.') ?> đ</span>
+                                <span style="text-decoration: line-through; color: var(--color-text-light); font-size: 0.85rem; font-weight: normal;"><?= number_format($originalPrice, 0, ',', '.') ?> đ</span>
+                            </div>
                         <?php else: ?>
-                            <span class="badge badge--success" style="width: fit-content; margin-top: 8px;">Còn hàng</span>
+                            <div class="card__price">
+                                <?= number_format($originalPrice, 0, ',', '.') ?> đ
+                            </div>
                         <?php endif; ?>
+                        
+                        <div style="display: flex; gap: var(--spacing-xs); align-items: center; margin-top: 8px; flex-wrap: wrap;">
+                            <?php if($product['Status'] == 'Hết hàng'): ?>
+                                <span class="badge badge--error">Hết hàng</span>
+                            <?php else: ?>
+                                <span class="badge badge--success">Còn hàng</span>
+                            <?php endif; ?>
+                            
+                            <?php if ($discountRate > 0): ?>
+                                <span class="badge badge--warning" style="background-color: var(--color-primary); color: white; font-weight: bold;">-<?= number_format($discountRate, 0) ?>%</span>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     
                     <div class="card__footer">
