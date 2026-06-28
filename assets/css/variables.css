@@ -1,31 +1,31 @@
 :root {
 
-    --color-primary-dark: #ff6b1a;
-    /* Cam đậm - dựa trên Alpha Books */
-    --color-primary: #ff7a3d;
-    /* Cam chính - màu chủ đạo, logo, nút hành động */
-    --color-secondary: #4a9b7f;
-    /* Xanh lục lam - tiêu đề, nhấn phụ */
-    --color-accent: #ff7a3d;
-    /* Cam - nút, điểm nhấn chính */
-    --color-accent-dark: #ff6b1a;
-    /* Cam đậm - hover state */
-    --color-background: #f5f8fa;
+    --color-primary-dark: #1e4241;
+    /* Xanh đậm  */
+    --color-primary: #2d5f5d;
+    /* Xanh trung bình - màu chủ đạo */
+    --color-secondary: #f9b234;
+    /* Vàng ấm - nhấn nổi bật */
+    --color-accent: #e85d04;
+    /* Cam - nút, điểm nhấn */
+    --color-accent-dark: #c44d03;
+    /* Cam đậm  */
+    --color-background: #f8f9fa;
     /* Nền sáng tổng thể */
     --color-surface: #ffffff;
     /* Nền thẻ, khu vực nội dung */
-    --color-border: #e8e8e8;
+    --color-border: #e0e0e0;
     /* Viền trung tính */
-    --color-text: #1a1a1a;
+    --color-text: #222831;
     /* Chữ chính */
-    --color-text-light: #666666;
+    --color-text-light: #6c757d;
     /* Chữ phụ, mô tả */
     --color-success: #4caf50;
     /* Thành công */
-    --color-error: #ff4444;
+    --color-error: #e63946;
     /* Lỗi, cảnh báo đỏ */
-    --color-warning: #ffa500;
-    /* Cảnh báo cam */
+    --color-warning: #ffb703;
+    /* Cảnh báo vàng */
     --color-info: #2196f3;
     /* Thông tin, nhắc nhở */
 
