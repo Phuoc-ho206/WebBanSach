@@ -3,11 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
-<<<<<<< HEAD
--- Generation Time: Jun 21, 2026 at 06:04 PM
-=======
 -- Generation Time: Jun 27, 2026 at 03:53 PM
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 -- Server version: 8.4.7
 -- PHP Version: 8.3.28
 
@@ -24,11 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `bookstore`
 --
-<<<<<<< HEAD
 CREATE DATABASE IF NOT EXISTS `bookstore` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `bookstore`;
-=======
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 
 -- --------------------------------------------------------
 
@@ -112,7 +105,6 @@ CREATE TABLE IF NOT EXISTS `cart_detail` (
   `SizeID` int DEFAULT NULL,
   `Quantity` int NOT NULL DEFAULT '1',
   `AddedAt` datetime DEFAULT CURRENT_TIMESTAMP,
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
   PRIMARY KEY (`CartID`,`ProductID`),
   KEY `fk_cartdetail_product` (`ProductID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -121,19 +113,7 @@ CREATE TABLE IF NOT EXISTS `cart_detail` (
 -- Dumping data for table `cart_detail`
 --
 
-<<<<<<< HEAD
-INSERT INTO `cart_detail` (`CartID`, `ProductID`, `Quantity`) VALUES
-(1, 1, 1),
-(1, 4, 1),
-(2, 2, 2),
-(2, 5, 1),
-(3, 8, 1),
-(4, 3, 1),
-(5, 9, 1),
-(6, 6, 5),
-(7, 7, 1),
-(8, 10, 1);
-=======
+
 INSERT INTO `cart_detail` (`CartID`, `ProductID`, `SizeID`, `Quantity`, `AddedAt`) VALUES
 (1, 1, NULL, 1, '2026-06-27 22:14:35'),
 (1, 4, NULL, 1, '2026-06-27 22:14:35'),
@@ -145,7 +125,6 @@ INSERT INTO `cart_detail` (`CartID`, `ProductID`, `SizeID`, `Quantity`, `AddedAt
 (6, 6, NULL, 5, '2026-06-27 22:14:35'),
 (7, 7, NULL, 1, '2026-06-27 22:14:35'),
 (8, 10, NULL, 1, '2026-06-27 22:14:35');
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 
 -- --------------------------------------------------------
 
@@ -236,13 +215,8 @@ INSERT INTO `image` (`ImageID`, `ProductID`, `ImageURL`, `AltText`, `IsThumbnail
 (1, 1, '/images/matbiec_thumb.jpg', 'Bìa sách Mắt Biếc', 1, 1),
 (2, 1, '/images/matbiec_back.jpg', 'Mặt sau sách Mắt Biếc', 0, 2),
 (3, 2, '/images/nhagiakim_thumb.jpg', 'Bìa sách Nhà Giả Kim', 1, 1),
-<<<<<<< HEAD
-(4, 3, '/images/richdad_thumb.jpg', 'Bìa sách Cha Giàu Cha Nghèo', 1, 1),
-(5, 4, '/images/dacnhantam_thumb.jpg', 'Bìa sách Đắc Nhân Tâm', 1, 1),
-=======
 (4, 3, '/images/books/richdad_thumb.jpg', 'Bìa sách Cha Giàu Cha Nghèo', 1, 1),
 (5, 4, '/images/books/dac-nhan-tam.jpg', 'Bìa sách Đắc Nhân Tâm', 1, 1),
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 (6, 5, '/images/cleancode_thumb.jpg', 'Bìa sách Clean Code', 1, 1),
 (7, 6, '/images/doremon1_thumb.jpg', 'Bìa sách Doraemon Tập 1', 1, 1),
 (8, 7, '/images/daiviet_thumb.jpg', 'Bìa sách Đại Việt Sử Ký Toàn Thư', 1, 1),
@@ -259,10 +233,7 @@ DROP TABLE IF EXISTS `order`;
 CREATE TABLE IF NOT EXISTS `order` (
   `OrderID` int NOT NULL AUTO_INCREMENT,
   `CustomerID` int DEFAULT NULL,
-<<<<<<< HEAD
-=======
   `EmployeeID` int DEFAULT NULL,
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
   `VoucherID` int DEFAULT NULL,
   `OrderDate` datetime DEFAULT CURRENT_TIMESTAMP,
   `ShippingAddress` text COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -270,31 +241,14 @@ CREATE TABLE IF NOT EXISTS `order` (
   `TotalAmount` decimal(15,2) NOT NULL,
   PRIMARY KEY (`OrderID`),
   KEY `fk_order_user` (`CustomerID`),
-<<<<<<< HEAD
-  KEY `fk_order_voucher` (`VoucherID`)
-=======
   KEY `fk_order_voucher` (`VoucherID`),
   KEY `fk_order_employee` (`EmployeeID`)
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `order`
 --
 
-<<<<<<< HEAD
-INSERT INTO `order` (`OrderID`, `CustomerID`, `VoucherID`, `OrderDate`, `ShippingAddress`, `OrderStatus`, `TotalAmount`) VALUES
-(1, 2, 2, '2026-04-01 09:00:00', '123 Nguyễn Trãi, Quận 1, TP.HCM', 'Delivered', 145000.00),
-(2, 3, NULL, '2026-04-02 09:45:00', '456 Lê Lợi, Quận 1, TP.HCM', 'Delivered', 500000.00),
-(3, 7, 5, '2026-04-08 09:30:00', '12 Cách Mạng Tháng 8, Quận 3, TP.HCM', 'Shipped', 70000.00),
-(4, 10, 1, '2026-04-11 15:15:00', '78 Bạch Đằng, Hải Châu, Đà Nẵng', 'Processing', 350000.00),
-(5, 2, NULL, '2026-04-12 10:00:00', 'Tòa nhà Bitexco, Quận 1, TP.HCM', 'Cancelled', 85000.00),
-(6, 6, 8, '2026-04-13 14:20:00', '789 Điện Biên Phủ, Bình Thạnh, TP.HCM', 'Pending', 120000.00),
-(7, 8, NULL, '2026-04-14 16:00:00', '34 Xuân Thủy, Cầu Giấy, Hà Nội', 'Shipped', 90000.00),
-(8, 9, 3, '2026-04-15 19:30:00', '56 Nguyễn Chí Thanh, Đống Đa, Hà Nội', 'Processing', 345000.00),
-(9, 3, NULL, '2026-04-16 11:00:00', '11 Nguyễn Đình Chiểu, Quận 3, TP.HCM', 'Pending', 65000.00),
-(10, 10, 2, '2026-04-18 08:30:00', '78 Bạch Đằng, Hải Châu, Đà Nẵng', 'Pending', 200000.00);
-=======
 INSERT INTO `order` (`OrderID`, `CustomerID`, `EmployeeID`, `VoucherID`, `OrderDate`, `ShippingAddress`, `OrderStatus`, `TotalAmount`) VALUES
 (1, 2, NULL, 2, '2026-04-01 09:00:00', '123 Nguyễn Trãi, Quận 1, TP.HCM', 'Delivered', 145000.00),
 (2, 3, NULL, NULL, '2026-04-02 09:45:00', '456 Lê Lợi, Quận 1, TP.HCM', 'Delivered', 500000.00),
@@ -306,7 +260,6 @@ INSERT INTO `order` (`OrderID`, `CustomerID`, `EmployeeID`, `VoucherID`, `OrderD
 (8, 9, NULL, 3, '2026-04-15 19:30:00', '56 Nguyễn Chí Thanh, Đống Đa, Hà Nội', 'Processing', 345000.00),
 (9, 3, NULL, NULL, '2026-04-16 11:00:00', '11 Nguyễn Đình Chiểu, Quận 3, TP.HCM', 'Pending', 65000.00),
 (10, 10, NULL, 2, '2026-04-18 08:30:00', '78 Bạch Đằng, Hải Châu, Đà Nẵng', 'Pending', 200000.00);
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 
 -- --------------------------------------------------------
 
@@ -318,10 +271,7 @@ DROP TABLE IF EXISTS `order_detail`;
 CREATE TABLE IF NOT EXISTS `order_detail` (
   `OrderID` int NOT NULL,
   `ProductID` int NOT NULL,
-<<<<<<< HEAD
-=======
   `SizeID` int DEFAULT NULL,
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
   `Quantity` int NOT NULL,
   `Price` int NOT NULL DEFAULT '0',
   `UnitPrice` decimal(15,2) NOT NULL,
@@ -333,19 +283,6 @@ CREATE TABLE IF NOT EXISTS `order_detail` (
 -- Dumping data for table `order_detail`
 --
 
-<<<<<<< HEAD
-INSERT INTO `order_detail` (`OrderID`, `ProductID`, `Quantity`, `Price`, `UnitPrice`) VALUES
-(1, 1, 1, 85000, 0.00),
-(1, 4, 1, 90000, 0.00),
-(2, 2, 2, 75000, 0.00),
-(2, 5, 1, 350000, 0.00),
-(3, 3, 1, 110000, 0.00),
-(4, 7, 1, 450000, 0.00),
-(5, 1, 1, 85000, 0.00),
-(6, 1, 1, 85000, 0.00),
-(7, 4, 1, 90000, 0.00),
-(8, 9, 1, 395000, 0.00);
-=======
 INSERT INTO `order_detail` (`OrderID`, `ProductID`, `SizeID`, `Quantity`, `Price`, `UnitPrice`) VALUES
 (1, 1, NULL, 1, 85000, 0.00),
 (1, 4, NULL, 1, 90000, 0.00),
@@ -357,7 +294,6 @@ INSERT INTO `order_detail` (`OrderID`, `ProductID`, `SizeID`, `Quantity`, `Price
 (6, 1, NULL, 1, 85000, 0.00),
 (7, 4, NULL, 1, 90000, 0.00),
 (8, 9, NULL, 1, 395000, 0.00);
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 
 -- --------------------------------------------------------
 
@@ -402,13 +338,10 @@ DROP TABLE IF EXISTS `product`;
 CREATE TABLE IF NOT EXISTS `product` (
   `ProductID` int NOT NULL AUTO_INCREMENT,
   `CategoryID` int DEFAULT NULL,
-<<<<<<< HEAD
   `ProductName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-=======
   `BrandID` int DEFAULT NULL,
   `ProductName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `Brand` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
   `Price` int NOT NULL DEFAULT '0',
   `Quantity` int DEFAULT '0',
   `Description` text COLLATE utf8mb4_unicode_ci,
@@ -422,19 +355,6 @@ CREATE TABLE IF NOT EXISTS `product` (
 -- Dumping data for table `product`
 --
 
-<<<<<<< HEAD
-INSERT INTO `product` (`ProductID`, `CategoryID`, `ProductName`, `Price`, `Quantity`, `Description`, `Publisher`, `Status`) VALUES
-(1, 1, 'Mắt Biếc', 85000, 150, 'Tiểu thuyết của Nguyễn Nhật Ánh', 'AlphaBooks', 'Còn hàng'),
-(2, 2, 'Nhà Giả Kim', 75000, 200, 'Tiểu thuyết của Paulo Coelho', 'AlphaBooks', 'Còn hàng'),
-(3, 3, 'Cha Giàu Cha Nghèo', 110000, 50, 'Sách tài chính cá nhân', 'AlphaBooks', 'Còn hàng'),
-(4, 4, 'Đắc Nhân Tâm', 90000, 300, 'Sách kỹ năng giao tiếp', 'AlphaBooks', 'Còn hàng'),
-(5, 5, 'Clean Code', 350000, 20, 'Kỹ thuật viết mã sạch', 'AlphaBooks', 'Còn hàng'),
-(6, 6, 'Doraemon Tập 1', 20000, 500, 'Truyện tranh thiếu nhi', 'AlphaBooks', 'Còn hàng'),
-(7, 7, 'Đại Việt Sử Ký Toàn Thư', 450000, 10, 'Lịch sử Việt Nam', 'AlphaBooks', 'Còn hàng'),
-(8, 8, 'Giáo trình Triết học Mác-Lênin', 65000, 100, 'Giáo trình đại học chuẩn', 'AlphaBooks', 'Còn hàng'),
-(9, 9, 'Hack Não 1500 Từ Tiếng Anh', 395000, 80, 'Sách học từ vựng hiệu quả', 'AlphaBooks', 'Còn hàng'),
-(10, 5, 'Computer Networking: A Top-Down Approach', 550000, 0, 'Giáo trình mạng máy tính', 'AlphaBooks', 'Hết hàng');
-=======
 INSERT INTO `product` (`ProductID`, `CategoryID`, `BrandID`, `ProductName`, `Brand`, `Price`, `Quantity`, `Description`, `Publisher`, `Status`) VALUES
 (1, 1, NULL, 'Mắt Biếc', NULL, 85000, 150, 'Tiểu thuyết của Nguyễn Nhật Ánh', 'AlphaBooks', 'Còn hàng'),
 (2, 2, NULL, 'Nhà Giả Kim', NULL, 75000, 200, 'Tiểu thuyết của Paulo Coelho', 'AlphaBooks', 'Còn hàng'),
@@ -446,7 +366,6 @@ INSERT INTO `product` (`ProductID`, `CategoryID`, `BrandID`, `ProductName`, `Bra
 (8, 8, NULL, 'Giáo trình Triết học Mác-Lênin', NULL, 65000, 100, 'Giáo trình đại học chuẩn', 'AlphaBooks', 'Còn hàng'),
 (9, 9, NULL, 'Hack Não 1500 Từ Tiếng Anh', NULL, 395000, 80, 'Sách học từ vựng hiệu quả', 'AlphaBooks', 'Còn hàng'),
 (10, 5, NULL, 'Computer Networking: A Top-Down Approach', NULL, 550000, 0, 'Giáo trình mạng máy tính', 'AlphaBooks', 'Hết hàng');
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 
 -- --------------------------------------------------------
 
@@ -483,8 +402,6 @@ INSERT INTO `promotion` (`PromotionID`, `PromotionName`, `DiscountPercent`, `Sta
 -- --------------------------------------------------------
 
 --
-<<<<<<< HEAD
-=======
 -- Table structure for table `promotion_detail`
 --
 
@@ -502,7 +419,6 @@ CREATE TABLE IF NOT EXISTS `promotion_detail` (
 -- --------------------------------------------------------
 
 --
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 -- Table structure for table `review`
 --
 
@@ -580,11 +496,8 @@ CREATE TABLE IF NOT EXISTS `user` (
   `Email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `Password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `Phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-<<<<<<< HEAD
-=======
   `Address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `CreatedDate` datetime DEFAULT CURRENT_TIMESTAMP,
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
   PRIMARY KEY (`CustomerID`),
   UNIQUE KEY `Email` (`Email`),
   KEY `fk_user_role` (`RoleID`)
@@ -594,19 +507,6 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Dumping data for table `user`
 --
 
-<<<<<<< HEAD
-INSERT INTO `user` (`CustomerID`, `RoleID`, `LastName`, `FirstName`, `Email`, `Password`, `Phone`) VALUES
-(1, 1, 'Nguyễn', 'Quản Trị', 'admin@bookstore.vn', 'hashed_pass_1', '0901234567'),
-(2, 2, 'Trần', 'Khách Hàng 1', 'khach1@gmail.com', 'hashed_pass_2', '0912345678'),
-(3, 2, 'Lê', 'Khách Hàng 2', 'khach2@gmail.com', 'hashed_pass_3', '0923456789'),
-(4, 4, 'Phạm', 'Nhân Viên', 'staff1@bookstore.vn', 'hashed_pass_4', '0934567890'),
-(5, 5, 'Hoàng', 'Giao Hàng', 'shipper@bookstore.vn', 'hashed_pass_5', '0945678901'),
-(6, 2, 'Vũ', 'Khách Hàng 3', 'khach3@gmail.com', 'hashed_pass_6', '0956789012'),
-(7, 2, 'Đặng', 'Khách Hàng 4', 'khach4@gmail.com', 'hashed_pass_7', '0967890123'),
-(8, 2, 'Bùi', 'Khách Hàng 5', 'khach5@gmail.com', 'hashed_pass_8', '0978901234'),
-(9, 2, 'Đỗ', 'Khách Hàng 6', 'khach6@gmail.com', 'hashed_pass_9', '0989012345'),
-(10, 2, 'Hồ', 'Khách Hàng 7', 'khach7@gmail.com', 'hashed_pass_10', '0990123456');
-=======
 INSERT INTO `user` (`CustomerID`, `RoleID`, `LastName`, `FirstName`, `Email`, `Password`, `Phone`, `Address`, `CreatedDate`) VALUES
 (1, 1, 'Nguyễn', 'Quản Trị', 'admin@bookstore.vn', 'hashed_pass_1', '0901234567', NULL, '2026-06-27 22:14:34'),
 (2, 2, 'Trần', 'Khách Hàng 1', 'khach1@gmail.com', 'hashed_pass_2', '0912345678', NULL, '2026-06-27 22:14:34'),
@@ -618,7 +518,6 @@ INSERT INTO `user` (`CustomerID`, `RoleID`, `LastName`, `FirstName`, `Email`, `P
 (8, 2, 'Bùi', 'Khách Hàng 5', 'khach5@gmail.com', 'hashed_pass_8', '0978901234', NULL, '2026-06-27 22:14:34'),
 (9, 2, 'Đỗ', 'Khách Hàng 6', 'khach6@gmail.com', 'hashed_pass_9', '0989012345', NULL, '2026-06-27 22:14:34'),
 (10, 2, 'Hồ', 'Khách Hàng 7', 'khach7@gmail.com', 'hashed_pass_10', '0990123456', NULL, '2026-06-27 22:14:34');
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 
 -- --------------------------------------------------------
 
@@ -630,38 +529,18 @@ DROP TABLE IF EXISTS `user_log`;
 CREATE TABLE IF NOT EXISTS `user_log` (
   `LogID` int NOT NULL AUTO_INCREMENT,
   `CustomerID` int DEFAULT NULL,
-<<<<<<< HEAD
-  `Action` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `LogDate` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`LogID`),
-  KEY `fk_userlog_user` (`CustomerID`)
-=======
   `EmployeeID` int DEFAULT NULL,
   `Action` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `LogDate` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`LogID`),
   KEY `fk_userlog_user` (`CustomerID`),
   KEY `fk_userlog_employee` (`EmployeeID`)
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `user_log`
 --
 
-<<<<<<< HEAD
-INSERT INTO `user_log` (`LogID`, `CustomerID`, `Action`, `LogDate`) VALUES
-(1, 2, 'Đăng nhập hệ thống', '2026-04-01 08:30:00'),
-(2, 2, 'Xem sản phẩm ID 1', '2026-04-01 08:35:00'),
-(3, 3, 'Đăng nhập hệ thống', '2026-04-02 09:15:00'),
-(4, 3, 'Thêm sản phẩm ID 5 vào giỏ', '2026-04-02 09:20:00'),
-(5, 6, 'Cập nhật địa chỉ giao hàng', '2026-04-03 10:00:00'),
-(6, 7, 'Đăng xuất', '2026-04-03 10:45:00'),
-(7, 8, 'Thanh toán đơn hàng', '2026-04-04 14:20:00'),
-(8, 1, 'Cập nhật giá sản phẩm ID 10', '2026-04-04 15:00:00'),
-(9, 9, 'Đăng ký tài khoản mới', '2026-04-05 11:11:00'),
-(10, 10, 'Áp dụng voucher NEWUSER100', '2026-04-05 11:20:00');
-=======
 INSERT INTO `user_log` (`LogID`, `CustomerID`, `EmployeeID`, `Action`, `LogDate`) VALUES
 (1, 2, NULL, 'Đăng nhập hệ thống', '2026-04-01 08:30:00'),
 (2, 2, NULL, 'Xem sản phẩm ID 1', '2026-04-01 08:35:00'),
@@ -692,7 +571,6 @@ CREATE TABLE IF NOT EXISTS `user_provider` (
   PRIMARY KEY (`ProviderID`),
   KEY `fk_userprovider_user` (`User_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 
 -- --------------------------------------------------------
 
@@ -726,8 +604,6 @@ INSERT INTO `voucher` (`VoucherID`, `VoucherCode`, `DiscountValue`, `ExpiredDate
 (9, 'NIGHTOWL', 35000.00, '2026-04-30 00:00:00'),
 (10, 'BIRTHDAY', 100000.00, '2026-12-31 00:00:00');
 
-<<<<<<< HEAD
-=======
 -- --------------------------------------------------------
 
 --
@@ -744,7 +620,6 @@ CREATE TABLE IF NOT EXISTS `voucher_detail` (
   KEY `fk_voucherdetail_voucher` (`VoucherID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 --
 -- Constraints for dumped tables
 --
@@ -784,10 +659,7 @@ ALTER TABLE `image`
 -- Constraints for table `order`
 --
 ALTER TABLE `order`
-<<<<<<< HEAD
-=======
   ADD CONSTRAINT `fk_order_employee` FOREIGN KEY (`EmployeeID`) REFERENCES `user` (`CustomerID`) ON DELETE SET NULL,
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
   ADD CONSTRAINT `fk_order_user` FOREIGN KEY (`CustomerID`) REFERENCES `user` (`CustomerID`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_order_voucher` FOREIGN KEY (`VoucherID`) REFERENCES `voucher` (`VoucherID`) ON DELETE SET NULL;
 
@@ -811,8 +683,6 @@ ALTER TABLE `product`
   ADD CONSTRAINT `fk_product_category` FOREIGN KEY (`CategoryID`) REFERENCES `category` (`CategoryID`) ON DELETE SET NULL;
 
 --
-<<<<<<< HEAD
-=======
 -- Constraints for table `promotion_detail`
 --
 ALTER TABLE `promotion_detail`
@@ -820,7 +690,6 @@ ALTER TABLE `promotion_detail`
   ADD CONSTRAINT `fk_promodetail_promo` FOREIGN KEY (`PromotionID`) REFERENCES `promotion` (`PromotionID`) ON DELETE CASCADE;
 
 --
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 -- Constraints for table `review`
 --
 ALTER TABLE `review`
@@ -837,9 +706,6 @@ ALTER TABLE `user`
 -- Constraints for table `user_log`
 --
 ALTER TABLE `user_log`
-<<<<<<< HEAD
-  ADD CONSTRAINT `fk_userlog_user` FOREIGN KEY (`CustomerID`) REFERENCES `user` (`CustomerID`) ON DELETE CASCADE;
-=======
   ADD CONSTRAINT `fk_userlog_employee` FOREIGN KEY (`EmployeeID`) REFERENCES `user` (`CustomerID`) ON DELETE SET NULL,
   ADD CONSTRAINT `fk_userlog_user` FOREIGN KEY (`CustomerID`) REFERENCES `user` (`CustomerID`) ON DELETE CASCADE;
 
@@ -855,7 +721,6 @@ ALTER TABLE `user_provider`
 ALTER TABLE `voucher_detail`
   ADD CONSTRAINT `fk_voucherdetail_user` FOREIGN KEY (`CustomerID`) REFERENCES `user` (`CustomerID`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_voucherdetail_voucher` FOREIGN KEY (`VoucherID`) REFERENCES `voucher` (`VoucherID`) ON DELETE CASCADE;
->>>>>>> 818077018440ff3cafeb8b308ad8c3f9a75858e3
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
