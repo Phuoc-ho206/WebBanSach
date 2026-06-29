@@ -67,7 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="form-group">
               <label class="form-label">Tổng tiền</label>
-              <input class="form-control" type="number" min="0" name="total" value="<?= h($editOrder['total'] ?? 0) ?>" required>
+              <div class="input-unit">
+                <input class="form-control" type="number" min="0" name="total" value="<?= h($editOrder['total'] ?? 0) ?>" required>
+                <span class="input-unit__text">đ</span>
+              </div>
             </div>
             <div class="form-group">
               <label class="form-label">Trạng thái</label>
@@ -103,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <td><?= h($order['code']) ?></td>
                 <td><?= h($order['customer']) ?></td>
                 <td><?= date('d/m/Y', strtotime($order['date'])) ?></td>
-                <td><?= number_format($order['total'], 0, ',', '.') ?>đ</td>
+                <td><?= number_format($order['total'], 0, ',', '.') ?> đ</td>
                 <td><span class="badge <?= badgeClass($order['status']) ?>"><?= h($order['status']) ?></span></td>
                 <td class="table__actions">
                   <a class="btn btn--sm btn--outline" href="orders.php?edit=<?= h($order['id']) ?>">Sửa</a>
