@@ -22,6 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if ($action === 'delete') {
     deleteItem('admin_orders', $_POST['id']);
+    if (isset($_POST['ajax'])) {
+      header('Content-Type: application/json');
+      echo json_encode(['success' => true]);
+      exit;
+    }
   }
 
   redirectTo('orders.php');

@@ -25,8 +25,8 @@ function formatNumber(value) {
   return Number(value || 0).toLocaleString('vi-VN');
 }
 
-function formatChartValue(value, unit) {
-  if (!unit) {
+function formatChartValue(value, unit, includeUnit = true) {
+  if (!unit || !includeUnit) {
     return formatNumber(value);
   }
 
@@ -59,7 +59,12 @@ function getAxisMax(maxValue, unit) {
 
 function getAxisTicks(maxValue, unit) {
   if (unit === 'đơn' || unit === 'Sản Phẩm') {
-    return [0, Math.ceil(maxValue / 2), maxValue];
+    if (maxValue <= 1) {
+      return [0, 1];
+    }
+
+    const middle = Math.ceil(maxValue / 2);
+    return middle === maxValue ? [0, maxValue] : [0, middle, maxValue];
   }
 
   return [0, maxValue / 2, maxValue];
@@ -105,7 +110,7 @@ function drawAxes(context, width, height, padding, maxValue, unit) {
     context.moveTo(padding, y);
     context.lineTo(width - padding / 2, y);
     context.stroke();
-    context.fillText(formatChartValue(displayValue, unit), padding - 8, y + 4);
+    context.fillText(formatChartValue(displayValue, unit, false), padding - 8, y + 4);
   });
 }
 
@@ -168,7 +173,6 @@ function drawLineChart(canvas, labels, values, color, unit) {
   context.stroke();
   context.font = '12px Segoe UI, Arial';
   context.textAlign = 'center';
-  let lastLabelRight = -Infinity;
 
   points.forEach(function (point, index) {
     context.fillStyle = '#ffffff';
@@ -180,13 +184,7 @@ function drawLineChart(canvas, labels, values, color, unit) {
     context.stroke();
     if (values[index] > 0) {
       const text = formatChartValue(values[index], unit);
-      const textWidth = context.measureText(text).width + 18;
-      const labelLeft = point.x - textWidth / 2;
-
-      if (labelLeft > lastLabelRight + 6) {
-        drawValueLabel(context, text, point.x, point.y - 14);
-        lastLabelRight = point.x + textWidth / 2;
-      }
+      drawValueLabel(context, text, point.x, point.y - 14);
     }
 
     context.font = '12px Segoe UI, Arial';
@@ -196,6 +194,7 @@ function drawLineChart(canvas, labels, values, color, unit) {
     context.fillText(labels[index], point.x, height - 12);
   });
 }
+
 
 function drawDoughnutChart(canvas, labels, values, unit) {
   const { context, width, height } = prepareCanvas(canvas);
