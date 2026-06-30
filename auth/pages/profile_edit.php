@@ -1,5 +1,5 @@
 <?php
-require_once '../../includes/config.php';
+require_once '../../config/db.php';
 
 if (!isset($_SESSION['profile'])) {
     $_SESSION['profile'] = [
@@ -161,27 +161,6 @@ include '../../includes/header.php';
     }
 </style>
 
-<!-- Header / Navbar -->
-<header class="navbar">
-    <a href="<?= url('/') ?>" class="navbar__brand">
-        <span style="color: var(--color-primary); font-size: 1.8rem; font-weight: 800;">📚 WebBanSach</span>
-    </a>
-    <button class="navbar__toggle" aria-label="Toggle Navigation">☰</button>
-    <ul class="navbar__menu">
-        <li class="navbar__item"><a href="<?= url('/') ?>" class="navbar__link">Trang chủ</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Cửa hàng</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Tin tức</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Giới thiệu</a></li>
-        <li class="navbar__item"><a href="#" class="navbar__link">Liên hệ</a></li>
-    </ul>
-    <div class="navbar__actions">
-        <a href="#" class="btn btn--ghost btn--sm" style="position: relative;">
-            🛒 Giỏ hàng
-            <span class="badge badge--primary" style="position: absolute; top: -5px; right: -5px;">3</span>
-        </a>
-        <a href="<?= url('auth/pages/profile.php') ?>" class="btn btn--primary btn--sm">Tài khoản</a>
-    </div>
-</header>
 
 <main class="profile-container">
     <!-- Breadcrumbs -->
@@ -223,8 +202,7 @@ include '../../includes/header.php';
                     placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành..."><?= htmlspecialchars($profile['address']) ?></textarea>
             </div>
 
-            <!-- Section 2 -->
-            <h3 class="section-title">🔒 Bảo mật & Đổi mật khẩu</h3>
+            <h3 class="section-title"><i class="fa-solid fa-lock" style="margin-right: 8px; color: var(--color-primary);"></i>Bảo mật & Đổi mật khẩu</h3>
             <div class="form-group">
                 <label for="current_password">Mật khẩu hiện tại</label>
                 <input type="password" id="current_password" name="current_password" autocomplete="current-password"
@@ -246,10 +224,10 @@ include '../../includes/header.php';
 
             <div class="actions-panel">
                 <button type="submit" class="btn btn--primary">
-                    💾 Lưu thay đổi
+                    <i class="fa-solid fa-floppy-disk" style="margin-right: 6px;"></i>Lưu thay đổi
                 </button>
                 <a href="profile.php" class="btn btn--outline">
-                    ❌ Hủy bỏ
+                    <i class="fa-solid fa-xmark" style="margin-right: 6px;"></i>Hủy bỏ
                 </a>
             </div>
         </form>
@@ -258,11 +236,7 @@ include '../../includes/header.php';
 
 <?php include '../../includes/footer.php'; ?>
 
-<script>
-    document.querySelector('.navbar__toggle').addEventListener('click', function () {
-        document.querySelector('.navbar').classList.toggle('is-open');
-    });
-</script>
+
 </body>
 
 </html>

@@ -22,6 +22,7 @@ if (isset($conn)) {
     <title><?= htmlspecialchars($pageTitle) ?></title>
     
     <link rel="stylesheet" href="/WebBanSach/assets/css/variables.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="stylesheet" href="<?= asset('css/components/navbar.css') ?>?v=<?= time() ?>">
     <link rel="stylesheet" href="<?= asset('css/components/footer.css') ?>">
@@ -48,7 +49,7 @@ if (isset($conn)) {
         <div class="header-top-container">
             
             <a href="<?= url('trangchu/index.php') ?>" class="header-logo" style="text-decoration: none;">
-                <span style="color: var(--color-primary); font-size: 2.2rem; font-weight: 900; letter-spacing: -0.5px; font-family: Georgia, serif;">📚 WebBanSach</span>
+                <span style="color: var(--color-primary); font-size: 2.2rem; font-weight: 900; letter-spacing: -0.5px; font-family: Georgia, serif;"><i class="fa-solid fa-book-open" style="color: var(--color-primary); margin-right: 8px;"></i>WebBanSach</span>
             </a>
 
             <form action="<?= url('trangchu/search.php') ?>" method="GET" class="header-search">
@@ -70,10 +71,10 @@ if (isset($conn)) {
                     </div>
                 </div>
 
-                <a href="<?= url('cart/history.php') ?>" class="header-action-item">
+                <a href="<?= url('cart/cart.php') ?>" class="header-action-item">
                     <div class="header-action-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                        <span class="header-cart-badge">0</span> 
+                        <i class="fa-solid fa-cart-shopping" style="font-size: 1.25rem;"></i>
+                        <span class="header-cart-badge"><?= array_sum($_SESSION['cart'] ?? []) ?></span> 
                     </div>
                     <div class="header-action-text">
                         <span style="opacity: 0; height: 0;">&nbsp;</span>
@@ -83,7 +84,7 @@ if (isset($conn)) {
 
                 <a href="<?= url('auth/pages/login.php') ?>" class="header-action-item">
                     <div class="header-action-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <i class="fa-solid fa-user" style="font-size: 1.25rem;"></i>
                     </div>
                     <div class="header-action-text">
                         <?php if(isset($_SESSION['user']) || isset($_SESSION['profile'])): ?>
@@ -106,7 +107,7 @@ if (isset($conn)) {
             
             <div class="category-dropdown-wrapper <?= (isset($isHomepage) && $isHomepage) ? 'always-open' : '' ?>">
                 <div class="category-dropdown-header">
-                    ☰ TẤT CẢ DANH MỤC
+                    <i class="fa-solid fa-bars" style="margin-right: 8px;"></i> TẤT CẢ DANH MỤC
                 </div>
                 
                 <ul class="category-sidebar-list">
@@ -134,10 +135,10 @@ if (isset($conn)) {
                             }
                         ?>
                             <li>
-                                <a href="<?= url('trangchu/category.php?id=' . $cat['CategoryID']) ?>">
-                                    <?= htmlspecialchars($catName) ?>
-                                    <span style="font-weight: 300;">›</span>
-                                </a>
+                                 <a href="<?= url('trangchu/category.php?id=' . $cat['CategoryID']) ?>">
+                                     <?= htmlspecialchars($catName) ?>
+                                     <i class="fa-solid fa-angle-right" style="font-size: 0.8rem; opacity: 0.5;"></i>
+                                 </a>
                                 
                                 <div class="category-submenu">
                                     <div class="category-submenu-title"><?= htmlspecialchars($catName) ?></div>
