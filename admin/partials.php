@@ -23,7 +23,7 @@ function badgeClass($status) {
     return 'badge--success';
   }
 
-  if (in_array($status, ['Chờ xử lý', 'Sắp hết hạn', 'Đang giao'], true)) {
+  if (in_array($status, ['Chờ xử lý', 'Sắp hết hạn', 'Đang giao', 'Chờ xác nhận'], true)) {
     return 'badge--warning';
   }
 
@@ -31,7 +31,7 @@ function badgeClass($status) {
     return 'badge--danger';
   }
 
-  return 'badge--info';
+  return 'badge--info'; // Ví dụ: 'Đã xác nhận' sẽ có màu badge--info
 }
 
 function adminSidebar() {

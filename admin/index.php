@@ -2,15 +2,77 @@
 require_once 'data.php';
 require_once 'partials.php';
 
-$productCount = count($_SESSION['admin_products']);
-$categoryCount = count($_SESSION['admin_categories']);
-$orderCount = count($_SESSION['admin_orders']);
-$userCount = count($_SESSION['admin_users']);
-$couponCount = count($_SESSION['admin_coupons']);
-$revenue = array_sum(array_column($_SESSION['admin_orders'], 'total'));
-$monthlyStats = monthlyOrderStats();
-$orderStatusStats = countByField($_SESSION['admin_orders'], 'status');
-$productCategoryStats = countByField($_SESSION['admin_products'], 'category');
+// Đếm tổng sản phẩm
+$res = $conn->query("SELECT COUNT(*) FROM product");
+$productCount = $res ? (int)$res->fetch_row()[0] : 0;
+
+// Đếm tổng danh mục
+$res = $conn->query("SELECT COUNT(*) FROM category");
+$categoryCount = $res ? (int)$res->fetch_row()[0] : 0;
+
+// Đếm tổng đơn hàng
+$res = $conn->query("SELECT COUNT(*) FROM `order`");
+$orderCount = $res ? (int)$res->fetch_row()[0] : 0;
+
+// Đếm tổng người dùng
+$res = $conn->query("SELECT COUNT(*) FROM user");
+$userCount = $res ? (int)$res->fetch_row()[0] : 0;
+
+// Đếm tổng mã giảm giá
+$res = $conn->query("SELECT COUNT(*) FROM voucher");
+$couponCount = $res ? (int)$res->fetch_row()[0] : 0;
+
+// Tính tổng doanh thu từ các đơn hàng thành công (Delivered)
+$res = $conn->query("SELECT SUM(TotalAmount) FROM `order` WHERE OrderStatus = 'Delivered'");
+$revenue = $res ? (float)$res->fetch_row()[0] : 0.0;
+
+// Thống kê doanh thu và đơn hàng theo tháng (cho cả năm)
+$monthlyStats = array_fill(1, 12, ['orders' => 0, 'revenue' => 0]);
+$resMonthly = $conn->query("
+  SELECT MONTH(OrderDate) AS Month, COUNT(*) AS OrderCount, SUM(TotalAmount) AS TotalRevenue 
+  FROM `order` 
+  GROUP BY MONTH(OrderDate)
+");
+if ($resMonthly) {
+  while ($row = $resMonthly->fetch_assoc()) {
+    $m = (int)$row['Month'];
+    if ($m >= 1 && $m <= 12) {
+      $monthlyStats[$m]['orders'] = (int)$row['OrderCount'];
+      $monthlyStats[$m]['revenue'] = (float)($row['TotalRevenue'] ?? 0);
+    }
+  }
+}
+
+// Thống kê trạng thái đơn hàng (ánh xạ sang tiếng Việt)
+$statusMapping = [
+  'Pending' => 'Chờ xác nhận',
+  'Processing' => 'Đã xác nhận',
+  'Shipped' => 'Đang giao',
+  'Delivered' => 'Hoàn thành',
+  'Cancelled' => 'Đã hủy'
+];
+$orderStatusStats = [];
+$resStatus = $conn->query("SELECT OrderStatus, COUNT(*) AS Count FROM `order` GROUP BY OrderStatus");
+if ($resStatus) {
+  while ($row = $resStatus->fetch_assoc()) {
+    $vnStatus = $statusMapping[$row['OrderStatus']] ?? $row['OrderStatus'];
+    $orderStatusStats[$vnStatus] = (int)$row['Count'];
+  }
+}
+
+// Thống kê số lượng sản phẩm theo danh mục
+$productCategoryStats = [];
+$resCatStats = $conn->query("
+  SELECT c.CategoryName, COUNT(p.ProductID) AS Count 
+  FROM category c 
+  INNER JOIN product p ON c.CategoryID = p.CategoryID 
+  GROUP BY c.CategoryID
+");
+if ($resCatStats) {
+  while ($row = $resCatStats->fetch_assoc()) {
+    $productCategoryStats[$row['CategoryName']] = (int)$row['Count'];
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
