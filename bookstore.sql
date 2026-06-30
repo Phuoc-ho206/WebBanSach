@@ -99,9 +99,6 @@ DROP TABLE IF EXISTS `cart_detail`;
 CREATE TABLE IF NOT EXISTS `cart_detail` (
   `CartID` int NOT NULL,
   `ProductID` int NOT NULL,
-<<<<<<< HEAD
-  `Quantity` int NOT NULL DEFAULT '1',
-=======
   `SizeID` int DEFAULT NULL,
   `Quantity` int NOT NULL DEFAULT '1',
   `AddedAt` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -331,6 +328,49 @@ INSERT INTO `payment` (`PaymentID`, `OrderID`, `PaymentMethod`, `PaymentStatus`,
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `password_reset_tokens`
+--
+
+DROP TABLE IF EXISTS `password_reset_tokens`;
+CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `used` tinyint(1) DEFAULT '0',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_sessions`
+--
+
+DROP TABLE IF EXISTS `user_sessions`;
+CREATE TABLE IF NOT EXISTS `user_sessions` (
+  `SessionID` int NOT NULL AUTO_INCREMENT,
+  `CustomerID` int NOT NULL,
+  `Jti` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `TokenHash` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `RememberMe` tinyint(1) NOT NULL DEFAULT '0',
+  `UserAgent` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `IpAddress` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ExpiresAt` datetime NOT NULL,
+  `RevokedAt` datetime DEFAULT NULL,
+  `CreatedAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `LastUsedAt` datetime DEFAULT NULL,
+  PRIMARY KEY (`SessionID`),
+  UNIQUE KEY `uk_user_sessions_jti` (`Jti`),
+  KEY `fk_usersession_user` (`CustomerID`),
+  KEY `idx_user_sessions_expires` (`ExpiresAt`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `product`
 --
 
@@ -340,7 +380,6 @@ CREATE TABLE IF NOT EXISTS `product` (
   `CategoryID` int DEFAULT NULL,
   `ProductName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `BrandID` int DEFAULT NULL,
-  `ProductName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `Brand` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Price` int NOT NULL DEFAULT '0',
   `Quantity` int DEFAULT '0',
@@ -508,7 +547,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 --
 
 INSERT INTO `user` (`CustomerID`, `RoleID`, `LastName`, `FirstName`, `Email`, `Password`, `Phone`, `Address`, `CreatedDate`) VALUES
-(1, 1, 'Nguyễn', 'Quản Trị', 'admin@bookstore.vn', 'hashed_pass_1', '0901234567', NULL, '2026-06-27 22:14:34'),
+(1, 1, 'Nguyễn', 'Quản Trị', 'admin@bookstore.vn', '88888888', '0901234567', NULL, '2026-06-27 22:14:34'),
 (2, 2, 'Trần', 'Khách Hàng 1', 'khach1@gmail.com', 'hashed_pass_2', '0912345678', NULL, '2026-06-27 22:14:34'),
 (3, 2, 'Lê', 'Khách Hàng 2', 'khach2@gmail.com', 'hashed_pass_3', '0923456789', NULL, '2026-06-27 22:14:34'),
 (4, 4, 'Phạm', 'Nhân Viên', 'staff1@bookstore.vn', 'hashed_pass_4', '0934567890', NULL, '2026-06-27 22:14:34'),
@@ -675,6 +714,18 @@ ALTER TABLE `order_detail`
 --
 ALTER TABLE `payment`
   ADD CONSTRAINT `fk_payment_order` FOREIGN KEY (`OrderID`) REFERENCES `order` (`OrderID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `password_reset_tokens`
+--
+ALTER TABLE `password_reset_tokens`
+  ADD CONSTRAINT `fk_passwordreset_user` FOREIGN KEY (`email`) REFERENCES `user` (`Email`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  ADD CONSTRAINT `fk_usersession_user` FOREIGN KEY (`CustomerID`) REFERENCES `user` (`CustomerID`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `product`

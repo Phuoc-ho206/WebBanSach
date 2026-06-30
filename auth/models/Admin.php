@@ -1,28 +1,66 @@
 <?php
 
 /**
- * Admin Model - Xử lý các thao tác với database cho admin
+ * Admin Model
+ * 
+ * Lớp xử lý các thao tác truy vấn dữ liệu liên quan đến quản trị viên (bảng `user` với RoleID = 1).
  */
-
 class Admin
 {
+    /**
+     * @var mysqli Kết nối cơ sở dữ liệu
+     */
     private $conn;
-    private $table = 'users';
 
+    /**
+     * @var string Tên bảng trong cơ sở dữ liệu
+     */
+    private $table = 'user';
+
+    /**
+     * Khởi tạo đối tượng Admin và thiết lập kết nối cơ sở dữ liệu.
+     */
     public function __construct()
     {
-        require_once __DIR__ . '/../../config/db.php';
-        $this->conn = $conn;
+        if (!isset($GLOBALS['conn'])) {
+            require_once __DIR__ . '/../../config/db.php';
+        }
+        $this->conn = $GLOBALS['conn'];
     }
 
     /**
-     * Tìm admin theo ID
+     * Ánh xạ dữ liệu từ một dòng trong cơ sở dữ liệu sang định dạng mảng admin mà ứng dụng sử dụng.
+     *
+     * @param array $row Dòng dữ liệu từ bảng `user`.
+     * @return array Mảng thông tin admin được chuẩn hóa.
+     */
+    private function mapRowToAdmin(array $row): array
+    {
+        $fullName = trim(($row['LastName'] ?? '') . ' ' . ($row['FirstName'] ?? ''));
+        return [
+            'id' => (int)$row['CustomerID'],
+            'username' => $row['Email'], // Sử dụng Email làm username do bảng user không có cột username
+            'email' => $row['Email'],
+            'password' => $row['Password'] ?? '',
+            'full_name' => $fullName,
+            'phone' => $row['Phone'] ?? '',
+            'address' => $row['Address'] ?? '',
+            'role' => 'admin',
+            'created_at' => $row['CreatedDate'] ?? null
+        ];
+    }
+
+    /**
+     * Tìm kiếm admin theo ID.
+     *
+     * @param int $id ID của admin (CustomerID).
+     * @return array|null Mảng thông tin quản trị viên nếu tìm thấy, ngược lại là null.
      */
     public function findById(int $id): ?array
     {
-        $sql = "SELECT id, username, email, full_name, phone, address, role, created_at 
+        $sql = "SELECT CustomerID, LastName, FirstName, Email, Phone, Address, RoleID, CreatedDate 
                 FROM {$this->table} 
-                WHERE id = ? AND role = 'admin'
+                WHERE CustomerID = ? AND RoleID = 1
                 LIMIT 1";
 
         $stmt = $this->conn->prepare($sql);
@@ -31,20 +69,23 @@ class Admin
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            return $result->fetch_assoc();
+            return $this->mapRowToAdmin($result->fetch_assoc());
         }
 
         return null;
     }
 
     /**
-     * Tìm admin theo email
+     * Tìm kiếm admin theo địa chỉ email.
+     *
+     * @param string $email Địa chỉ email cần tìm.
+     * @return array|null Mảng thông tin quản trị viên nếu tìm thấy, ngược lại là null.
      */
     public function findByEmail(string $email): ?array
     {
-        $sql = "SELECT id, username, email, password, full_name, phone, address, role, created_at 
+        $sql = "SELECT CustomerID, LastName, FirstName, Email, Password, Phone, Address, RoleID, CreatedDate 
                 FROM {$this->table} 
-                WHERE email = ? AND role = 'admin'
+                WHERE Email = ? AND RoleID = 1
                 LIMIT 1";
 
         $stmt = $this->conn->prepare($sql);
@@ -53,40 +94,32 @@ class Admin
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            return $result->fetch_assoc();
+            return $this->mapRowToAdmin($result->fetch_assoc());
         }
 
         return null;
     }
 
     /**
-     * Tìm admin theo username
+     * Tìm kiếm admin theo tên đăng nhập (email).
+     *
+     * @param string $username Tên đăng nhập của quản trị viên.
+     * @return array|null Mảng thông tin quản trị viên nếu tìm thấy, ngược lại là null.
      */
     public function findByUsername(string $username): ?array
     {
-        $sql = "SELECT id, username, email, password, full_name, phone, address, role, created_at 
-                FROM {$this->table} 
-                WHERE username = ? AND role = 'admin'
-                LIMIT 1";
-
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param('s', $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            return $result->fetch_assoc();
-        }
-
-        return null;
+        return $this->findByEmail($username);
     }
 
     /**
-     * Kiểm tra user có phải admin không
+     * Kiểm tra người dùng có phải là quản trị viên (RoleID = 1) hay không.
+     *
+     * @param int $userId ID của người dùng.
+     * @return bool True nếu là admin, ngược lại là false.
      */
     public function isAdmin(int $userId): bool
     {
-        $sql = "SELECT role FROM {$this->table} WHERE id = ? LIMIT 1";
+        $sql = "SELECT RoleID FROM {$this->table} WHERE CustomerID = ? LIMIT 1";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('i', $userId);
@@ -95,70 +128,102 @@ class Admin
 
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
-            return $user['role'] === 'admin';
+            return (int)$user['RoleID'] === 1;
         }
 
         return false;
     }
 
     /**
-     * Lấy tất cả admin users
+     * Lấy danh sách tất cả các quản trị viên trong hệ thống.
+     *
+     * @return array Danh sách mảng thông tin các quản trị viên.
      */
     public function getAllAdmins(): array
     {
-        $sql = "SELECT id, username, email, full_name, phone, created_at 
+        $sql = "SELECT CustomerID, LastName, FirstName, Email, Phone, CreatedDate 
                 FROM {$this->table} 
-                WHERE role = 'admin'
-                ORDER BY created_at DESC";
+                WHERE RoleID = 1
+                ORDER BY CreatedDate DESC";
 
         $result = $this->conn->query($sql);
         $admins = [];
 
         while ($row = $result->fetch_assoc()) {
-            $admins[] = $row;
+            $admins[] = $this->mapRowToAdmin($row);
         }
 
         return $admins;
     }
 
     /**
-     * Tạo admin mới
+     * Tạo một tài khoản admin mới.
+     *
+     * @param array $data Mảng dữ liệu admin chứa: email, password, full_name, phone, address.
+     * @return bool True nếu tạo thành công, ngược lại là false.
      */
     public function create(array $data): bool
     {
         $sql = "INSERT INTO {$this->table} 
-                (username, email, password, full_name, phone, address, role, created_at) 
-                VALUES (?, ?, ?, ?, ?, ?, 'admin', NOW())";
+                (LastName, FirstName, Email, Password, Phone, Address, RoleID, CreatedDate) 
+                VALUES (?, ?, ?, ?, ?, ?, 1, NOW())";
+
+        $fullName = trim($data['full_name'] ?? $data['username'] ?? '');
+        $parts = explode(' ', $fullName);
+        if (count($parts) > 1) {
+            $firstName = array_pop($parts);
+            $lastName = implode(' ', $parts);
+        } else {
+            $firstName = $fullName;
+            $lastName = '';
+        }
+
+        $phone = $data['phone'] ?? '';
+        $address = $data['address'] ?? '';
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param(
             'ssssss',
-            $data['username'],
+            $lastName,
+            $firstName,
             $data['email'],
             $data['password'],
-            $data['full_name'] ?? '',
-            $data['phone'] ?? '',
-            $data['address'] ?? ''
+            $phone,
+            $address
         );
 
         return $stmt->execute();
     }
 
     /**
-     * Cập nhật thông tin admin
+     * Cập nhật thông tin của tài khoản admin.
+     *
+     * @param int $id ID của admin cần cập nhật.
+     * @param array $data Mảng dữ liệu cập nhật chứa: full_name, email, phone, address.
+     * @return bool True nếu cập nhật thành công, ngược lại là false.
      */
     public function update(int $id, array $data): bool
     {
         $sql = "UPDATE {$this->table} 
-                SET username = ?, email = ?, full_name = ?, phone = ?, address = ? 
-                WHERE id = ? AND role = 'admin'";
+                SET LastName = ?, FirstName = ?, Email = ?, Phone = ?, Address = ? 
+                WHERE CustomerID = ? AND RoleID = 1";
+
+        $fullName = trim($data['full_name'] ?? '');
+        $parts = explode(' ', $fullName);
+        if (count($parts) > 1) {
+            $firstName = array_pop($parts);
+            $lastName = implode(' ', $parts);
+        } else {
+            $firstName = $fullName;
+            $lastName = '';
+        }
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param(
             'sssssi',
-            $data['username'],
+            $lastName,
+            $firstName,
             $data['email'],
-            $data['full_name'],
             $data['phone'],
             $data['address'],
             $id
@@ -168,11 +233,14 @@ class Admin
     }
 
     /**
-     * Xóa admin (chuyển role thành customer thay vì xóa)
+     * Xóa tài khoản admin khỏi nhóm quản trị (chuyển đổi vai trò về customer - RoleID = 2).
+     *
+     * @param int $id ID của admin cần hạ quyền.
+     * @return bool True nếu thực hiện thành công, ngược lại là false.
      */
     public function delete(int $id): bool
     {
-        $sql = "UPDATE {$this->table} SET role = 'customer' WHERE id = ? AND role = 'admin'";
+        $sql = "UPDATE {$this->table} SET RoleID = 2 WHERE CustomerID = ? AND RoleID = 1";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('i', $id);

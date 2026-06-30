@@ -4,6 +4,8 @@
  * ProfileController - Xử lý cập nhật thông tin profile và đổi mật khẩu
  */
 
+require_once __DIR__ . '/../models/Customer.php';
+
 class ProfileController
 {
     private $customerModel;

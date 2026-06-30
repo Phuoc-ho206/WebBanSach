@@ -4,6 +4,8 @@
  * RegisterController - Xử lý đăng ký tài khoản mới
  */
 
+require_once __DIR__ . '/../models/Customer.php';
+
 class RegisterController
 {
     private $customerModel;

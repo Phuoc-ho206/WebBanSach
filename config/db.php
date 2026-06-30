@@ -20,6 +20,7 @@ if ($conn->connect_error) {
 
 // Set charset UTF-8 để hiển thị tiếng Việt không bị lỗi
 $conn->set_charset("utf8mb4");
+$GLOBALS['conn'] = $conn;
 
 // --- Các hàm tiện ích dùng chung ---
 
@@ -37,5 +38,16 @@ if (!function_exists('url')) {
     {
         return '/WebBanSach/' . ltrim($path, '/');
     }
+}
+
+// Khôi phục đăng nhập từ JWT remember-me (chạy một lần mỗi request)
+if (!defined('AUTH_SESSION_RESTORED')) {
+    define('AUTH_SESSION_RESTORED', true);
+    require_once __DIR__ . '/auth.php';
+    require_once __DIR__ . '/../auth/helpers/JwtHelper.php';
+    require_once __DIR__ . '/../auth/models/Customer.php';
+    require_once __DIR__ . '/../auth/models/UserSession.php';
+    require_once __DIR__ . '/../auth/controller/authcontroller.php';
+    AuthController::tryRestoreSession();
 }
 ?>

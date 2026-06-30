@@ -11,9 +11,9 @@ if (isset($_POST['action']) && $_POST['action'] === 'logout') {
     exit;
 }
 
-// Nếu đã đăng nhập → về trang chủ
+// Nếu đã đăng nhập → chuyển theo vai trò
 if (isset($_SESSION['user'])) {
-    header('Location: /WebBanSach/index.php');
+    header('Location: ' . AuthController::getRedirectUrl($_SESSION['user']));
     exit;
 }
 
@@ -31,19 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $user = AuthController::login($identity, $password);
         if ($user) {
-            $_SESSION['user'] = $user;
-            if (isset($_POST['remember']) && $_POST['remember'] === 'on') {
-                setcookie(
-                    'login_identity',
-                    $identity,
-                    time() + (30 * 24 * 60 * 60), // 30 ngày
-                    '/',
-                    '',
-                    true,  // https only
-                    true   // httponly
-                );
-            }
-            header('Location: /WebBanSach/index.php');
+            $remember = isset($_POST['remember']) && $_POST['remember'] === 'on';
+            AuthController::establishSession($user, $remember);
+            header('Location: ' . AuthController::getRedirectUrl($user));
             exit;
         } else {
             $error = 'Tên đăng nhập hoặc mật khẩu không đúng.';
@@ -55,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['code'])) {
     $user = googleauthcontroller::handleCallback();
     if ($user) {
-        $_SESSION['user'] = $user;
-        header('Location: /WebBanSach/index.php');
+        AuthController::establishSession($user, false);
+        header('Location: ' . AuthController::getRedirectUrl($user));
         exit;
     }
 }

@@ -1,29 +1,112 @@
 <?php
 
 /**
- * Customer Model - Xử lý các thao tác với database cho khách hàng
+ * Customer Model
+ * 
+ * Lớp xử lý các thao tác truy vấn dữ liệu liên quan đến khách hàng (bảng `user`).
  */
-
 class Customer
 {
+    /**
+     * @var mysqli Kết nối cơ sở dữ liệu
+     */
     private $conn;
-    private $table = 'users';
 
+    /**
+     * @var string Tên bảng trong cơ sở dữ liệu
+     */
+    private $table = 'user';
+
+    /**
+     * Khởi tạo đối tượng Customer và thiết lập kết nối cơ sở dữ liệu.
+     */
     public function __construct()
     {
-        // Import database connection từ config/db.php
-        require_once __DIR__ . '/../../config/db.php';
-        $this->conn = $conn;
+        if (!isset($GLOBALS['conn'])) {
+            require_once __DIR__ . '/../../config/db.php';
+        }
+        $this->conn = $GLOBALS['conn'];
     }
 
     /**
-     * Tìm user theo ID
+     * Ánh xạ mã RoleID sang tên vai trò (role name).
+     *
+     * @param int $roleId Mã vai trò từ cơ sở dữ liệu.
+     * @return string Tên vai trò tương ứng (mặc định là 'customer').
+     */
+    private function getRoleName(int $roleId): string
+    {
+        $roles = [
+            1 => 'admin',
+            2 => 'customer',
+            3 => 'manager',
+            4 => 'staff',
+            5 => 'shipper',
+            6 => 'accountant',
+            7 => 'editor',
+            8 => 'marketing',
+            9 => 'support',
+            10 => 'guest'
+        ];
+        return $roles[$roleId] ?? 'customer';
+    }
+
+    /**
+     * Ánh xạ tên vai trò (role name) sang mã RoleID.
+     *
+     * @param string $roleName Tên vai trò.
+     * @return int Mã vai trò tương ứng (mặc định là 2 - customer).
+     */
+    private function getRoleId(string $roleName): int
+    {
+        $roles = [
+            'admin' => 1,
+            'customer' => 2,
+            'manager' => 3,
+            'staff' => 4,
+            'shipper' => 5,
+            'accountant' => 6,
+            'editor' => 7,
+            'marketing' => 8,
+            'support' => 9,
+            'guest' => 10
+        ];
+        return $roles[strtolower($roleName)] ?? 2;
+    }
+
+    /**
+     * Ánh xạ dữ liệu từ một dòng trong cơ sở dữ liệu sang định dạng mảng user mà ứng dụng sử dụng.
+     *
+     * @param array $row Dòng dữ liệu từ bảng `user`.
+     * @return array Mảng thông tin người dùng được chuẩn hóa.
+     */
+    private function mapRowToUser(array $row): array
+    {
+        $fullName = trim(($row['LastName'] ?? '') . ' ' . ($row['FirstName'] ?? ''));
+        return [
+            'id' => (int) $row['CustomerID'],
+            'username' => $row['Email'], // Sử dụng Email làm username do bảng user không có cột username
+            'email' => $row['Email'],
+            'password' => $row['Password'] ?? '',
+            'full_name' => $fullName,
+            'phone' => $row['Phone'] ?? '',
+            'address' => $row['Address'] ?? '',
+            'role' => $this->getRoleName((int) ($row['RoleID'] ?? 2)),
+            'created_at' => $row['CreatedDate'] ?? null
+        ];
+    }
+
+    /**
+     * Tìm kiếm người dùng theo ID.
+     *
+     * @param int $id ID của khách hàng (CustomerID).
+     * @return array|null Mảng thông tin khách hàng nếu tìm thấy, ngược lại là null.
      */
     public function findById(int $id): ?array
     {
-        $sql = "SELECT id, username, email, full_name, phone, address, role, created_at 
+        $sql = "SELECT CustomerID, RoleID, LastName, FirstName, Email, Phone, Address, CreatedDate 
                 FROM {$this->table} 
-                WHERE id = ? 
+                WHERE CustomerID = ? 
                 LIMIT 1";
 
         $stmt = $this->conn->prepare($sql);
@@ -32,20 +115,23 @@ class Customer
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            return $result->fetch_assoc();
+            return $this->mapRowToUser($result->fetch_assoc());
         }
 
         return null;
     }
 
     /**
-     * Tìm user theo email
+     * Tìm kiếm người dùng theo địa chỉ email.
+     *
+     * @param string $email Địa chỉ email cần tìm.
+     * @return array|null Mảng thông tin khách hàng nếu tìm thấy, ngược lại là null.
      */
     public function findByEmail(string $email): ?array
     {
-        $sql = "SELECT id, username, email, password, full_name, phone, address, role, created_at 
+        $sql = "SELECT CustomerID, RoleID, LastName, FirstName, Email, Password, Phone, Address, CreatedDate 
                 FROM {$this->table} 
-                WHERE email = ? 
+                WHERE Email = ? 
                 LIMIT 1";
 
         $stmt = $this->conn->prepare($sql);
@@ -54,95 +140,105 @@ class Customer
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            return $result->fetch_assoc();
+            return $this->mapRowToUser($result->fetch_assoc());
         }
 
         return null;
     }
 
     /**
-     * Tìm user theo username
+     * Tìm kiếm người dùng theo tên đăng nhập.
+     * Do cấu trúc bảng `user` không có cột `username`, hệ thống sẽ tìm kiếm theo email.
+     *
+     * @param string $username Tên đăng nhập (email).
+     * @return array|null Mảng thông tin khách hàng nếu tìm thấy, ngược lại là null.
      */
     public function findByUsername(string $username): ?array
     {
-        $sql = "SELECT id, username, email, password, full_name, phone, address, role, created_at 
-                FROM {$this->table} 
-                WHERE username = ? 
-                LIMIT 1";
-
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param('s', $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            return $result->fetch_assoc();
-        }
-
-        return null;
+        return $this->findByEmail($username);
     }
 
     /**
-     * Tìm user theo username hoặc email (dùng cho login)
+     * Tìm kiếm người dùng theo định danh (username hoặc email) để phục vụ đăng nhập.
+     *
+     * @param string $identity Tên đăng nhập hoặc email.
+     * @return array|null Mảng thông tin khách hàng nếu tìm thấy, ngược lại là null.
      */
     public function findByIdentity(string $identity): ?array
     {
-        $sql = "SELECT id, username, email, password, full_name, phone, address, role, created_at 
-                FROM {$this->table} 
-                WHERE username = ? OR email = ? 
-                LIMIT 1";
-
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param('ss', $identity, $identity);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            return $result->fetch_assoc();
-        }
-
-        return null;
+        return $this->findByEmail($identity);
     }
 
     /**
-     * Tạo user mới
+     * Tạo một người dùng mới trong hệ thống.
+     *
+     * @param array $data Mảng dữ liệu người dùng chứa: email, password, full_name, phone, address, role.
+     * @return bool True nếu tạo thành công, ngược lại là false.
      */
     public function create(array $data): bool
     {
         $sql = "INSERT INTO {$this->table} 
-                (username, email, password, full_name, phone, address, role, created_at) 
+                (LastName, FirstName, Email, Password, Phone, Address, RoleID, CreatedDate) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+
+        $fullName = trim($data['full_name'] ?? $data['username'] ?? '');
+        $parts = explode(' ', $fullName);
+        if (count($parts) > 1) {
+            $firstName = array_pop($parts);
+            $lastName = implode(' ', $parts);
+        } else {
+            $firstName = $fullName;
+            $lastName = '';
+        }
+
+        $roleId = $this->getRoleId($data['role'] ?? 'customer');
+        $phone = $data['phone'] ?? '';
+        $address = $data['address'] ?? '';
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param(
-            'sssssss',
-            $data['username'],
+            'ssssssi',
+            $lastName,
+            $firstName,
             $data['email'],
             $data['password'],
-            $data['full_name'] ?? '',
-            $data['phone'] ?? '',
-            $data['address'] ?? '',
-            $data['role'] ?? 'customer'
+            $phone,
+            $address,
+            $roleId
         );
 
         return $stmt->execute();
     }
 
     /**
-     * Cập nhật thông tin user
+     * Cập nhật thông tin cá nhân của người dùng.
+     *
+     * @param int $id ID của khách hàng cần cập nhật.
+     * @param array $data Mảng dữ liệu cập nhật chứa: full_name, email, phone, address.
+     * @return bool True nếu cập nhật thành công, ngược lại là false.
      */
     public function update(int $id, array $data): bool
     {
         $sql = "UPDATE {$this->table} 
-                SET username = ?, email = ?, full_name = ?, phone = ?, address = ? 
-                WHERE id = ?";
+                SET LastName = ?, FirstName = ?, Email = ?, Phone = ?, Address = ? 
+                WHERE CustomerID = ?";
+
+        $fullName = trim($data['full_name'] ?? '');
+        $parts = explode(' ', $fullName);
+        if (count($parts) > 1) {
+            $firstName = array_pop($parts);
+            $lastName = implode(' ', $parts);
+        } else {
+            $firstName = $fullName;
+            $lastName = '';
+        }
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param(
             'sssssi',
-            $data['username'],
+            $lastName,
+            $firstName,
             $data['email'],
-            $data['full_name'],
             $data['phone'],
             $data['address'],
             $id
@@ -152,11 +248,15 @@ class Customer
     }
 
     /**
-     * Cập nhật mật khẩu
+     * Cập nhật mật khẩu mới cho người dùng.
+     *
+     * @param int $id ID của khách hàng cần cập nhật.
+     * @param string $newPasswordHash Mật khẩu mới đã được mã hóa.
+     * @return bool True nếu cập nhật thành công, ngược lại là false.
      */
     public function updatePassword(int $id, string $newPasswordHash): bool
     {
-        $sql = "UPDATE {$this->table} SET password = ? WHERE id = ?";
+        $sql = "UPDATE {$this->table} SET Password = ? WHERE CustomerID = ?";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('si', $newPasswordHash, $id);
@@ -165,11 +265,15 @@ class Customer
     }
 
     /**
-     * Kiểm tra password có đúng không
+     * Kiểm tra mật khẩu của người dùng có chính xác không.
+     *
+     * @param int $id ID của khách hàng cần kiểm tra.
+     * @param string $password Mật khẩu gốc nhập vào.
+     * @return bool True nếu mật khẩu đúng, ngược lại là false.
      */
     public function checkPassword(int $id, string $password): bool
     {
-        $sql = "SELECT password FROM {$this->table} WHERE id = ? LIMIT 1";
+        $sql = "SELECT Password FROM {$this->table} WHERE CustomerID = ? LIMIT 1";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('i', $id);
@@ -178,33 +282,32 @@ class Customer
 
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
-            return password_verify($password, $user['password']);
+            return password_verify($password, $user['Password']);
         }
 
         return false;
     }
 
     /**
-     * Kiểm tra username đã tồn tại chưa
+     * Kiểm tra tên đăng nhập đã tồn tại chưa.
+     *
+     * @param string $username Tên đăng nhập (email) cần kiểm tra.
+     * @return bool True nếu đã tồn tại, ngược lại là false.
      */
     public function usernameExists(string $username): bool
     {
-        $sql = "SELECT id FROM {$this->table} WHERE username = ? LIMIT 1";
-
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param('s', $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        return $result->num_rows > 0;
+        return $this->emailExists($username);
     }
 
     /**
-     * Kiểm tra email đã tồn tại chưa
+     * Kiểm tra địa chỉ email đã tồn tại trong hệ thống chưa.
+     *
+     * @param string $email Địa chỉ email cần kiểm tra.
+     * @return bool True nếu đã tồn tại, ngược lại là false.
      */
     public function emailExists(string $email): bool
     {
-        $sql = "SELECT id FROM {$this->table} WHERE email = ? LIMIT 1";
+        $sql = "SELECT CustomerID FROM {$this->table} WHERE Email = ? LIMIT 1";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('s', $email);
@@ -215,11 +318,14 @@ class Customer
     }
 
     /**
-     * Cập nhật thời gian login cuối
+     * Ghi nhận lịch sử đăng nhập thành công của người dùng vào bảng `user_log`.
+     *
+     * @param int $id ID của khách hàng vừa đăng nhập.
+     * @return bool True nếu ghi nhận thành công, ngược lại là false.
      */
     public function updateLastLogin(int $id): bool
     {
-        $sql = "UPDATE {$this->table} SET last_login = NOW() WHERE id = ?";
+        $sql = "INSERT INTO user_log (CustomerID, Action, LogDate) VALUES (?, 'Đăng nhập hệ thống', NOW())";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('i', $id);
@@ -228,24 +334,13 @@ class Customer
     }
 
     /**
-     * Lấy thông tin user để hiển thị (không bao gồm password)
+     * Lấy thông tin chi tiết hồ sơ cá nhân của người dùng (không bao gồm mật khẩu).
+     *
+     * @param int $id ID của khách hàng.
+     * @return array|null Mảng thông tin hồ sơ hoặc null nếu không tìm thấy.
      */
     public function getUserProfile(int $id): ?array
     {
-        $sql = "SELECT id, username, email, full_name, phone, address, role, created_at 
-                FROM {$this->table} 
-                WHERE id = ? 
-                LIMIT 1";
-
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            return $result->fetch_assoc();
-        }
-
-        return null;
+        return $this->findById($id);
     }
 }

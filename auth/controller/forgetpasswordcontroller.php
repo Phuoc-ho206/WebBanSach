@@ -14,7 +14,7 @@ class ForgetPasswordController
     public function __construct()
     {
         require_once __DIR__ . '/../../config/db.php';
-        $this->conn = $conn;
+        $this->conn = $conn ?? $GLOBALS['conn'] ?? null;
     }
 
     /**
@@ -33,7 +33,7 @@ class ForgetPasswordController
         }
 
         // Bước 2: Kiểm tra email có tồn tại trong hệ thống không
-        $sql = "SELECT id FROM users WHERE email = ? LIMIT 1";
+        $sql = "SELECT CustomerID FROM user WHERE Email = ? LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('s', $email);
         $stmt->execute();
@@ -214,7 +214,7 @@ class ForgetPasswordController
         }
 
         // Bước 2: Kiểm tra email có tồn tại không
-        $sql = "SELECT id FROM users WHERE email = ? LIMIT 1";
+        $sql = "SELECT CustomerID FROM user WHERE Email = ? LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('s', $email);
         $stmt->execute();
@@ -235,9 +235,9 @@ class ForgetPasswordController
         $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
 
         // Bước 4: Cập nhật password
-        $updateSql = "UPDATE users SET password = ? WHERE id = ?";
+        $updateSql = "UPDATE user SET Password = ? WHERE CustomerID = ?";
         $updateStmt = $this->conn->prepare($updateSql);
-        $updateStmt->bind_param('si', $passwordHash, $user['id']);
+        $updateStmt->bind_param('si', $passwordHash, $user['CustomerID']);
 
         if (!$updateStmt->execute()) {
             $updateStmt->close();
