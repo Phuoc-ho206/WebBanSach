@@ -76,6 +76,11 @@ if ($isValidSignature && $orderId > 0) {
                 $orderRow = $resCust->fetch_assoc();
                 $orderCustId = $orderRow['CustomerID'];
                 if ($orderCustId !== null && $orderCustId > 0) {
+                    $stmtDelCartDetail = $conn->prepare("DELETE FROM cart_detail WHERE CartID IN (SELECT CartID FROM cart WHERE CustomerID = ? AND Status = 'Active')");
+                    $stmtDelCartDetail->bind_param("i", $orderCustId);
+                    $stmtDelCartDetail->execute();
+                    $stmtDelCartDetail->close();
+
                     $stmtCompleteCart = $conn->prepare("UPDATE cart SET Status = 'Completed' WHERE CustomerID = ? AND Status = 'Active'");
                     $stmtCompleteCart->bind_param("i", $orderCustId);
                     $stmtCompleteCart->execute();

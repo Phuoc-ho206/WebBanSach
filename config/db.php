@@ -135,4 +135,24 @@ if (!function_exists('sync_cart_to_db')) {
         $stmtLoad->close();
     }
 }
+
+if (!function_exists('getGuestInfoFromAddress')) {
+    function getGuestInfoFromAddress($address) {
+        $info = [
+            'fullname' => 'Khách vãng lai',
+            'phone' => '',
+            'address' => $address
+        ];
+        if (preg_match('/Người nhận:\s*([^|]+)/i', $address, $matches)) {
+            $info['fullname'] = trim($matches[1]);
+        }
+        if (preg_match('/SĐT:\s*([^|]+)/i', $address, $matches)) {
+            $info['phone'] = trim($matches[1]);
+        }
+        if (preg_match('/Địa chỉ:\s*(.+)$/i', $address, $matches)) {
+            $info['address'] = trim($matches[1]);
+        }
+        return $info;
+    }
+}
 ?>

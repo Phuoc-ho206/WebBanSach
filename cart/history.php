@@ -7,13 +7,16 @@ include '../includes/header.php';
 
 // Trạng thái lọc từ URL
 $statusFilter = isset($_GET['status']) ? trim($_GET['status']) : 'all';
-$searchPhone = isset($_GET['search_phone']) ? trim($_GET['search_phone']) : '';
+$searchPhone = isset($_GET['search_phone']) ? trim($_GET['search_phone']) : ($_SESSION['guest_search_phone'] ?? '');
 
 $orders = [];
 $customerId = isset($_SESSION['user']) ? intval($_SESSION['user']['id']) : 0;
 
 // Xử lý truy vấn đơn hàng
 if ($customerId > 0) {
+    // Xóa session tra cứu khách vãng lai nếu đã đăng nhập thành viên
+    unset($_SESSION['guest_search_phone']);
+    
     // Người dùng đăng nhập
     $sql = "SELECT o.OrderID, o.OrderDate, o.ShippingAddress, o.OrderStatus, o.TotalAmount, p.PaymentStatus, p.PaymentMethod 
             FROM `order` o
@@ -38,6 +41,9 @@ if ($customerId > 0) {
     }
     $stmt->close();
 } elseif (!empty($searchPhone)) {
+    // Lưu SĐT tra cứu của khách vãng lai vào session
+    $_SESSION['guest_search_phone'] = $searchPhone;
+    
     // Khách vãng lai tra cứu bằng số điện thoại
     $phonePattern = "%SĐT: " . $searchPhone . "%";
     $sql = "SELECT o.OrderID, o.OrderDate, o.ShippingAddress, o.OrderStatus, o.TotalAmount, p.PaymentStatus, p.PaymentMethod 

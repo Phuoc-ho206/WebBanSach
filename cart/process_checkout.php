@@ -222,6 +222,11 @@ try {
 
     // 8. Nếu là COD, đánh dấu giỏ hàng DB đã hoàn thành
     if ($paymentMethod === 'COD' && $customerId !== null && $customerId > 0) {
+        $stmtDelCartDetail = $conn->prepare("DELETE FROM cart_detail WHERE CartID IN (SELECT CartID FROM cart WHERE CustomerID = ? AND Status = 'Active')");
+        $stmtDelCartDetail->bind_param("i", $customerId);
+        $stmtDelCartDetail->execute();
+        $stmtDelCartDetail->close();
+
         $stmtCompleteCart = $conn->prepare("UPDATE cart SET Status = 'Completed' WHERE CustomerID = ? AND Status = 'Active'");
         $stmtCompleteCart->bind_param("i", $customerId);
         $stmtCompleteCart->execute();

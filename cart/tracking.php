@@ -2,12 +2,16 @@
 require_once '../config/db.php';
 
 $orderId = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$inputPhone = isset($_GET['phone']) ? trim($_GET['phone']) : '';
 
 $order = null;
+$isAuthorized = false;
+$verifyError = '';
+
 if ($orderId > 0) {
     // Truy vấn thông tin đơn hàng
     $sql = "
-        SELECT o.OrderID, o.OrderDate, o.ShippingAddress, o.OrderStatus, p.PaymentMethod 
+        SELECT o.OrderID, o.CustomerID, o.OrderDate, o.ShippingAddress, o.OrderStatus, p.PaymentMethod 
         FROM `order` o
         LEFT JOIN `payment` p ON o.OrderID = p.OrderID
         WHERE o.OrderID = ?
@@ -20,15 +24,72 @@ if ($orderId > 0) {
         $order = $res->fetch_assoc();
     }
     $stmt->close();
+    
+    if ($order) {
+        $currentCustomerId = isset($_SESSION['user']) ? intval($_SESSION['user']['id']) : 0;
+        
+        // 1. Kiểm tra đối với đơn hàng thành viên
+        if ($order['CustomerID'] !== null) {
+            if ($order['CustomerID'] === $currentCustomerId) {
+                $isAuthorized = true;
+            } else {
+                $verifyError = 'Bạn không có quyền truy cập thông tin đơn hàng này!';
+            }
+        } 
+        // 2. Kiểm tra đối với đơn hàng khách vãng lai
+        else {
+            $guestInfo = getGuestInfoFromAddress($order['ShippingAddress']);
+            $orderPhone = $guestInfo['phone'];
+            
+            // Xử lý nếu người dùng cung cấp SĐT qua GET
+            if (!empty($inputPhone)) {
+                if ($inputPhone === $orderPhone) {
+                    $_SESSION['verified_orders'][$orderId] = true;
+                    $_SESSION['guest_search_phone'] = $inputPhone;
+                    $isAuthorized = true;
+                } else {
+                    $verifyError = 'Số điện thoại xác minh không chính xác!';
+                }
+            } else {
+                // Kiểm tra các session đã lưu trước đó
+                if (isset($_SESSION['verified_orders'][$orderId]) && $_SESSION['verified_orders'][$orderId] === true) {
+                    $isAuthorized = true;
+                } elseif (isset($_SESSION['guest_search_phone']) && $_SESSION['guest_search_phone'] === $orderPhone) {
+                    $isAuthorized = true;
+                } elseif (isset($_SESSION['guest_checkout']['phone']) && $_SESSION['guest_checkout']['phone'] === $orderPhone) {
+                    $isAuthorized = true;
+                }
+            }
+        }
+    } else {
+        $verifyError = 'Đơn hàng không tồn tại trên hệ thống!';
+    }
 }
 
-$pageTitle = $order ? 'Theo dõi đơn hàng #WBS-' . $orderId : 'Tra cứu hành trình đơn hàng';
+// Xử lý POST xác minh số điện thoại cho khách vãng lai
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_guest_phone'])) {
+    $postPhone = trim($_POST['verify_guest_phone']);
+    if ($order && $order['CustomerID'] === null) {
+        $guestInfo = getGuestInfoFromAddress($order['ShippingAddress']);
+        $orderPhone = $guestInfo['phone'];
+        if ($postPhone === $orderPhone) {
+            $_SESSION['verified_orders'][$orderId] = true;
+            $_SESSION['guest_search_phone'] = $postPhone;
+            $isAuthorized = true;
+            $verifyError = '';
+        } else {
+            $verifyError = 'Số điện thoại xác minh không chính xác. Vui lòng thử lại!';
+        }
+    }
+}
+
+$pageTitle = ($order && $isAuthorized) ? 'Theo dõi đơn hàng #WBS-' . $orderId : 'Tra cứu hành trình đơn hàng';
 $extraCss = ['css/cart.css'];
 include '../includes/header.php';
 
 // Các mức độ của hành trình giao hàng
 $statusSteps = ['Pending', 'Processing', 'Shipped', 'Delivered'];
-$currentStatus = $order['OrderStatus'] ?? '';
+$currentStatus = ($order && $isAuthorized) ? $order['OrderStatus'] : '';
 $currentIndex = array_search($currentStatus, $statusSteps);
 if ($currentIndex === false && $currentStatus === 'Cancelled') {
     $currentIndex = -1; // Đơn hàng đã hủy
@@ -51,15 +112,57 @@ if ($currentIndex === false && $currentStatus === 'Cancelled') {
         <h1 class="order-title">Theo dõi hành trình đơn hàng</h1>
     </div>
 
-    <?php if (!$order): ?>
-        <!-- Form tra cứu trực tiếp từ trang tracking nếu chưa chọn đơn hàng -->
-        <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: var(--spacing-xl); text-align: center; box-shadow: var(--box-shadow-sm); max-width: 600px; margin: 40px auto;">
-            <i class="fa-solid fa-location-dot" style="font-size: 3.5rem; display: block; margin-bottom: var(--spacing-sm); color: var(--color-primary);"></i>
-            <h2 style="margin-top: 0; margin-bottom: var(--spacing-sm); color: var(--color-text);">Tra cứu nhanh trạng thái đơn hàng</h2>
-            <p style="color: var(--color-text-light); margin-bottom: var(--spacing-lg); font-size: 0.95rem;">Nhập mã số đơn hàng của bạn (ví dụ: nhập số 1 cho mã đơn hàng #WBS-1) để kiểm tra hành trình vận chuyển.</p>
-            <form method="GET" action="tracking.php" style="display: flex; gap: var(--spacing-xs); max-width: 400px; margin: 0 auto;">
-                <input type="number" name="id" class="form-control" placeholder="Nhập mã số đơn hàng (ví dụ: 1)..." required min="1">
-                <button type="submit" class="btn btn--primary" style="padding: 10px 24px; font-weight: bold; white-space: nowrap;">Tra cứu</button>
+    <?php if (!$order || ($order['CustomerID'] !== null && !$isAuthorized)): ?>
+        <?php if ($orderId <= 0): ?>
+            <!-- Form tra cứu nhanh trạng thái đơn hàng (yêu cầu ID + SĐT) -->
+            <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: var(--spacing-xl); text-align: center; box-shadow: var(--box-shadow-sm); max-width: 500px; margin: 40px auto;">
+                <i class="fa-solid fa-map-location-dot" style="font-size: 3.5rem; display: block; margin-bottom: var(--spacing-sm); color: var(--color-primary);"></i>
+                <h2 style="margin-top: 0; margin-bottom: var(--spacing-sm); color: var(--color-text);">Tra cứu hành trình đơn hàng</h2>
+                <p style="color: var(--color-text-light); margin-bottom: var(--spacing-lg); font-size: 0.95rem;">Nhập Mã đơn hàng và Số điện thoại đặt hàng để tra cứu hành trình vận chuyển.</p>
+                
+                <?php if (!empty($verifyError)): ?>
+                    <div class="alert alert--error" style="margin-bottom: var(--spacing-md); padding: 10px; border-radius: var(--border-radius-sm); font-size: 0.9rem; text-align: left; background-color: rgba(239, 68, 68, 0.1); border: 1px solid var(--color-error); color: var(--color-error);">
+                        <i class="fa-solid fa-circle-exclamation" style="margin-right: 6px;"></i><?= htmlspecialchars($verifyError) ?>
+                    </div>
+                <?php endif; ?>
+
+                <form method="GET" action="tracking.php" style="display: flex; flex-direction: column; gap: var(--spacing-md); max-width: 400px; margin: 0 auto; text-align: left;">
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 6px; color: var(--color-text);">Mã đơn hàng <span style="color: var(--color-error);">*</span></label>
+                        <input type="number" name="id" class="form-control" placeholder="Ví dụ: 1, 2..." required min="1">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; margin-bottom: 6px; color: var(--color-text);">Số điện thoại nhận hàng <?= isset($_SESSION['user']) ? '<span style="font-weight: normal; color: var(--color-text-light);">(Không bắt buộc với thành viên)</span>' : '<span style="color: var(--color-error);">*</span>' ?></label>
+                        <input type="text" name="phone" class="form-control" placeholder="Nhập số điện thoại đặt hàng..." <?= isset($_SESSION['user']) ? '' : 'required' ?> value="<?= htmlspecialchars($inputPhone) ?>">
+                    </div>
+                    <button type="submit" class="btn btn--primary" style="padding: 12px; font-weight: bold; margin-top: var(--spacing-sm);">Tra cứu ngay</button>
+                </form>
+            </div>
+        <?php else: ?>
+            <!-- Báo lỗi không tìm thấy hoặc không có quyền truy cập -->
+            <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: var(--spacing-xl); text-align: center; box-shadow: var(--box-shadow-sm); max-width: 500px; margin: 40px auto;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 3.5rem; display: block; margin-bottom: var(--spacing-sm); color: var(--color-error);"></i>
+                <h2 style="margin-top: 0; margin-bottom: var(--spacing-sm); color: var(--color-text);">Không thể truy cập</h2>
+                <p style="color: var(--color-text-light); margin-bottom: var(--spacing-lg); font-size: 0.95rem;"><?= !empty($verifyError) ? htmlspecialchars($verifyError) : 'Đơn hàng không tồn tại hoặc bạn không có quyền truy cập.' ?></p>
+                <a href="tracking.php" class="btn btn--primary" style="padding: 10px 24px; font-weight: bold; text-decoration: none;">Quay lại tra cứu</a>
+            </div>
+        <?php endif; ?>
+    <?php elseif (!$isAuthorized): ?>
+        <!-- Form xác minh số điện thoại cho khách vãng lai -->
+        <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: var(--spacing-xl); text-align: center; box-shadow: var(--box-shadow-sm); max-width: 500px; margin: 40px auto;">
+            <i class="fa-solid fa-user-shield" style="font-size: 3.5rem; display: block; margin-bottom: var(--spacing-sm); color: var(--color-primary);"></i>
+            <h2 style="margin-top: 0; margin-bottom: var(--spacing-sm); color: var(--color-text);">Xác minh đơn hàng</h2>
+            <p style="color: var(--color-text-light); margin-bottom: var(--spacing-lg); font-size: 0.95rem;">Đơn hàng này thuộc về <strong>Khách vãng lai</strong>. Vui lòng cung cấp số điện thoại mua hàng để tiếp tục theo dõi vận chuyển.</p>
+            
+            <?php if (!empty($verifyError)): ?>
+                <div class="alert alert--error" style="margin-bottom: var(--spacing-md); padding: 10px; border-radius: var(--border-radius-sm); font-size: 0.9rem; text-align: left; background-color: rgba(239, 68, 68, 0.1); border: 1px solid var(--color-error); color: var(--color-error);">
+                    <i class="fa-solid fa-circle-exclamation" style="margin-right: 6px;"></i><?= htmlspecialchars($verifyError) ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" style="display: flex; flex-direction: column; gap: var(--spacing-md); max-width: 350px; margin: 0 auto;">
+                <input type="text" name="verify_guest_phone" class="form-control" placeholder="Nhập số điện thoại mua hàng..." required style="text-align: center;">
+                <button type="submit" class="btn btn--primary" style="padding: 12px; font-weight: bold;">Xác minh & Theo dõi</button>
             </form>
         </div>
     <?php else: ?>

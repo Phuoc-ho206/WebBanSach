@@ -30,9 +30,45 @@ $stmt->close();
 
 // Kiểm tra quyền truy cập đơn hàng
 $currentCustomerId = isset($_SESSION['user']) ? intval($_SESSION['user']['id']) : 0;
-if ($order['CustomerID'] !== null && $order['CustomerID'] !== $currentCustomerId) {
+$isAuthorized = false;
+$orderPhone = '';
+
+if ($order['CustomerID'] !== null) {
+    // Đơn hàng của thành viên đăng nhập
+    if ($order['CustomerID'] === $currentCustomerId) {
+        $isAuthorized = true;
+    }
+} else {
+    // Đơn hàng của khách vãng lai
+    $guestInfo = getGuestInfoFromAddress($order['ShippingAddress']);
+    $orderPhone = $guestInfo['phone'];
+    
+    if (isset($_SESSION['verified_orders'][$orderId]) && $_SESSION['verified_orders'][$orderId] === true) {
+        $isAuthorized = true;
+    } elseif (isset($_SESSION['guest_search_phone']) && $_SESSION['guest_search_phone'] === $orderPhone) {
+        $isAuthorized = true;
+    } elseif (isset($_SESSION['guest_checkout']['phone']) && $_SESSION['guest_checkout']['phone'] === $orderPhone) {
+        $isAuthorized = true;
+    }
+}
+
+// Xử lý POST xác minh số điện thoại cho khách vãng lai
+$verifyPhoneError = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_guest_phone'])) {
+    $inputPhone = trim($_POST['verify_guest_phone']);
+    if ($order['CustomerID'] === null && !empty($orderPhone) && $inputPhone === $orderPhone) {
+        $_SESSION['verified_orders'][$orderId] = true;
+        $_SESSION['guest_search_phone'] = $inputPhone;
+        $isAuthorized = true;
+    } else {
+        $verifyPhoneError = 'Số điện thoại xác minh không chính xác. Vui lòng thử lại!';
+    }
+}
+
+if ($order['CustomerID'] !== null && !$isAuthorized) {
     die("<div style='text-align:center; padding:100px 20px;'><h3>Bạn không có quyền truy cập thông tin đơn hàng này!</h3><a href='history.php' class='btn btn--primary'>Lịch sử đơn hàng</a></div>");
 }
+
 
 // 2. Truy vấn chi tiết sản phẩm đã mua
 $sqlDetails = "
@@ -97,7 +133,26 @@ function getDeliveryStatusText($status) {
         <li>Chi tiết đơn hàng #WBS-<?= $orderId ?></li>
     </ul>
 
-    <div class="order-title-section">
+    <?php if (!$isAuthorized): ?>
+        <!-- Form xác minh số điện thoại cho khách vãng lai -->
+        <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: var(--spacing-xl); text-align: center; box-shadow: var(--box-shadow-sm); max-width: 500px; margin: 40px auto;">
+            <i class="fa-solid fa-user-shield" style="font-size: 3.5rem; display: block; margin-bottom: var(--spacing-sm); color: var(--color-primary);"></i>
+            <h2 style="margin-top: 0; margin-bottom: var(--spacing-sm); color: var(--color-text);">Xác minh đơn hàng</h2>
+            <p style="color: var(--color-text-light); margin-bottom: var(--spacing-lg); font-size: 0.95rem;">Đơn hàng này thuộc về <strong>Khách vãng lai</strong>. Vui lòng cung cấp số điện thoại mua hàng để tiếp tục xem chi tiết.</p>
+            
+            <?php if (!empty($verifyPhoneError)): ?>
+                <div class="alert alert--error" style="margin-bottom: var(--spacing-md); padding: 10px; border-radius: var(--border-radius-sm); font-size: 0.9rem; text-align: left; background-color: rgba(239, 68, 68, 0.1); border: 1px solid var(--color-error); color: var(--color-error);">
+                    <i class="fa-solid fa-circle-exclamation" style="margin-right: 6px;"></i><?= htmlspecialchars($verifyPhoneError) ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" style="display: flex; flex-direction: column; gap: var(--spacing-md); max-width: 350px; margin: 0 auto;">
+                <input type="text" name="verify_guest_phone" class="form-control" placeholder="Nhập số điện thoại mua hàng..." required style="text-align: center;">
+                <button type="submit" class="btn btn--primary" style="padding: 12px; font-weight: bold;">Xác minh & Xem chi tiết</button>
+            </form>
+        </div>
+    <?php else: ?>
+        <div class="order-title-section">
         <div>
             <h1 class="order-title">Chi tiết đơn hàng #WBS-<?= $orderId ?></h1>
             <p style="color: var(--color-text-light); margin: var(--spacing-xs) 0 0 0; font-size: var(--font-size-sm);">
@@ -121,9 +176,21 @@ function getDeliveryStatusText($status) {
             <div class="detail-section-card">
                 <h2 class="detail-section-title"><i class="fa-solid fa-user" style="margin-right: 10px; color: var(--color-primary);"></i>Thông tin nhận hàng</h2>
                 <div style="line-height: 1.6; color: var(--color-text); font-size: 0.95rem;">
-                    <?php if ($order['CustomerID'] === null): ?>
-                        <!-- Định dạng lưu trữ khách vãng lai: Tên | SĐT | Địa chỉ -->
-                        <div style="white-space: pre-line;"><?= htmlspecialchars($order['ShippingAddress']) ?></div>
+                    <?php if ($order['CustomerID'] === null): 
+                        $guestInfo = getGuestInfoFromAddress($order['ShippingAddress']);
+                    ?>
+                        <div class="info-details-item">
+                            <span class="info-details-label" style="display:inline-block; width: 140px;">Người nhận:</span>
+                            <span class="info-details-value"><?= htmlspecialchars($guestInfo['fullname']) ?></span>
+                        </div>
+                        <div class="info-details-item" style="margin-top: 6px;">
+                            <span class="info-details-label" style="display:inline-block; width: 140px;">Số điện thoại:</span>
+                            <span class="info-details-value"><?= htmlspecialchars($guestInfo['phone']) ?></span>
+                        </div>
+                        <div class="info-details-item" style="margin-top: 6px;">
+                            <span class="info-details-label" style="display:inline-block; width: 140px;">Địa chỉ giao hàng:</span>
+                            <span class="info-details-value"><?= htmlspecialchars($guestInfo['address']) ?></span>
+                        </div>
                     <?php else: ?>
                         <!-- Định dạng thành viên đăng nhập -->
                         <div class="info-details-item">
@@ -254,6 +321,7 @@ function getDeliveryStatusText($status) {
             </div>
         </div>
     </div>
+    <?php endif; ?>
 </main>
 
 <?php include '../includes/footer.php'; ?>
