@@ -182,6 +182,9 @@ function getDeliveryStatusText($status) {
                                 <th>Đơn giá</th>
                                 <th>Số lượng</th>
                                 <th style="text-align: right;">Thành tiền</th>
+                                <?php if ($order['OrderStatus'] === 'Delivered'): ?>
+                                    <th style="text-align: center; width: 120px;">Thao tác</th>
+                                <?php endif; ?>
                             </tr>
                         </thead>
                         <tbody>
@@ -202,6 +205,13 @@ function getDeliveryStatusText($status) {
                                     <td style="text-align: right; font-weight: var(--font-weight-bold); color: var(--color-text);">
                                         <?= number_format($item['Price'], 0, ',', '.') ?> đ
                                     </td>
+                                    <?php if ($order['OrderStatus'] === 'Delivered'): ?>
+                                        <td style="text-align: center; vertical-align: middle;">
+                                            <a href="<?= url('trangchu/detail.php?id=' . $item['ProductID']) ?>#review-form-section" class="btn btn--outline btn--sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 0.8rem; font-weight: bold; border-color: var(--color-secondary); color: var(--color-text); text-decoration: none; border-radius: var(--border-radius-sm);">
+                                                <i class="fa-solid fa-star" style="color: var(--color-secondary);"></i> Đánh giá
+                                            </a>
+                                        </td>
+                                    <?php endif; ?>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

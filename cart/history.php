@@ -191,17 +191,26 @@ function getStatusText($status) {
                         <?php foreach ($items as $item): 
                             $imgSrc = !empty($item['ImageURL']) ? url('assets' . $item['ImageURL']) : asset('images/default-book.png');
                         ?>
-                            <a href="<?= url('cart/detail.php?id=' . $oId) ?>" class="order-card__product">
-                                <img class="order-card__product-img" src="<?= $imgSrc ?>" alt="<?= htmlspecialchars($item['ProductName']) ?>" style="width: 50px; height: 68px; object-fit: contain; background: var(--color-background); border-radius: var(--border-radius-sm); border: 1px solid var(--color-border); padding: 2px;">
-                                <div class="order-card__product-info">
-                                    <h3 class="order-card__product-title"><?= htmlspecialchars($item['ProductName']) ?></h3>
-                                    <span class="order-card__product-meta">Đơn giá: <?= number_format($item['UnitPrice'], 0, ',', '.') ?> đ</span>
-                                </div>
-                                <div class="order-card__product-price">
-                                    <span class="order-card__product-price-current"><?= number_format($item['Price'], 0, ',', '.') ?> đ</span>
-                                    <div class="order-card__product-price-qty">x <?= $item['Quantity'] ?></div>
-                                </div>
-                            </a>
+                            <div class="order-card__product-row" style="display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); border-bottom: 1px dashed var(--color-border); padding-bottom: var(--spacing-sm); margin-bottom: 2px; width: 100%;">
+                                <a href="<?= url('cart/detail.php?id=' . $oId) ?>" class="order-card__product" style="flex: 1;">
+                                    <img class="order-card__product-img" src="<?= $imgSrc ?>" alt="<?= htmlspecialchars($item['ProductName']) ?>" style="width: 50px; height: 68px; object-fit: contain; background: var(--color-background); border-radius: var(--border-radius-sm); border: 1px solid var(--color-border); padding: 2px;">
+                                    <div class="order-card__product-info">
+                                        <h3 class="order-card__product-title"><?= htmlspecialchars($item['ProductName']) ?></h3>
+                                        <span class="order-card__product-meta">Đơn giá: <?= number_format($item['UnitPrice'], 0, ',', '.') ?> đ</span>
+                                    </div>
+                                    <div class="order-card__product-price">
+                                        <span class="order-card__product-price-current"><?= number_format($item['Price'], 0, ',', '.') ?> đ</span>
+                                        <div class="order-card__product-price-qty">x <?= $item['Quantity'] ?></div>
+                                    </div>
+                                </a>
+                                <?php if ($order['OrderStatus'] === 'Delivered'): ?>
+                                    <div style="flex-shrink: 0; padding-left: var(--spacing-md);">
+                                        <a href="<?= url('trangchu/detail.php?id=' . $item['ProductID']) ?>#review-form-section" class="btn btn--outline btn--sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 0.8rem; font-weight: bold; border-color: var(--color-secondary); color: var(--color-text); text-decoration: none; border-radius: var(--border-radius-sm);">
+                                            <i class="fa-solid fa-star" style="color: var(--color-secondary);"></i> Đánh giá
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
                         <?php endforeach; ?>
                     </div>
                     

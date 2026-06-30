@@ -36,7 +36,62 @@ $product = $result->fetch_assoc();
 $stmt->close();
 
 $pageTitle = $product['ProductName'] . ' - Chi tiết sách';
-$extraCss = ['css/components/button.css', 'css/components/badge.css', 'css/components/form.css', 'css/components/card.css'];
+$extraCss = ['css/components/button.css', 'css/components/badge.css', 'css/components/form.css', 'css/components/card.css', 'css/components/review.css'];
+
+// Tính toán đánh giá trung bình và tổng số lượng bình luận
+$avgRating = 0;
+$totalReviews = 0;
+$starCounts = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+
+$sql_rating_stats = "SELECT AVG(Rating) AS avg_rating, COUNT(*) AS total_reviews FROM review WHERE ProductID = ?";
+$stmt_stats = $conn->prepare($sql_rating_stats);
+$stmt_stats->bind_param("i", $productId);
+$stmt_stats->execute();
+$res_stats = $stmt_stats->get_result()->fetch_assoc();
+if ($res_stats) {
+    $avgRating = $res_stats['avg_rating'] !== null ? round(floatval($res_stats['avg_rating']), 1) : 0;
+    $totalReviews = intval($res_stats['total_reviews']);
+}
+$stmt_stats->close();
+
+if ($totalReviews > 0) {
+    $sql_star_distribution = "SELECT Rating, COUNT(*) AS count FROM review WHERE ProductID = ? GROUP BY Rating";
+    $stmt_dist = $conn->prepare($sql_star_distribution);
+    $stmt_dist->bind_param("i", $productId);
+    $stmt_dist->execute();
+    $res_dist = $stmt_dist->get_result();
+    while ($row = $res_dist->fetch_assoc()) {
+        $star = intval($row['Rating']);
+        if ($star >= 1 && $star <= 5) {
+            $starCounts[$star] = intval($row['count']);
+        }
+    }
+    $stmt_dist->close();
+}
+
+// Truy vấn danh sách đánh giá kèm theo thông tin kiểm tra Đã mua hàng
+$reviews = [];
+$sql_reviews = "
+    SELECT r.ReviewID, r.CustomerID, r.Rating, r.Comment, r.ReviewDate, u.FirstName, u.LastName,
+           (SELECT COUNT(*) 
+            FROM `order` o 
+            JOIN `order_detail` od ON o.OrderID = od.OrderID 
+            WHERE o.CustomerID = r.CustomerID AND od.ProductID = r.ProductID AND o.OrderStatus = 'Delivered'
+           ) AS VerifiedPurchase
+    FROM review r
+    LEFT JOIN user u ON r.CustomerID = u.CustomerID
+    WHERE r.ProductID = ?
+    ORDER BY r.ReviewDate DESC
+";
+$stmt_rev = $conn->prepare($sql_reviews);
+$stmt_rev->bind_param("i", $productId);
+$stmt_rev->execute();
+$res_rev = $stmt_rev->get_result();
+while ($row = $res_rev->fetch_assoc()) {
+    $reviews[] = $row;
+}
+$stmt_rev->close();
+
 include '../includes/header.php';
 ?>
 
@@ -87,6 +142,21 @@ include '../includes/header.php';
         <div class="product-info-wrapper">
             <h1 class="product-detail-title"><?= htmlspecialchars($product['ProductName']) ?></h1>
             
+            <div class="product-rating-meta">
+                <div class="product-rating-stars">
+                    <?php 
+                    $fullStars = floor($avgRating);
+                    $halfStar = ($avgRating - $fullStars) >= 0.5 ? 1 : 0;
+                    $emptyStars = 5 - $fullStars - $halfStar;
+                    for ($i = 0; $i < $fullStars; $i++) echo '<i class="fa-solid fa-star"></i>';
+                    if ($halfStar) echo '<i class="fa-solid fa-star-half-stroke"></i>';
+                    for ($i = 0; $i < $emptyStars; $i++) echo '<i class="fa-regular fa-star"></i>';
+                    ?>
+                </div>
+                <span class="product-rating-average"><?= $avgRating > 0 ? $avgRating : '0.0' ?></span>
+                <span class="product-rating-count">(<?= $totalReviews ?> đánh giá)</span>
+            </div>
+
             <div class="product-meta-row">
                 <div>Thể loại: <strong style="color: var(--color-text);"><?= htmlspecialchars($product['CategoryName'] ?? 'Chưa phân loại') ?></strong></div>
                 <div>|</div>
@@ -145,6 +215,161 @@ include '../includes/header.php';
             </form>
         </div>
     </div>
+
+    <!-- PHẦN ĐÁNH GIÁ & BÌNH LUẬN -->
+    <section class="reviews-section">
+        <h2 class="reviews-section-title">
+            <i class="fa-solid fa-comments"></i> Đánh giá từ độc giả
+        </h2>
+
+        <!-- Khối thống kê tổng quan -->
+        <div class="rating-summary-box">
+            <div class="rating-average-card">
+                <div class="rating-average-number"><?= $avgRating > 0 ? $avgRating : '0.0' ?></div>
+                <div class="rating-average-stars">
+                    <?php 
+                    for ($i = 0; $i < $fullStars; $i++) echo '<i class="fa-solid fa-star"></i>';
+                    if ($halfStar) echo '<i class="fa-solid fa-star-half-stroke"></i>';
+                    for ($i = 0; $i < $emptyStars; $i++) echo '<i class="fa-regular fa-star"></i>';
+                    ?>
+                </div>
+                <div class="rating-average-count">Tất cả <?= $totalReviews ?> đánh giá</div>
+            </div>
+
+            <div class="rating-bars-list">
+                <?php for ($star = 5; $star >= 1; $star--): 
+                    $count = $starCounts[$star];
+                    $percent = $totalReviews > 0 ? round(($count / $totalReviews) * 100) : 0;
+                ?>
+                    <div class="rating-bar-row">
+                        <span class="rating-bar-label"><?= $star ?> sao <i class="fa-solid fa-star" style="color: var(--color-secondary); font-size: 0.8rem;"></i></span>
+                        <div class="rating-bar-track">
+                            <div class="rating-bar-fill" style="width: <?= $percent ?>%;"></div>
+                        </div>
+                        <span class="rating-bar-percent"><?= $percent ?>%</span>
+                    </div>
+                <?php endfor; ?>
+            </div>
+        </div>
+
+        <!-- Thông báo từ session -->
+        <?php if (isset($_SESSION['review_success'])): ?>
+            <div class="alert alert--success" style="margin-bottom: var(--spacing-md);">
+                <i class="alert__icon fa-solid fa-circle-check"></i>
+                <div class="alert__content">
+                    <div class="alert__title">Thành công</div>
+                    <div><?= htmlspecialchars($_SESSION['review_success']) ?></div>
+                </div>
+            </div>
+            <?php unset($_SESSION['review_success']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['review_error'])): ?>
+            <div class="alert alert--error" style="margin-bottom: var(--spacing-md);">
+                <i class="alert__icon fa-solid fa-circle-xmark"></i>
+                <div class="alert__content">
+                    <div class="alert__title">Lỗi</div>
+                    <div><?= htmlspecialchars($_SESSION['review_error']) ?></div>
+                </div>
+            </div>
+            <?php unset($_SESSION['review_error']); ?>
+        <?php endif; ?>
+
+        <!-- Danh sách bình luận -->
+        <div class="reviews-list">
+            <?php if (empty($reviews)): ?>
+                <div class="no-reviews-placeholder">
+                    <i class="fa-regular fa-comment-dots"></i>
+                    <span>Chưa có đánh giá nào cho cuốn sách này. Hãy là người đầu tiên chia sẻ cảm nhận của bạn!</span>
+                </div>
+            <?php else: ?>
+                <?php foreach ($reviews as $rev): 
+                    // Tạo avatar viết tắt từ tên người dùng
+                    $fullName = trim(($rev['LastName'] ?? '') . ' ' . ($rev['FirstName'] ?? ''));
+                    if (empty($fullName)) {
+                        $fullName = 'Khách hàng';
+                    }
+                    $words = explode(' ', $fullName);
+                    $initials = '';
+                    if (count($words) >= 2) {
+                        $initials = mb_substr($words[0], 0, 1) . mb_substr(end($words), 0, 1);
+                    } else {
+                        $initials = mb_substr($fullName, 0, 2);
+                    }
+                    $initials = mb_strtoupper($initials);
+                ?>
+                    <div class="review-item">
+                        <div class="review-avatar"><?= htmlspecialchars($initials) ?></div>
+                        <div class="review-body">
+                            <div class="review-header">
+                                <div class="review-user-info">
+                                    <span class="review-username"><?= htmlspecialchars($fullName) ?></span>
+                                    <?php if (intval($rev['VerifiedPurchase']) > 0): ?>
+                                        <span class="review-verified-badge">
+                                            <i class="fa-solid fa-circle-check"></i> Đã mua hàng
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <span class="review-date"><?= date('d/m/Y H:i', strtotime($rev['ReviewDate'])) ?></span>
+                            </div>
+                            <div class="review-stars">
+                                <?php 
+                                $r = intval($rev['Rating']);
+                                for ($i = 0; $i < $r; $i++) echo '<i class="fa-solid fa-star"></i>';
+                                for ($i = 0; $i < (5 - $r); $i++) echo '<i class="fa-regular fa-star" style="color: #ccc;"></i>';
+                                ?>
+                            </div>
+                            <p class="review-comment"><?= htmlspecialchars($rev['Comment']) ?></p>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <!-- Biểu mẫu gửi đánh giá mới -->
+        <div class="review-form-container" id="review-form-section">
+            <h3 class="review-form-title">Để lại nhận xét của bạn</h3>
+            <?php if (isset($_SESSION['user'])): ?>
+                <form action="add_review.php" method="POST">
+                    <input type="hidden" name="product_id" value="<?= $productId ?>">
+                    
+                    <div class="star-selector-group">
+                        <span class="star-selector-label">Đánh giá của bạn về cuốn sách này:</span>
+                        <div class="rating-input">
+                            <input type="radio" id="star5" name="rating" value="5" required>
+                            <label for="star5" title="5 sao"><i class="fa-solid fa-star"></i></label>
+                            
+                            <input type="radio" id="star4" name="rating" value="4">
+                            <label for="star4" title="4 sao"><i class="fa-solid fa-star"></i></label>
+                            
+                            <input type="radio" id="star3" name="rating" value="3">
+                            <label for="star3" title="3 sao"><i class="fa-solid fa-star"></i></label>
+                            
+                            <input type="radio" id="star2" name="rating" value="2">
+                            <label for="star2" title="2 sao"><i class="fa-solid fa-star"></i></label>
+                            
+                            <input type="radio" id="star1" name="rating" value="1">
+                            <label for="star1" title="1 sao"><i class="fa-solid fa-star"></i></label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="comment" style="font-weight: bold;">Nội dung bình luận:</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="4" placeholder="Nhập cảm nhận của bạn về nội dung cuốn sách, dịch vụ giao hàng hoặc đóng gói..." required style="min-height: 100px; padding: 10px; width: 100%; border: var(--border-width) solid var(--color-border); border-radius: var(--border-radius-sm); font-family: inherit; font-size: 14px; box-sizing: border-box;"></textarea>
+                    </div>
+                    
+                    <div style="margin-top: var(--spacing-md); text-align: right;">
+                        <button type="submit" class="btn btn--primary" style="padding: 10px 24px; font-weight: bold; min-height: 40px;">Gửi đánh giá</button>
+                    </div>
+                </form>
+            <?php else: ?>
+                <div style="text-align: center; padding: var(--spacing-md) 0;">
+                    <p style="color: var(--color-text-light); margin-bottom: var(--spacing-sm);">Bạn phải đăng nhập tài khoản thành viên để gửi bình luận và đánh giá cho cuốn sách này.</p>
+                    <a href="<?= url('auth/pages/login.php') ?>" class="btn btn--outline" style="padding: 8px 20px; font-weight: bold; text-decoration: none; display: inline-block;">Đăng nhập ngay</a>
+                </div>
+            <?php endif; ?>
+        </div>
+    </section>
 </main>
 
 <?php include '../includes/footer.php'; ?>
@@ -152,6 +377,22 @@ include '../includes/header.php';
     const qtyInput = document.getElementById('quantity');
     function increaseQty() { let c = parseInt(qtyInput.value) || 1; if(c < 99) qtyInput.value = c + 1; }
     function decreaseQty() { let c = parseInt(qtyInput.value) || 1; if (c > 1) qtyInput.value = c - 1; }
+
+    // Tự động cuộn mượt và focus vào ô bình luận khi url có #review-form-section
+    window.addEventListener('DOMContentLoaded', () => {
+        if (window.location.hash === '#review-form-section') {
+            const reviewForm = document.getElementById('review-form-section');
+            if (reviewForm) {
+                setTimeout(() => {
+                    reviewForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const commentArea = document.getElementById('comment');
+                    if (commentArea) {
+                        commentArea.focus();
+                    }
+                }, 300); // Trì hoãn nhẹ để trang ổn định giao diện trước khi cuộn
+            }
+        }
+    });
 </script>
 </body>
 </html>
