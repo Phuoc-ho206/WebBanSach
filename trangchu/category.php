@@ -33,29 +33,16 @@ $sql_products = "
     WHERE 1=1
 ";
 
-// Lọc theo Danh mục
-if ($categoryId > 0) {
-    $sql_products .= " AND p.CategoryID = $categoryId";
-}
-// Lọc theo Giá Tối thiểu
-if ($minPrice > 0) {
-    $sql_products .= " AND p.Price >= $minPrice";
-}
-// Lọc theo Giá Tối đa
-if ($maxPrice > 0) {
-    $sql_products .= " AND p.Price <= $maxPrice";
-}
-// Lọc theo Thương hiệu
+if ($categoryId > 0) $sql_products .= " AND p.CategoryID = $categoryId";
+if ($minPrice > 0) $sql_products .= " AND p.Price >= $minPrice";
+if ($maxPrice > 0) $sql_products .= " AND p.Price <= $maxPrice";
 if (!empty($publisher)) {
-    // Escaping để chống SQL Injection
     $safe_publisher = $conn->real_escape_string($publisher);
     $sql_products .= " AND p.Publisher = '$safe_publisher'";
 }
 
 $sql_products .= " ORDER BY p.ProductID DESC";
 $products = $conn->query($sql_products);
-
-// Lấy danh sách Thương hiệu độc nhất đang có trong Database để hiển thị ra dropdown
 $publishers_query = $conn->query("SELECT DISTINCT Publisher FROM product WHERE Publisher IS NOT NULL AND Publisher != ''");
 ?>
 
@@ -74,70 +61,30 @@ $publishers_query = $conn->query("SELECT DISTINCT Publisher FROM product WHERE P
     .breadcrumb .separator { color: var(--color-text-light); font-size: 1.1rem; }
     .breadcrumb .current { color: var(--color-primary); font-weight: var(--font-weight-medium); }
 
+    /* CSS RIÊNG CHO BANNER TRANG DANH MỤC */
     .category-banner {
         width: 100%; min-height: 200px;
-        background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/WebBanSach/assets/images/category-bg.jpg') center/cover;
-        background-color: #fcecd7; border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-lg);
+        border-radius: var(--border-radius-lg); margin-bottom: var(--spacing-lg);
         display: flex; flex-direction: column; align-items: center; justify-content: center;
-        color: white; text-align: center; padding: var(--spacing-md);
+        text-align: center; padding: var(--spacing-md);
+        box-shadow: var(--box-shadow-md);
+    }
+    .category-banner h1 {
+        color: #ffffff !important;
     }
 
-    /* CSS CHO BỘ LỌC TÌM KIẾM CHI TIẾT (FILTER BAR) */
     .advanced-filter-bar {
-        background-color: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: var(--border-radius-lg);
-        padding: var(--spacing-md) var(--spacing-lg);
-        margin-bottom: var(--spacing-xl);
-        box-shadow: var(--box-shadow-sm);
+        background-color: var(--color-surface); border: 1px solid var(--color-border);
+        border-radius: var(--border-radius-lg); padding: var(--spacing-md) var(--spacing-lg);
+        margin-bottom: var(--spacing-xl); box-shadow: var(--box-shadow-sm);
     }
-
-    .filter-form {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: var(--spacing-xl);
-    }
-
-    .filter-group {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
-    }
-
-    .filter-label {
-        font-weight: var(--font-weight-bold);
-        color: var(--color-text);
-        font-size: 0.95rem;
-        min-width: 90px;
-    }
-
-    .filter-price-inputs {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .filter-input {
-        padding: 8px 12px;
-        border: 1px solid var(--color-border);
-        border-radius: var(--border-radius);
-        outline: none;
-        width: 130px;
-    }
-
-    .filter-input:focus {
-        border-color: var(--color-primary);
-    }
-
-    .filter-select {
-        padding: 8px 12px;
-        border: 1px solid var(--color-border);
-        border-radius: var(--border-radius);
-        outline: none;
-        min-width: 180px;
-        background-color: white;
-    }
+    .filter-form { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-xl); }
+    .filter-group { display: flex; align-items: center; gap: var(--spacing-sm); }
+    .filter-label { font-weight: var(--font-weight-bold); color: var(--color-text); font-size: 0.95rem; min-width: 90px; }
+    .filter-price-inputs { display: flex; align-items: center; gap: 8px; }
+    .filter-input { padding: 8px 12px; border: 1px solid var(--color-border); border-radius: var(--border-radius); outline: none; width: 130px; }
+    .filter-input:focus { border-color: var(--color-primary); }
+    .filter-select { padding: 8px 12px; border: 1px solid var(--color-border); border-radius: var(--border-radius); outline: none; min-width: 180px; background-color: white; }
 
     @media (max-width: 768px) {
         .filter-form { flex-direction: column; align-items: flex-start; gap: var(--spacing-md); }
@@ -154,8 +101,15 @@ $publishers_query = $conn->query("SELECT DISTINCT Publisher FROM product WHERE P
         <span class="current"><?= htmlspecialchars($categoryName) ?></span>
     </div>
 
-    <div class="category-banner">
-        <h1 style="font-size: 2.2rem; font-weight: 800; margin: 0 0 8px 0; text-transform: uppercase;">Tủ Sách <?= htmlspecialchars($categoryName) ?></h1>
+    <?php 
+        // Dùng chung 1 tấm ảnh duy nhất cho TẤT CẢ các danh mục
+        $bannerImage = 'banner_default.jpg';
+    ?>
+    
+    <!-- KHỐI BANNER CHÍNH CỦA TRANG DANH MỤC -->
+    <!-- Chèn trực tiếp lớp màu đen mờ 40% và đường dẫn ảnh động vào thuộc tính style -->
+    <div class="category-banner" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('<?= asset("images/" . $bannerImage) ?>') center/cover;">
+        <h1 style="font-size: 2.2rem; font-weight: 800; margin: 0; text-transform: uppercase;">Tủ Sách <?= htmlspecialchars($categoryName) ?></h1>
     </div>
 
     <div class="advanced-filter-bar">

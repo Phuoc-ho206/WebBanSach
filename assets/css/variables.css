@@ -89,3 +89,48 @@
     --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
+/* ==========================================================================
+   BANNER DÙNG CHUNG TOÀN HỆ THỐNG (GLOBAL DYNAMIC BANNER)
+   ========================================================================== */
+.global-banner {
+    width: 100%;
+    min-height: 220px; /* Chiều cao tiêu chuẩn của banner */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-lg);
+    
+    /* Căn giữa chữ theo cả chiều dọc và chiều ngang */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md);
+    
+    /* Thiết lập vị trí tương đối để làm lớp phủ tối */
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--box-shadow-md);
+}
+
+/* Tự động tạo lớp phủ đen mờ 40% trên MỌI BANNER để chữ trắng luôn rõ ràng, 
+   bạn không cần phải gõ linear-gradient trong mã HTML/PHP nữa */
+.global-banner::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4); /* Độ mờ 40% */
+    z-index: 1;
+}
+
+/* Đẩy toàn bộ chữ và nút bấm lên trên lớp phủ đen */
+.global-banner > * {
+    position: relative;
+    z-index: 2;
+    color: #ffffff !important; /* Ép tất cả chữ bên trong thành màu trắng */
+    text-align: center;
+}
