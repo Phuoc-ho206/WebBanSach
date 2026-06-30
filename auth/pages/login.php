@@ -4,9 +4,16 @@ require_once '../controller/authcontroller.php';
 require_once '../controller/GoogleAuthController.php';
 require_once '../controller/fbauthcontroller.php';
 
-// Nếu đã đăng nhập → về trang chủ
-if (isset($_SESSION['user'])) {
+// Xử lý logout
+if (isset($_POST['action']) && $_POST['action'] === 'logout') {
+    AuthController::logout();
     header('Location: /WebBanSach/index.php');
+    exit;
+}
+
+// Nếu đã đăng nhập → chuyển theo vai trò
+if (isset($_SESSION['user'])) {
+    header('Location: ' . AuthController::getRedirectUrl($_SESSION['user']));
     exit;
 }
 
@@ -16,7 +23,7 @@ $success = $_SESSION['success'] ?? '';
 unset($_SESSION['success']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $identity = $_POST['identity'] ?? '';
+    $identity = trim($_POST['identity'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if (empty($identity) || empty($password)) {
@@ -24,8 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $user = AuthController::login($identity, $password);
         if ($user) {
-            $_SESSION['user'] = $user;
-            header('Location: /WebBanSach/index.php');
+            $remember = isset($_POST['remember']) && $_POST['remember'] === 'on';
+            AuthController::establishSession($user, $remember);
+            header('Location: ' . AuthController::getRedirectUrl($user));
             exit;
         } else {
             $error = 'Tên đăng nhập hoặc mật khẩu không đúng.';
@@ -37,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['code'])) {
     $user = googleauthcontroller::handleCallback();
     if ($user) {
-        $_SESSION['user'] = $user;
-        header('Location: /WebBanSach/index.php');
+        AuthController::establishSession($user, false);
+        header('Location: ' . AuthController::getRedirectUrl($user));
         exit;
     }
 }
@@ -46,9 +54,6 @@ if (isset($_GET['code'])) {
 $google_login_url = googleauthcontroller::getLoginUrl();
 $facebook_login_url = fbauthcontroller::getLoginUrl();
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -73,7 +78,8 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--color-background);
+            background: var(--color-background) url('/WebBanSach/assets/images/uploads/background_login.jpg') no-repeat center center fixed;
+            background-size: cover;
             font-family: var(--font-family-base)
         }
 
@@ -179,21 +185,15 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
                 <?= htmlspecialchars($success) ?>
             </div>
         <?php endif; ?>
-        <div
-            style="background-color: #e3f2fd; color: #0277bd; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; text-align: center; border: 1px solid #81d4fa;">
-            <strong>Tài khoản Demo:</strong><br>
-            Tên đăng nhập: <code>nguyenvana</code><br>
-            Mật khẩu: <code>123456</code>
-        </div>
         <form action="/WebBanSach/auth/pages/login.php" method="POST">
             <div class="form-group">
                 <label for="identity">Email hoặc tên đăng nhập</label>
-                <input id="identity" name="identity" type="text" required>
+                <input id="identity" name="identity" type="text" required placeholder="Tên đăng nhập hoặc email">
             </div>
             <div class="form-group">
                 <label for="password">Mật khẩu</label>
                 <div class="input-row">
-                    <input id="password" name="password" type="password" required>
+                    <input id="password" name="password" type="password" required placeholder="Mật khẩu">
 
                 </div>
             </div>

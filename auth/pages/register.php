@@ -1,3 +1,34 @@
+<?php
+session_start();
+require_once '../controller/registercontroller.php';
+
+// Nếu đã đăng nhập → về trang chủ
+if (isset($_SESSION['user'])) {
+    header('Location: /WebBanSach/index.php');
+    exit;
+}
+
+$error = '';
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $confirmPassword = $_POST['confirm_password'] ?? '';
+
+    $registerController = new RegisterController();
+    $result = $registerController->register($username, $email, $password, $confirmPassword);
+
+    if ($result['success']) {
+        $success = $result['message'];
+        // Redirect sau 2 giây
+        header('Refresh: 2; URL=/WebBanSach/auth/pages/login.php');
+    } else {
+        $error = $result['message'];
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -10,6 +41,25 @@
     <link rel="stylesheet" href="/WebBanSach/assets/css/components/form.css">
     <link rel="stylesheet" href="/WebBanSach/assets/css/components/card.css">
     <style>
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -21,7 +71,8 @@
             align-items: center;
             justify-content: center;
             font-family: var(--font-family-base);
-            background: var(--color-background);
+            background: var(--color-background) url('/WebBanSach/assets/images/uploads/background_login.jpg') no-repeat center center fixed;
+            background-size: cover;
             box-sizing: border-box;
         }
 
@@ -46,35 +97,68 @@
         }
 
         .form-group {
-            margin-bottom: 12px
+            margin-bottom: 16px
         }
 
         label {
             display: block;
-            margin-bottom: 6px
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--color-text);
         }
 
         input[type="text"],
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 10px;
-            box-sizing: border-box
+            padding: 12px;
+            box-sizing: border-box;
+            border: var(--border-width) solid var(--color-border);
+            border-radius: var(--border-radius-sm);
+            font-family: inherit;
+            font-size: var(--font-size-md);
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
         }
 
         .actions {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             align-items: stretch;
             justify-content: center;
-            margin-top: 12px;
+            margin-top: 20px;
         }
 
         .actions .btn,
         .actions a.btn {
             width: 100%;
             box-sizing: border-box;
+            padding: 12px 20px;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: var(--border-width) solid var(--color-border);
+        }
+
+        .auth-footer a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -83,30 +167,54 @@
     <div class="card auth-card">
         <h1>Đăng ký</h1>
         <p>Tạo tài khoản mới của bạn</p>
+
+        <?php if ($error): ?>
+            <div class="alert alert-danger">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($success): ?>
+            <div class="alert alert-success">
+                <?php echo htmlspecialchars($success); ?>
+            </div>
+        <?php endif; ?>
         <form action="/WebBanSach/auth/pages/register.php" method="POST">
             <div class="form-group">
                 <label for="username">Tên đăng nhập</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" placeholder="Nhập tên đăng nhập"
+                    value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>"
+                    required autofocus>
             </div>
+
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" placeholder="example@email.com"
+                    value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
             </div>
+
             <div class="form-group">
                 <label for="password">Mật khẩu</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" placeholder="Ít nhất 8 ký tự" required>
             </div>
+
             <div class="form-group">
                 <label for="confirm_password">Xác nhận mật khẩu</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Nhập lại mật khẩu"
+                    required>
             </div>
+
             <div class="actions">
                 <button type="submit" class="btn btn-primary">Đăng ký</button>
-                <a class="btn btn-secondary" href="/WebBanSach/auth/pages/login.php">Quay lại</a>
+                <a class="btn btn-secondary" href="/WebBanSach/auth/pages/login.php">Quay lại đăng nhập</a>
             </div>
         </form>
-        <div style="text-align:center; margin-top:12px">
-            <a href="/WebBanSach/auth/pages/Forgetpassword/index.php">Quên mật khẩu?</a>
+
+        <div class="auth-footer">
+            <p style="margin: 0 0 8px; color: var(--color-text-light); font-size: var(--font-size-sm);">
+                Đã có tài khoản?
+            </p>
+            <a href="/WebBanSach/auth/pages/login.php">Đăng nhập ngay</a>
         </div>
     </div>
 </body>

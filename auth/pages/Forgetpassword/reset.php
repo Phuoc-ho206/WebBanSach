@@ -1,3 +1,39 @@
+<?php
+session_start();
+require_once '../../../config/db.php';
+require_once '../../../auth/controller/forgetpasswordcontroller.php';
+
+$error = '';
+$email = $_SESSION['verified_email'] ?? '';
+
+// Kiểm tra đã verify OTP chưa
+if (empty($email)) {
+    header('Location: /WebBanSach/auth/pages/Forgetpassword/index.php');
+    exit;
+}
+
+// Xử lý reset password
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $password = $_POST['password'] ?? '';
+    $confirmPassword = $_POST['confirm_password'] ?? '';
+
+    $forgetPasswordController = new ForgetPasswordController();
+    $result = $forgetPasswordController->resetPassword($email, $password, $confirmPassword);
+
+    if ($result['success']) {
+        // Xóa session
+        unset($_SESSION['reset_email']);
+        unset($_SESSION['verified_email']);
+
+        // Redirect về login với success message
+        $_SESSION['success'] = $result['message'];
+        header('Location: /WebBanSach/auth/pages/login.php');
+        exit;
+    } else {
+        $error = $result['message'];
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -22,7 +58,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--color-background);
+            background: var(--color-background) url('/WebBanSach/assets/images/uploads/background_login.jpg') no-repeat center center fixed;
+            background-size: cover;
             font-family: var(--font-family-base);
         }
 
@@ -202,6 +239,13 @@
         <p class="subtitle">
             Nhập mật khẩu mới của bạn
         </p>
+
+        <?php if ($error): ?>
+            <div
+                style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 16px; border: 1px solid #f5c6cb; text-align: center;">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php endif; ?>
 
         <form method="POST" action="">
 

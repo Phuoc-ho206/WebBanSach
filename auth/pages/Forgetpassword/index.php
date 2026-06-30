@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // 2. Check email tồn tại
         try {
-            $stmt = $conn->prepare("SELECT CustomerId FROM user WHERE email = ?");
+            $stmt = $conn->prepare("SELECT CustomerID FROM user WHERE Email = ?");
             $stmt->bind_param("s", $email);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -101,7 +101,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--color-background);
+            background: var(--color-background) url('/WebBanSach/assets/images/uploads/background_login.jpg') no-repeat center center fixed;
+            background-size: cover;
             font-family: var(--font-family-base)
         }
 
