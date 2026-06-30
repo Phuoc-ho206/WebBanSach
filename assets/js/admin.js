@@ -21,7 +21,73 @@ function prepareCanvas(canvas) {
   return { context, width, height };
 }
 
-function drawAxes(context, width, height, padding) {
+function formatNumber(value) {
+  return Number(value || 0).toLocaleString('vi-VN');
+}
+
+function formatChartValue(value, unit, includeUnit = true) {
+  if (!unit || !includeUnit) {
+    return formatNumber(value);
+  }
+
+  if (unit === 'đ') {
+    return formatNumber(value) + ' đ';
+  }
+
+  return formatNumber(value) + ' ' + unit;
+}
+
+function getChartPadding(unit) {
+  return unit === 'đ' ? 72 : 56;
+}
+
+function getAxisMax(maxValue, unit) {
+  if (unit === 'đơn' || unit === 'Sản Phẩm') {
+    if (maxValue <= 5) {
+      return 5;
+    }
+
+    if (maxValue <= 10) {
+      return 10;
+    }
+
+    return Math.ceil(maxValue / 5) * 5;
+  }
+
+  return Math.max(maxValue, 1);
+}
+
+function getAxisTicks(maxValue, unit) {
+  if (unit === 'đơn' || unit === 'Sản Phẩm') {
+    if (maxValue <= 1) {
+      return [0, 1];
+    }
+
+    const middle = Math.ceil(maxValue / 2);
+    return middle === maxValue ? [0, maxValue] : [0, middle, maxValue];
+  }
+
+  return [0, maxValue / 2, maxValue];
+}
+
+function drawValueLabel(context, text, x, y) {
+  context.font = '11px Segoe UI, Arial';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+
+  const width = context.measureText(text).width + 12;
+  const labelX = Math.max(width / 2 + 4, x);
+  const labelY = Math.max(12, y);
+
+  context.fillStyle = 'rgba(255, 255, 255, 0.92)';
+  context.fillRect(labelX - width / 2, labelY - 9, width, 18);
+  context.strokeStyle = '#eeeeee';
+  context.strokeRect(labelX - width / 2, labelY - 9, width, 18);
+  context.fillStyle = '#555555';
+  context.fillText(text, labelX, labelY + 0.5);
+}
+
+function drawAxes(context, width, height, padding, maxValue, unit) {
   context.strokeStyle = '#e8e8e8';
   context.lineWidth = 1;
   context.beginPath();
@@ -29,16 +95,33 @@ function drawAxes(context, width, height, padding) {
   context.lineTo(padding, height - padding);
   context.lineTo(width - padding / 2, height - padding);
   context.stroke();
+
+  context.font = '11px Segoe UI, Arial';
+  context.fillStyle = '#777777';
+  context.textAlign = 'right';
+
+  getAxisTicks(maxValue, unit).forEach(function (value) {
+    const ratio = value / maxValue;
+    const displayValue = unit === 'đơn' || unit === 'Sản Phẩm' ? value : Math.round(value);
+    const y = height - padding - (height - padding * 2) * ratio;
+
+    context.strokeStyle = '#f0f0f0';
+    context.beginPath();
+    context.moveTo(padding, y);
+    context.lineTo(width - padding / 2, y);
+    context.stroke();
+    context.fillText(formatChartValue(displayValue, unit, false), padding - 8, y + 4);
+  });
 }
 
-function drawBarChart(canvas, labels, values, color) {
+function drawBarChart(canvas, labels, values, color, unit) {
   const { context, width, height } = prepareCanvas(canvas);
-  const padding = 36;
-  const maxValue = Math.max(...values, 1);
+  const padding = getChartPadding(unit);
+  const maxValue = getAxisMax(Math.max(...values, 1), unit);
   const gap = 8;
   const barWidth = Math.max((width - padding * 2 - gap * (values.length - 1)) / values.length, 8);
 
-  drawAxes(context, width, height, padding);
+  drawAxes(context, width, height, padding, maxValue, unit);
   context.font = '12px Segoe UI, Arial';
   context.textAlign = 'center';
 
@@ -50,14 +133,21 @@ function drawBarChart(canvas, labels, values, color) {
     context.fillStyle = color;
     context.fillRect(x, y, barWidth, barHeight);
     context.fillStyle = '#666666';
+    if (value > 0) {
+      drawValueLabel(context, formatChartValue(value, unit), x + barWidth / 2, y - 12);
+    }
+    context.font = '12px Segoe UI, Arial';
+    context.textAlign = 'center';
+    context.textBaseline = 'alphabetic';
+    context.fillStyle = '#666666';
     context.fillText(labels[index], x + barWidth / 2, height - 12);
   });
 }
 
-function drawLineChart(canvas, labels, values, color) {
+function drawLineChart(canvas, labels, values, color, unit) {
   const { context, width, height } = prepareCanvas(canvas);
-  const padding = 36;
-  const maxValue = Math.max(...values, 1);
+  const padding = getChartPadding(unit);
+  const maxValue = getAxisMax(Math.max(...values, 1), unit);
   const step = (width - padding * 2) / Math.max(values.length - 1, 1);
   const points = values.map(function (value, index) {
     return {
@@ -66,7 +156,7 @@ function drawLineChart(canvas, labels, values, color) {
     };
   });
 
-  drawAxes(context, width, height, padding);
+  drawAxes(context, width, height, padding, maxValue, unit);
   context.strokeStyle = color;
   context.lineWidth = 3;
   context.beginPath();
@@ -92,12 +182,21 @@ function drawLineChart(canvas, labels, values, color) {
     context.arc(point.x, point.y, 4, 0, Math.PI * 2);
     context.fill();
     context.stroke();
+    if (values[index] > 0) {
+      const text = formatChartValue(values[index], unit);
+      drawValueLabel(context, text, point.x, point.y - 14);
+    }
+
+    context.font = '12px Segoe UI, Arial';
+    context.textAlign = 'center';
+    context.textBaseline = 'alphabetic';
     context.fillStyle = '#666666';
     context.fillText(labels[index], point.x, height - 12);
   });
 }
 
-function drawDoughnutChart(canvas, labels, values) {
+
+function drawDoughnutChart(canvas, labels, values, unit) {
   const { context, width, height } = prepareCanvas(canvas);
   const colors = ['#ff7a3d', '#4a9b7f', '#2196f3', '#ffa500', '#ff4444', '#6c5ce7'];
   const total = values.reduce(function (sum, value) {
@@ -135,7 +234,7 @@ function drawDoughnutChart(canvas, labels, values) {
     context.fillStyle = colors[index % colors.length];
     context.fillRect(x, y - 9, 10, 10);
     context.fillStyle = '#666666';
-    context.fillText(label, x + 16, y);
+    context.fillText(label + ': ' + formatChartValue(values[index], unit), x + 16, y);
   });
 }
 
@@ -144,17 +243,18 @@ function renderAdminCharts() {
     const labels = getJsonData(canvas, 'labels');
     const values = getJsonData(canvas, 'values').map(Number);
     const color = canvas.dataset.color || '#ff7a3d';
+    const unit = canvas.dataset.unit || '';
 
     if (canvas.dataset.chart === 'bar') {
-      drawBarChart(canvas, labels, values, color);
+      drawBarChart(canvas, labels, values, color, unit);
     }
 
     if (canvas.dataset.chart === 'line') {
-      drawLineChart(canvas, labels, values, color);
+      drawLineChart(canvas, labels, values, color, unit);
     }
 
     if (canvas.dataset.chart === 'doughnut') {
-      drawDoughnutChart(canvas, labels, values);
+      drawDoughnutChart(canvas, labels, values, unit);
     }
   });
 }

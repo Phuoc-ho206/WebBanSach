@@ -37,7 +37,7 @@ $productCategoryStats = countByField($_SESSION['admin_products'], 'category');
         <article class="card stat-card"><div class="card__body"><p class="card__subtitle">Đơn hàng</p><h3 class="card__title"><?= $orderCount ?></h3></div></article>
         <article class="card stat-card"><div class="card__body"><p class="card__subtitle">Người dùng</p><h3 class="card__title"><?= $userCount ?></h3></div></article>
         <article class="card stat-card"><div class="card__body"><p class="card__subtitle">Mã giảm giá</p><h3 class="card__title"><?= $couponCount ?></h3></div></article>
-        <article class="card stat-card"><div class="card__body"><p class="card__subtitle">Doanh thu</p><h3 class="card__title"><?= number_format($revenue, 0, ',', '.') ?>đ</h3></div></article>
+        <article class="card stat-card"><div class="card__body"><p class="card__subtitle">Doanh thu</p><h3 class="card__title"><?= number_format($revenue, 0, ',', '.') ?> đ</h3></div></article>
       </section>
 
       <section class="card-grid card-grid--charts">
@@ -48,7 +48,8 @@ $productCategoryStats = countByField($_SESSION['admin_products'], 'category');
               data-chart="bar"
               data-labels='<?= h(json_encode(array_map(function ($m) { return 'T' . $m; }, range(1, 12)), JSON_UNESCAPED_UNICODE)) ?>'
               data-values='<?= h(json_encode(array_column($monthlyStats, 'revenue'), JSON_UNESCAPED_UNICODE)) ?>'
-              data-color="#ff7a3d">
+              data-color="#ff7a3d"
+              data-unit="đ">
             </canvas>
           </div>
         </article>
@@ -60,7 +61,8 @@ $productCategoryStats = countByField($_SESSION['admin_products'], 'category');
               data-chart="line"
               data-labels='<?= h(json_encode(array_map(function ($m) { return 'T' . $m; }, range(1, 12)), JSON_UNESCAPED_UNICODE)) ?>'
               data-values='<?= h(json_encode(array_column($monthlyStats, 'orders'), JSON_UNESCAPED_UNICODE)) ?>'
-              data-color="#2196f3">
+              data-color="#2196f3"
+              data-unit="đơn">
             </canvas>
           </div>
         </article>
@@ -71,7 +73,8 @@ $productCategoryStats = countByField($_SESSION['admin_products'], 'category');
             <canvas
               data-chart="doughnut"
               data-labels='<?= h(json_encode(array_keys($orderStatusStats), JSON_UNESCAPED_UNICODE)) ?>'
-              data-values='<?= h(json_encode(array_values($orderStatusStats), JSON_UNESCAPED_UNICODE)) ?>'>
+              data-values='<?= h(json_encode(array_values($orderStatusStats), JSON_UNESCAPED_UNICODE)) ?>'
+              data-unit="đơn">
             </canvas>
           </div>
         </article>
@@ -82,7 +85,8 @@ $productCategoryStats = countByField($_SESSION['admin_products'], 'category');
             <canvas
               data-chart="doughnut"
               data-labels='<?= h(json_encode(array_keys($productCategoryStats), JSON_UNESCAPED_UNICODE)) ?>'
-              data-values='<?= h(json_encode(array_values($productCategoryStats), JSON_UNESCAPED_UNICODE)) ?>'>
+              data-values='<?= h(json_encode(array_values($productCategoryStats), JSON_UNESCAPED_UNICODE)) ?>'
+              data-unit="Sản Phẩm">
             </canvas>
           </div>
         </article>
