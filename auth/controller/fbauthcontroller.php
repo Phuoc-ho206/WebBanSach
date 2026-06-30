@@ -2,8 +2,8 @@
 
 class fbauthcontroller
 {
-    private static $appId = 'FACEBOOK_APP_ID';
-    private static $appSecret = 'FACEBOOK_APP_SECRET';
+    private static $appId = '1035137065523085';
+    private static $appSecret = '628f152177ad723e92389d7f5aea2341';
     private static $redirectUri = 'http://localhost/WebBanSach/auth/pages/login.php'; // URL callback
 
     // Lấy URL đăng nhập Facebook
@@ -14,7 +14,7 @@ class fbauthcontroller
             . 'client_id=' . self::$appId
             . '&redirect_uri=' . urlencode(self::$redirectUri)
             . '&scope=' . $scope
-            . '&state=' . bin2hex(random_bytes(16)); // Bảo mật CSRF
+            . '&state=facebook'; // Sử dụng state để định tuyến callback
 
         return $authUrl;
     }
@@ -34,14 +34,22 @@ class fbauthcontroller
 
         $code = $_GET['code'];
 
-        // Bước 1: Dùng code để lấy access token từ Facebook
+        // Bước 1: Dùng code để lấy access token từ Facebook sử dụng cURL (tắt SSL verification ở localhost)
         $tokenUrl = 'https://graph.facebook.com/v18.0/oauth/access_token?'
             . 'client_id=' . self::$appId
             . '&client_secret=' . self::$appSecret
             . '&redirect_uri=' . urlencode(self::$redirectUri)
             . '&code=' . $code;
 
-        $response = @file_get_contents($tokenUrl);
+        $ch = curl_init($tokenUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
         if ($response === false) {
             return false;
         }
@@ -53,10 +61,18 @@ class fbauthcontroller
 
         $accessToken = $tokenData['access_token'];
 
-        // Bước 2: Dùng access token để lấy thông tin user từ Facebook
+        // Bước 2: Dùng access token để lấy thông tin user từ Facebook sử dụng cURL (tắt SSL verification ở localhost)
         $userUrl = 'https://graph.facebook.com/me?fields=id,name,email&access_token=' . $accessToken;
 
-        $userResponse = @file_get_contents($userUrl);
+        $ch = curl_init($userUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $userResponse = curl_exec($ch);
+        curl_close($ch);
+
         if ($userResponse === false) {
             return false;
         }
@@ -162,7 +178,7 @@ class fbauthcontroller
         // 4. Lưu liên kết vào bảng user_provider
         $linkSql = "INSERT INTO user_provider (User_ID, ProviderName, Provider_userID, access_token, CreatedAt) VALUES (?, 'Facebook', ?, ?, NOW())";
         $linkStmt = $conn->prepare($linkSql);
-        $linkStmt->bind_param('isss', $userId, $facebookId, $accessToken);
+        $linkStmt->bind_param('iss', $userId, $facebookId, $accessToken);
         $linkStmt->execute();
         $linkStmt->close();
 

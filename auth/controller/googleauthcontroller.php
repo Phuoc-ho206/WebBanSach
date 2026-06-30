@@ -1,7 +1,9 @@
 <?php
 
-define('GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_ID');
-define('GOOGLE_CLIENT_SECRET', 'GOOGLE_CLIENT_SECRET');
+require_once __DIR__ . '/../../config/env.php';
+
+define('GOOGLE_CLIENT_ID', env('GOOGLE_CLIENT_ID', ''));
+define('GOOGLE_CLIENT_SECRET', env('GOOGLE_CLIENT_SECRET', ''));
 define('GOOGLE_REDIRECT_URI', 'http://localhost/WebBanSach/auth/pages/login.php');
 
 class googleauthcontroller
@@ -132,7 +134,7 @@ class googleauthcontroller
         // 4. Lưu liên kết vào bảng user_provider
         $linkSql = "INSERT INTO user_provider (User_ID, ProviderName, Provider_userID, access_token, CreatedAt) VALUES (?, 'Google', ?, ?, NOW())";
         $linkStmt = $conn->prepare($linkSql);
-        $linkStmt->bind_param('isss', $userId, $googleId, $accessToken);
+        $linkStmt->bind_param('iss', $userId, $googleId, $accessToken);
         $linkStmt->execute();
         $linkStmt->close();
 

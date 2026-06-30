@@ -63,10 +63,21 @@ $totalAmount = 0;
 $conn->begin_transaction();
 
 try {
-    // 1. Tính tổng tiền thực tế từ DB để tránh giả mạo giá từ client
+    // 1. Tính tổng tiền thực tế từ DB để tránh giả mạo giá từ client (Có kết hợp khuyến mãi sản phẩm)
     $productIds = array_keys($cart);
     $placeholders = implode(',', array_fill(0, count($productIds), '?'));
-    $sql = "SELECT ProductID, Price, Quantity, Status FROM product WHERE ProductID IN ($placeholders) FOR UPDATE";
+    $sql = "
+        SELECT p.ProductID, p.Price AS OriginalPrice, p.Quantity, p.Status, ap.DiscountRate
+        FROM product p
+        LEFT JOIN (
+            SELECT pd.ProductID, MAX(pd.DiscountRate) AS DiscountRate
+            FROM promotion_detail pd
+            JOIN promotion pr ON pd.PromotionID = pr.PromotionID
+            WHERE NOW() BETWEEN COALESCE(pd.StartDate, pr.StartDate) AND COALESCE(pd.EndDate, pr.EndDate)
+            GROUP BY pd.ProductID
+        ) ap ON p.ProductID = ap.ProductID
+        WHERE p.ProductID IN ($placeholders) FOR UPDATE
+    ";
     $stmt = $conn->prepare($sql);
     $types = str_repeat('i', count($productIds));
     $stmt->bind_param($types, ...$productIds);
@@ -87,27 +98,90 @@ try {
         if ($p['Quantity'] < $qty || $p['Status'] === 'Hết hàng') {
             throw new Exception("Sản phẩm mã #$pId không đủ tồn kho thực tế.");
         }
-        $totalAmount += $p['Price'] * $qty;
+        
+        $discountRate = isset($p['DiscountRate']) ? floatval($p['DiscountRate']) : 0;
+        $actualPrice = $p['OriginalPrice'] - ($p['OriginalPrice'] * $discountRate / 100);
+        $productsDb[$pId]['ActualPrice'] = $actualPrice;
+        
+        $totalAmount += $actualPrice * $qty;
     }
     
-    $finalTotalAmount = $totalAmount + $shippingFee;
-
-    // 2. Thêm vào bảng `order`
-    $sqlOrder = "INSERT INTO `order` (CustomerID, VoucherID, ShippingAddress, OrderStatus, TotalAmount) VALUES (?, NULL, ?, 'Pending', ?)";
-    $stmtOrder = $conn->prepare($sqlOrder);
+    // 2. Xác thực và tính toán mã giảm giá (Voucher)
+    $voucherId = null;
+    $voucherDiscount = 0;
     
-    // PHP bind_param xử lý kiểu dữ liệu nullable
-    if ($customerId === null) {
-        $nullVal = null;
-        $stmtOrder->bind_param("ssd", $nullVal, $shippingAddress, $finalTotalAmount);
+    if (isset($_SESSION['applied_voucher']) && $customerId !== null) {
+        $sessionVoucher = $_SESSION['applied_voucher'];
+        $sqlVoucher = "SELECT * FROM voucher WHERE VoucherID = ? AND (ExpiredDate IS NULL OR ExpiredDate >= NOW()) LIMIT 1 FOR UPDATE";
+        $stmtVoucher = $conn->prepare($sqlVoucher);
+        $stmtVoucher->bind_param("i", $sessionVoucher['id']);
+        $stmtVoucher->execute();
+        $resVoucher = $stmtVoucher->get_result();
+        
+        if ($resVoucher->num_rows === 0) {
+            throw new Exception("Mã giảm giá đã áp dụng không hợp lệ hoặc đã hết hạn.");
+        }
+        
+        $voucher = $resVoucher->fetch_assoc();
+        $stmtVoucher->close();
+        
+        // Kiểm tra xem voucher đã được khách hàng sử dụng chưa
+        $sqlCheckUsed = "SELECT UsedStatus FROM voucher_detail WHERE CustomerID = ? AND VoucherID = ? LIMIT 1 FOR UPDATE";
+        $stmtCheck = $conn->prepare($sqlCheckUsed);
+        $stmtCheck->bind_param("ii", $customerId, $voucher['VoucherID']);
+        $stmtCheck->execute();
+        $resCheck = $stmtCheck->get_result();
+        
+        if ($resCheck->num_rows > 0) {
+            $usedRow = $resCheck->fetch_assoc();
+            if (intval($usedRow['UsedStatus']) === 1) {
+                throw new Exception("Bạn đã sử dụng mã giảm giá này cho một đơn hàng trước đó.");
+            }
+        }
+        $stmtCheck->close();
+        
+        $voucherId = intval($voucher['VoucherID']);
+        $voucherDiscount = floatval($voucher['DiscountValue']);
     } else {
-        $stmtOrder->bind_param("isd", $customerId, $shippingAddress, $finalTotalAmount);
+        // Khách vãng lai hoặc không áp dụng voucher
+        unset($_SESSION['applied_voucher']);
     }
+    
+    $finalTotalAmount = max(0, $totalAmount + $shippingFee - $voucherDiscount);
+
+    // 3. Thêm vào bảng `order`
+    $sqlOrder = "INSERT INTO `order` (CustomerID, VoucherID, ShippingAddress, OrderStatus, TotalAmount) VALUES (?, ?, ?, 'Pending', ?)";
+    $stmtOrder = $conn->prepare($sqlOrder);
+    $stmtOrder->bind_param("iisd", $customerId, $voucherId, $shippingAddress, $finalTotalAmount);
     $stmtOrder->execute();
     $orderId = $conn->insert_id;
     $stmtOrder->close();
 
-    // 3. Thêm vào bảng `order_detail` & Trừ tồn kho
+    // 4. Cập nhật trạng thái voucher thành đã sử dụng (UsedStatus = 1)
+    if ($customerId !== null && $voucherId !== null) {
+        $sqlCheckDetail = "SELECT 1 FROM voucher_detail WHERE CustomerID = ? AND VoucherID = ? LIMIT 1";
+        $stmtCD = $conn->prepare($sqlCheckDetail);
+        $stmtCD->bind_param("ii", $customerId, $voucherId);
+        $stmtCD->execute();
+        $resCD = $stmtCD->get_result();
+        $stmtCD->close();
+        
+        if ($resCD->num_rows > 0) {
+            $sqlUpdateVoucher = "UPDATE voucher_detail SET UsedStatus = 1 WHERE CustomerID = ? AND VoucherID = ?";
+            $stmtUV = $conn->prepare($sqlUpdateVoucher);
+            $stmtUV->bind_param("ii", $customerId, $voucherId);
+            $stmtUV->execute();
+            $stmtUV->close();
+        } else {
+            $sqlInsertVoucher = "INSERT INTO voucher_detail (CustomerID, VoucherID, UsedStatus) VALUES (?, ?, 1)";
+            $stmtIV = $conn->prepare($sqlInsertVoucher);
+            $stmtIV->bind_param("ii", $customerId, $voucherId);
+            $stmtIV->execute();
+            $stmtIV->close();
+        }
+    }
+
+    // 5. Thêm vào bảng `order_detail` & Trừ tồn kho
     $sqlDetail = "INSERT INTO `order_detail` (OrderID, ProductID, Quantity, Price, UnitPrice) VALUES (?, ?, ?, ?, ?)";
     $stmtDetail = $conn->prepare($sqlDetail);
     
@@ -116,7 +190,7 @@ try {
     
     foreach ($cart as $pId => $qty) {
         $p = $productsDb[$pId];
-        $unitPrice = $p['Price'];
+        $unitPrice = $p['ActualPrice'];
         $linePrice = $unitPrice * $qty;
         
         // Thêm chi tiết đơn
@@ -132,22 +206,38 @@ try {
     $stmtDetail->close();
     $stmtUpdateStock->close();
 
-    // 4. Thêm bản ghi `payment`
+    // 6. Thêm bản ghi `payment`
     $sqlPayment = "INSERT INTO `payment` (OrderID, PaymentMethod, PaymentStatus) VALUES (?, ?, 'Pending')";
     $stmtPayment = $conn->prepare($sqlPayment);
     $stmtPayment->bind_param("is", $orderId, $paymentMethod);
     $stmtPayment->execute();
     $stmtPayment->close();
 
-    // 5. Thêm bản ghi `delivery`
+    // 7. Thêm bản ghi `delivery`
     $sqlDelivery = "INSERT INTO `delivery` (OrderID, DeliveryStatus, ShippingFee) VALUES (?, 'Preparing', ?)";
     $stmtDelivery = $conn->prepare($sqlDelivery);
     $stmtDelivery->bind_param("id", $orderId, $shippingFee);
     $stmtDelivery->execute();
     $stmtDelivery->close();
 
+    // 8. Nếu là COD, đánh dấu giỏ hàng DB đã hoàn thành
+    if ($paymentMethod === 'COD' && $customerId !== null && $customerId > 0) {
+        $stmtDelCartDetail = $conn->prepare("DELETE FROM cart_detail WHERE CartID IN (SELECT CartID FROM cart WHERE CustomerID = ? AND Status = 'Active')");
+        $stmtDelCartDetail->bind_param("i", $customerId);
+        $stmtDelCartDetail->execute();
+        $stmtDelCartDetail->close();
+
+        $stmtCompleteCart = $conn->prepare("UPDATE cart SET Status = 'Completed' WHERE CustomerID = ? AND Status = 'Active'");
+        $stmtCompleteCart->bind_param("i", $customerId);
+        $stmtCompleteCart->execute();
+        $stmtCompleteCart->close();
+    }
+
     // Commit Transaction thành công
     $conn->commit();
+    
+    // Ghi nhật ký đặt hàng thành công
+    write_user_log($conn, "Đặt hàng thành công đơn hàng #WBS-" . $orderId . ($customerId ? "" : " (Khách vãng lai)"), $customerId);
     
     // Nếu chọn thanh toán VNPAY
     if ($paymentMethod === 'VNPAY') {
@@ -208,6 +298,7 @@ try {
 
     // Nếu chọn thanh toán COD
     unset($_SESSION['cart']);
+    unset($_SESSION['applied_voucher']);
     $_SESSION['success_order_id'] = $orderId;
     header('Location: ' . url('cart/success.php?id=' . $orderId));
     exit;

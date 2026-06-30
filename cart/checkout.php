@@ -20,9 +20,17 @@ $shippingFee = 0;
 $productIds = array_keys($cart);
 $placeholders = implode(',', array_fill(0, count($productIds), '?'));
 $sql = "
-    SELECT p.ProductID, p.ProductName, p.Price, p.Quantity AS Stock, i.ImageURL 
+    SELECT p.ProductID, p.ProductName, p.Price AS OriginalPrice, p.Quantity AS Stock, i.ImageURL,
+           ap.DiscountRate
     FROM product p
     LEFT JOIN image i ON p.ProductID = i.ProductID AND i.IsThumbnail = 1
+    LEFT JOIN (
+        SELECT pd.ProductID, MAX(pd.DiscountRate) AS DiscountRate
+        FROM promotion_detail pd
+        JOIN promotion pr ON pd.PromotionID = pr.PromotionID
+        WHERE NOW() BETWEEN COALESCE(pd.StartDate, pr.StartDate) AND COALESCE(pd.EndDate, pr.EndDate)
+        GROUP BY pd.ProductID
+    ) ap ON p.ProductID = ap.ProductID
     WHERE p.ProductID IN ($placeholders)
 ";
 $stmt = $conn->prepare($sql);
@@ -33,6 +41,11 @@ $result = $stmt->get_result();
 
 while ($row = $result->fetch_assoc()) {
     $qty = $cart[$row['ProductID']];
+    
+    // Tính toán giá khuyến mãi
+    $discountRate = isset($row['DiscountRate']) ? floatval($row['DiscountRate']) : 0;
+    $row['Price'] = $row['OriginalPrice'] - ($row['OriginalPrice'] * $discountRate / 100);
+    
     $row['CartQuantity'] = $qty;
     $row['Subtotal'] = $row['Price'] * $qty;
     $totalAmount += $row['Subtotal'];
@@ -247,6 +260,36 @@ if (isset($_SESSION['user'])) {
                     <span>Tạm tính tiền hàng</span>
                     <span><?= number_format($totalAmount, 0, ',', '.') ?> đ</span>
                 </div>
+
+                <?php 
+                $voucherDiscount = 0;
+                $appliedVoucher = $_SESSION['applied_voucher'] ?? null;
+                if ($appliedVoucher && isset($_SESSION['user'])) {
+                    $voucherDiscount = floatval($appliedVoucher['value']);
+                } else {
+                    unset($_SESSION['applied_voucher']);
+                    $appliedVoucher = null;
+                }
+                
+                $finalTotal = max(0, $totalAmount + $shippingFee - $voucherDiscount);
+                ?>
+
+                <?php if ($appliedVoucher): ?>
+                    <div class="detail-summary-row" style="color: #2e7d32; font-weight: bold;">
+                        <span style="display: flex; align-items: center; gap: 4px;">
+                            <i class="fa-solid fa-ticket"></i> Voucher (<?= htmlspecialchars($appliedVoucher['code']) ?>)
+                        </span>
+                        <span style="display: flex; align-items: center; gap: 8px;">
+                            -<?= number_format($voucherDiscount, 0, ',', '.') ?> đ
+                            <form action="<?= url('cart/apply_voucher.php') ?>" method="POST" style="margin: 0; display: inline;">
+                                <input type="hidden" name="action" value="remove">
+                                <button type="submit" style="background: none; border: none; color: var(--color-error); cursor: pointer; padding: 0; font-size: 0.95rem;" title="Gỡ mã">
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                </button>
+                            </form>
+                        </span>
+                    </div>
+                <?php endif; ?>
                 
                 <div class="detail-summary-row">
                     <span>Phí vận chuyển</span>
@@ -255,7 +298,28 @@ if (isset($_SESSION['user'])) {
                 
                 <div class="detail-summary-row detail-summary-row--total" style="margin-top: 10px; padding-top: 10px;">
                     <span>Tổng số tiền cần trả</span>
-                    <span class="detail-summary-value"><?= number_format($totalAmount + $shippingFee, 0, ',', '.') ?> đ</span>
+                    <span class="detail-summary-value"><?= number_format($finalTotal, 0, ',', '.') ?> đ</span>
+                </div>
+
+                <!-- Khu vực nhập Voucher phụ tại trang thanh toán -->
+                <div style="border-top: 1px dashed var(--color-border); margin-top: var(--spacing-md); padding-top: var(--spacing-md);">
+                    <?php if (isset($_SESSION['user'])): ?>
+                        <?php if (!$appliedVoucher): ?>
+                            <form action="<?= url('cart/apply_voucher.php') ?>" method="POST" style="display: flex; gap: var(--spacing-xs); margin-bottom: 0;">
+                                <input type="hidden" name="action" value="apply">
+                                <input type="text" name="voucher_code" class="form-control" placeholder="Nhập mã giảm giá..." style="padding: 8px 12px; font-size: 0.9rem; margin-bottom: 0;" required>
+                                <button type="submit" class="btn btn--primary" style="padding: 0 16px; font-size: 0.9rem; font-weight: bold; white-space: nowrap; height: 38px;">Áp dụng</button>
+                            </form>
+                        <?php else: ?>
+                            <div style="font-size: 0.85rem; color: #2e7d32; display: flex; align-items: center; gap: 4px;">
+                                <i class="fa-solid fa-circle-check"></i> Đã áp dụng mã giảm giá thành công!
+                            </div>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <div style="font-size: 0.85rem; color: var(--color-text-light); text-align: center; background: var(--color-background); padding: var(--spacing-sm); border-radius: var(--border-radius-sm); border: 1px dashed var(--color-border);">
+                            <i class="fa-solid fa-lock" style="margin-right: 4px;"></i> Vui lòng <a href="<?= url('auth/pages/login.php') ?>" style="color: var(--color-primary); font-weight: bold; text-decoration: none;">Đăng nhập</a> để sử dụng mã giảm giá.
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <div class="detail-summary-actions" style="margin-top: var(--spacing-lg);">

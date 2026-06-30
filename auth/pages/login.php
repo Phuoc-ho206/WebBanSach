@@ -2,7 +2,7 @@
 session_start();
 require_once '../controller/authcontroller.php';
 require_once '../controller/GoogleAuthController.php';
-require_once '../controller/fbauthcontroller.php';
+// require_once '../controller/fbauthcontroller.php';
 
 // Xử lý logout
 if (isset($_POST['action']) && $_POST['action'] === 'logout') {
@@ -33,6 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user) {
             $remember = isset($_POST['remember']) && $_POST['remember'] === 'on';
             AuthController::establishSession($user, $remember);
+            
+            // Đồng bộ giỏ hàng khi đăng nhập thành công (từ nhánh Payment-cart)
+            require_once '../../config/db.php';
+            sync_cart_to_db($conn, $user['id']);
+            write_user_log($conn, "Đăng nhập hệ thống");
+            
             header('Location: ' . AuthController::getRedirectUrl($user));
             exit;
         } else {
@@ -44,15 +50,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Xử lý callback từ Google
 if (isset($_GET['code'])) {
     $user = googleauthcontroller::handleCallback();
+
     if ($user) {
         AuthController::establishSession($user, false);
+        
+        // Đồng bộ giỏ hàng khi đăng nhập bằng Google thành công (từ nhánh Payment-cart)
+        require_once '../../config/db.php';
+        sync_cart_to_db($conn, $user['id']);
+        write_user_log($conn, "Đăng nhập hệ thống bằng Google");
+        
         header('Location: ' . AuthController::getRedirectUrl($user));
         exit;
+    } else {
+        $error = 'Đăng nhập bằng tài khoản Google thất bại. Vui lòng kiểm tra lại cấu hình hoặc thử lại.';
     }
 }
 
 $google_login_url = googleauthcontroller::getLoginUrl();
-$facebook_login_url = fbauthcontroller::getLoginUrl();
 ?>
 
 <!DOCTYPE html>
@@ -213,13 +227,6 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
                     <img src="/WebBanSach/assets/images/icon/gg.png" alt="Google"
                         style="width: 24px; height: 24px; object-fit: contain; background: white; border-radius: 50%; padding: 2px;">
                     Đăng nhập với Google
-                </a>
-
-                <a href="<?= $facebook_login_url ?>" class="btn btn-primary"
-                    style="text-align:center; text-decoration:none; font-weight: bold; color: white; display:flex; align-items:center; justify-content:center; background-color: #3e24eaff; gap: 8px;">
-                    <img src="/WebBanSach/assets/images/icon/fb.png" alt="Facebook"
-                        style="width: 24px; height: 24px; object-fit: contain;">
-                    Đăng nhập với Facebook
                 </a>
             </div>
         </form>
