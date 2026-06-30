@@ -85,7 +85,7 @@ class Customer
         $fullName = trim(($row['LastName'] ?? '') . ' ' . ($row['FirstName'] ?? ''));
         return [
             'id' => (int) $row['CustomerID'],
-            'username' => $row['Email'], // Sử dụng Email làm username do bảng user không có cột username
+            'username' => $row['username'] ?? $row['Email'] ?? '',
             'email' => $row['Email'],
             'password' => $row['Password'] ?? '',
             'full_name' => $fullName,
@@ -104,7 +104,7 @@ class Customer
      */
     public function findById(int $id): ?array
     {
-        $sql = "SELECT CustomerID, RoleID, LastName, FirstName, Email, Phone, Address, CreatedDate 
+        $sql = "SELECT CustomerID, RoleID, LastName, FirstName, Email, username, Phone, Address, CreatedDate 
                 FROM {$this->table} 
                 WHERE CustomerID = ? 
                 LIMIT 1";
@@ -129,7 +129,7 @@ class Customer
      */
     public function findByEmail(string $email): ?array
     {
-        $sql = "SELECT CustomerID, RoleID, LastName, FirstName, Email, Password, Phone, Address, CreatedDate 
+        $sql = "SELECT CustomerID, RoleID, LastName, FirstName, Email, username, Password, Phone, Address, CreatedDate 
                 FROM {$this->table} 
                 WHERE Email = ? 
                 LIMIT 1";
@@ -155,7 +155,21 @@ class Customer
      */
     public function findByUsername(string $username): ?array
     {
-        return $this->findByEmail($username);
+        $sql = "SELECT CustomerID, RoleID, LastName, FirstName, Email, username, Password, Phone, Address, CreatedDate 
+                FROM {$this->table} 
+                WHERE username = ? 
+                LIMIT 1";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('s', $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            return $this->mapRowToUser($result->fetch_assoc());
+        }
+
+        return null;
     }
 
     /**
@@ -166,7 +180,21 @@ class Customer
      */
     public function findByIdentity(string $identity): ?array
     {
-        return $this->findByEmail($identity);
+        $sql = "SELECT CustomerID, RoleID, LastName, FirstName, Email, username, Password, Phone, Address, CreatedDate 
+                FROM {$this->table} 
+                WHERE username = ? OR Email = ? 
+                LIMIT 1";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('ss', $identity, $identity);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            return $this->mapRowToUser($result->fetch_assoc());
+        }
+
+        return null;
     }
 
     /**
@@ -178,8 +206,8 @@ class Customer
     public function create(array $data): bool
     {
         $sql = "INSERT INTO {$this->table} 
-                (LastName, FirstName, Email, Password, Phone, Address, RoleID, CreatedDate) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+                (LastName, FirstName, Email, username, Password, Phone, Address, RoleID, CreatedDate) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
         $fullName = trim($data['full_name'] ?? $data['username'] ?? '');
         $parts = explode(' ', $fullName);
@@ -194,13 +222,15 @@ class Customer
         $roleId = $this->getRoleId($data['role'] ?? 'customer');
         $phone = $data['phone'] ?? '';
         $address = $data['address'] ?? '';
+        $username = $data['username'] ?? '';
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param(
-            'ssssssi',
+            'sssssssi',
             $lastName,
             $firstName,
             $data['email'],
+            $username,
             $data['password'],
             $phone,
             $address,
@@ -296,7 +326,14 @@ class Customer
      */
     public function usernameExists(string $username): bool
     {
-        return $this->emailExists($username);
+        $sql = "SELECT CustomerID FROM {$this->table} WHERE username = ? LIMIT 1";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('s', $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        return $result->num_rows > 0;
     }
 
     /**

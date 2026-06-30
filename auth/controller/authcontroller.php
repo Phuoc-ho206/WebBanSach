@@ -7,7 +7,6 @@
 require_once __DIR__ . '/../../config/auth.php';
 require_once __DIR__ . '/../helpers/JwtHelper.php';
 require_once __DIR__ . '/../models/Customer.php';
-// require_once __DIR__ . '/../models/UserSession.php';
 
 class AuthController
 {
@@ -25,12 +24,12 @@ class AuthController
      * @param string $password  Mật khẩu gốc
      * @return array|null       Thông tin user nếu đúng, null nếu sai
      */
-    public static function login(string $identity, string $password): ?array
+    public static function login(string $username, string $password): ?array
     {
-        $identity = trim($identity);
+        $username = trim($username);
 
         $controller = new self();
-        $user = $controller->customerModel->findByIdentity($identity);
+        $user = $controller->customerModel->findByIdentity($username);
 
         if (!$user) {
             return null;
@@ -119,7 +118,7 @@ class AuthController
      */
     public static function getRedirectUrl(array $user): string
     {
-        if (($user['role'] ?? '') === 'admin') {
+        if (($user['role'] ?? '') === 'Admin') {
             return '/WebBanSach/admin/index.php';
         }
 
