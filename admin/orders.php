@@ -115,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $conn->commit();
+        write_user_log($conn, "Cập nhật trạng thái đơn hàng #WBS-" . $id . " thành: " . $status);
       } catch (Exception $e) {
         $conn->rollback();
       }
@@ -124,6 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($action === 'delete') {
     $id = (int)$_POST['id'];
     $conn->query("DELETE FROM `order` WHERE OrderID = $id");
+    write_user_log($conn, "Xóa đơn hàng #WBS-" . $id);
   }
 
   redirectTo('orders.php');

@@ -119,6 +119,13 @@ if ($customerId !== null && $customerId > 0) {
     }
 }
 
+// Thiết lập Toast popup hiển thị ở giỏ hàng (không ghi CSDL)
+if (isset($_SESSION['warning'])) {
+    $_SESSION['log_toast'] = $_SESSION['warning'];
+} elseif (isset($_SESSION['success'])) {
+    $_SESSION['log_toast'] = $_SESSION['success'];
+}
+
 header('Location: ' . url('cart/cart.php'));
 exit;
 ?>

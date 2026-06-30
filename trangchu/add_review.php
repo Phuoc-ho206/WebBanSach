@@ -57,6 +57,7 @@ if ($stmt) {
     $stmt->bind_param("iiis", $customerId, $productId, $rating, $comment);
     if ($stmt->execute()) {
         $_SESSION['review_success'] = 'Cảm ơn bạn đã gửi đánh giá và bình luận!';
+        write_user_log($conn, "Đánh giá sản phẩm ID " . $productId . " (" . $rating . " sao)", $customerId);
     } else {
         $_SESSION['review_error'] = 'Đã có lỗi xảy ra trong quá trình lưu đánh giá. Vui lòng thử lại sau.';
     }

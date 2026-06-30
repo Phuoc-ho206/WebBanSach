@@ -31,11 +31,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->bind_param("isiisssi", $categoryId, $name, $price, $stock, $status, $publisher, $description, $id);
       $stmt->execute();
       $stmt->close();
+      write_user_log($conn, "Cập nhật sản phẩm ID " . $id . " - Tên: " . $name);
     } else {
       $stmt = $conn->prepare("INSERT INTO product (CategoryID, ProductName, Price, Quantity, Status, Publisher, Description) VALUES (?, ?, ?, ?, ?, ?, ?)");
       $stmt->bind_param("isiisss", $categoryId, $name, $price, $stock, $status, $publisher, $description);
       $stmt->execute();
+      $newId = $stmt->insert_id;
       $stmt->close();
+      write_user_log($conn, "Thêm mới sản phẩm ID " . $newId . " - Tên: " . $name);
     }
   }
 
@@ -45,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $stmt->close();
+    write_user_log($conn, "Xóa sản phẩm ID " . $id);
   }
 
   redirectTo('products.php');

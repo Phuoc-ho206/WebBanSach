@@ -155,4 +155,29 @@ if (!function_exists('getGuestInfoFromAddress')) {
         return $info;
     }
 }
+
+if (!function_exists('write_user_log')) {
+    function write_user_log($conn, $action, $customerId = null, $employeeId = null) {
+        // Tự động nhận diện CustomerID / EmployeeID từ session
+        if ($customerId === null && $employeeId === null && isset($_SESSION['user'])) {
+            $userId = intval($_SESSION['user']['id']);
+            $roleId = intval($_SESSION['user']['role_id'] ?? 2);
+            if ($roleId === 2) { // 2 là Customer
+                $customerId = $userId;
+            } else { // Các vai trò khác là nhân viên (Admin, Staff, Manager...)
+                $employeeId = $userId;
+            }
+        }
+        
+        $sql = "INSERT INTO `user_log` (CustomerID, EmployeeID, Action) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        if ($stmt) {
+            $stmt->bind_param("iis", $customerId, $employeeId, $action);
+            $stmt->execute();
+            $stmt->close();
+        }
+        // Lưu lại log để hiển thị Toast popup tức thời
+        $_SESSION['log_toast'] = $action;
+    }
+}
 ?>

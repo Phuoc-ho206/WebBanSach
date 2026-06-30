@@ -15,7 +15,9 @@ function adminCssLinks() {
   <link rel="stylesheet" href="../assets/css/components/card.css?v=3">
   <link rel="stylesheet" href="../assets/css/components/form.css?v=3">
   <link rel="stylesheet" href="../assets/css/components/navbar.css?v=3">
-  <link rel="stylesheet" href="../assets/css/components/table.css?v=3">';
+  <link rel="stylesheet" href="../assets/css/components/table.css?v=3">
+  <link rel="stylesheet" href="../assets/css/components/alert_toast.css?v=3">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">';
 }
 
 function badgeClass($status) {
@@ -49,6 +51,44 @@ function adminSidebar() {
       </ul>
     </nav>
   </header>
+
+  <?php if (isset($_SESSION['log_toast'])): 
+    $toastMsg = $_SESSION['log_toast'];
+    $toastClass = 'toast--success';
+    $toastColor = 'var(--color-success)';
+    $toastIcon = 'fa-circle-check';
+    
+    // Kiểm tra các từ khóa mang tính chất tiêu cực/cảnh báo/lỗi
+    if (preg_match('/(thất bại|hủy|lỗi|xóa|vượt quá|giới hạn|hết hàng|cảnh báo)/i', $toastMsg)) {
+        $toastClass = 'toast--error';
+        $toastColor = 'var(--color-error)';
+        $toastIcon = 'fa-circle-xmark';
+    }
+  ?>
+    <div class="toast-container" id="admin-toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 10000; display: block; max-width: 380px; width: 100%;">
+      <div class="toast <?= $toastClass ?>" id="admin-toast" style="animation: toast-in 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-left: 4px solid <?= $toastColor ?>; background: var(--color-surface); padding: 16px; border-radius: var(--border-radius); display: flex; gap: 12px; align-items: flex-start;">
+        <i class="fa-solid <?= $toastIcon ?>" style="color: <?= $toastColor ?>; font-size: 1.25rem; margin-top: 2px;"></i>
+        <div style="flex: 1;">
+          <div style="font-weight: bold; margin-bottom: 4px; color: var(--color-text); text-align: left;">
+            <?= ($toastClass === 'toast--error') ? 'Thông báo hệ thống' : 'Nhật ký hệ thống' ?>
+          </div>
+          <div style="font-size: 0.9rem; color: var(--color-text-light); line-height: 1.4; text-align: left;"><?= htmlspecialchars($toastMsg) ?></div>
+        </div>
+        <button onclick="document.getElementById('admin-toast-container').remove()" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--color-text-light); padding: 0; line-height: 1; opacity: 0.7;">&times;</button>
+      </div>
+    </div>
+    <script>
+      setTimeout(function() {
+        var el = document.getElementById('admin-toast-container');
+        if (el) {
+          el.style.opacity = '0';
+          el.style.transition = 'opacity 0.5s ease';
+          setTimeout(function() { el.remove(); }, 500);
+        }
+      }, 4000);
+    </script>
+    <?php unset($_SESSION['log_toast']); ?>
+  <?php endif; ?>
   <?php
 }
 

@@ -67,6 +67,7 @@ if ($isValidSignature && $orderId > 0) {
             $stmtOrder->execute();
             $stmtOrder->close();
 
+            $orderCustId = null;
             // Đọc CustomerID từ đơn hàng để tìm và đánh dấu giỏ hàng của họ thành Completed
             $stmtGetCust = $conn->prepare("SELECT CustomerID FROM `order` WHERE OrderID = ?");
             $stmtGetCust->bind_param("i", $orderId);
@@ -90,6 +91,9 @@ if ($isValidSignature && $orderId > 0) {
             $stmtGetCust->close();
 
             $conn->commit();
+            
+            // Ghi nhật ký thanh toán thành công qua VNPAY
+            write_user_log($conn, "Thanh toán thành công đơn hàng #WBS-" . $orderId . " qua VNPAY", $orderCustId);
             
             // Xóa giỏ hàng và voucher khi thanh toán thành công
             unset($_SESSION['cart']);
@@ -129,6 +133,7 @@ if ($isValidSignature && $orderId > 0) {
             $stmtRestoreStock->close();
             $stmtDetails->close();
 
+            $custVal = null;
             // 4. Hoàn lại trạng thái voucher trong database (nếu có)
             $stmtGetVoucher = $conn->prepare("SELECT CustomerID, VoucherID FROM `order` WHERE OrderID = ?");
             $stmtGetVoucher->bind_param("i", $orderId);
@@ -148,6 +153,9 @@ if ($isValidSignature && $orderId > 0) {
             $stmtGetVoucher->close();
 
             $conn->commit();
+            
+            // Ghi nhật ký thanh toán thất bại qua VNPAY
+            write_user_log($conn, "Thanh toán thất bại đơn hàng #WBS-" . $orderId . " qua VNPAY", $custVal);
         } catch (Exception $e) {
             $conn->rollback();
         }

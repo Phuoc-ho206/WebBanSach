@@ -24,11 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->bind_param("ssi", $name, $description, $id);
       $stmt->execute();
       $stmt->close();
+      write_user_log($conn, "Cập nhật danh mục ID " . $id . " - Tên: " . $name);
     } else {
       $stmt = $conn->prepare("INSERT INTO category (CategoryName, Description) VALUES (?, ?)");
       $stmt->bind_param("ss", $name, $description);
       $stmt->execute();
+      $newId = $stmt->insert_id;
       $stmt->close();
+      write_user_log($conn, "Thêm mới danh mục ID " . $newId . " - Tên: " . $name);
     }
   }
 
@@ -38,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $stmt->close();
+    write_user_log($conn, "Xóa danh mục ID " . $id);
   }
 
   redirectTo('categories.php');

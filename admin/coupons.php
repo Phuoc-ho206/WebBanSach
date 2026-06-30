@@ -25,11 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->bind_param("sdsi", $code, $discount, $expiredDate, $id);
       $stmt->execute();
       $stmt->close();
+      write_user_log($conn, "Cập nhật mã giảm giá ID " . $id . " - Mã: " . $code);
     } else {
       $stmt = $conn->prepare("INSERT INTO voucher (VoucherCode, DiscountValue, ExpiredDate) VALUES (?, ?, ?)");
       $stmt->bind_param("sds", $code, $discount, $expiredDate);
       $stmt->execute();
+      $newId = $stmt->insert_id;
       $stmt->close();
+      write_user_log($conn, "Thêm mới mã giảm giá ID " . $newId . " - Mã: " . $code);
     }
   }
 
@@ -39,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $stmt->close();
+    write_user_log($conn, "Xóa mã giảm giá ID " . $id);
   }
 
   redirectTo('coupons.php');

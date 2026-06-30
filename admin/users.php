@@ -35,13 +35,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->bind_param("isssssi", $roleId, $lastName, $firstName, $email, $phone, $address, $id);
       $stmt->execute();
       $stmt->close();
+      write_user_log($conn, "Cập nhật người dùng ID " . $id . " - Email: " . $email);
     } else {
       // Thiết lập mật khẩu mặc định cho người dùng mới
       $defaultPassword = password_hash('123456', PASSWORD_DEFAULT);
       $stmt = $conn->prepare("INSERT INTO user (RoleID, LastName, FirstName, Email, Password, Phone, Address) VALUES (?, ?, ?, ?, ?, ?, ?)");
       $stmt->bind_param("issssss", $roleId, $lastName, $firstName, $email, $defaultPassword, $phone, $address);
       $stmt->execute();
+      $newId = $stmt->insert_id;
       $stmt->close();
+      write_user_log($conn, "Thêm mới người dùng ID " . $newId . " - Email: " . $email);
     }
   }
 
@@ -51,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("i", $id);
     $stmt->execute();
     $stmt->close();
+    write_user_log($conn, "Xóa người dùng ID " . $id);
   }
 
   redirectTo('users.php');

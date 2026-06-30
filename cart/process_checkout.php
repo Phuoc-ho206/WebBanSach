@@ -236,6 +236,9 @@ try {
     // Commit Transaction thành công
     $conn->commit();
     
+    // Ghi nhật ký đặt hàng thành công
+    write_user_log($conn, "Đặt hàng thành công đơn hàng #WBS-" . $orderId . ($customerId ? "" : " (Khách vãng lai)"), $customerId);
+    
     // Nếu chọn thanh toán VNPAY
     if ($paymentMethod === 'VNPAY') {
         // Thiết lập múi giờ Việt Nam để khớp thời gian với cổng VNPAY

@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Đồng bộ giỏ hàng khi đăng nhập thành công
             require_once '../../config/db.php';
             sync_cart_to_db($conn, $user['id']);
+            write_user_log($conn, "Đăng nhập hệ thống");
             header('Location: /WebBanSach/index.php');
             exit;
         } else {
@@ -44,6 +45,7 @@ if (isset($_GET['code'])) {
         // Đồng bộ giỏ hàng khi đăng nhập bằng Google thành công
         require_once '../../config/db.php';
         sync_cart_to_db($conn, $user['id']);
+        write_user_log($conn, "Đăng nhập hệ thống bằng Google");
         header('Location: /WebBanSach/index.php');
         exit;
     }
