@@ -40,9 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Xử lý upload ảnh bìa (Cloudinary)
     $uploadedImageUrl = null;
+    $uploadFailed = false;
     if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPLOAD_ERR_OK) {
       require_once __DIR__ . '/../config/cloudinary.php';
       $uploadedImageUrl = CloudinaryHelper::uploadImage($_FILES['product_image']['tmp_name']);
+      if (!$uploadedImageUrl) {
+        $uploadFailed = true;
+      }
     }
 
     if ($id) {
@@ -73,7 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $checkStmt->close();
       }
       
-      write_user_log($conn, "Cập nhật sản phẩm ID " . $id . " - Tên: " . $name);
+      if ($uploadFailed) {
+        $_SESSION['log_toast'] = "Lỗi: Cập nhật sản phẩm thành công nhưng không thể upload ảnh lên Cloudinary (hãy kiểm tra credentials trong .env).";
+      } else {
+        write_user_log($conn, "Cập nhật sản phẩm ID " . $id . " - Tên: " . $name);
+      }
     } else {
       $stmt = $conn->prepare("INSERT INTO product (CategoryID, ProductName, Price, Quantity, Status, Publisher, Description) VALUES (?, ?, ?, ?, ?, ?, ?)");
       $stmt->bind_param("isiisss", $categoryId, $name, $price, $stock, $status, $publisher, $description);
@@ -90,7 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $insertImgStmt->close();
       }
       
-      write_user_log($conn, "Thêm mới sản phẩm ID " . $newId . " - Tên: " . $name);
+      if ($uploadFailed) {
+        $_SESSION['log_toast'] = "Lỗi: Thêm sản phẩm thành công nhưng không thể upload ảnh lên Cloudinary (hãy kiểm tra credentials trong .env).";
+      } else {
+        write_user_log($conn, "Thêm mới sản phẩm ID " . $newId . " - Tên: " . $name);
+      }
     }
   }
 
