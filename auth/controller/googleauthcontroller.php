@@ -89,7 +89,8 @@ class googleauthcontroller
                     'full_name' => trim($userRow['LastName'] . ' ' . $userRow['FirstName']),
                     'phone' => $userRow['Phone'] ?? '',
                     'address' => $userRow['Address'] ?? '',
-                    'role' => 'customer',
+                    'role' => (int)($userRow['RoleID'] ?? 2) === 1 ? 'admin' : 'customer',
+                    'role_id' => (int)($userRow['RoleID'] ?? 2),
                     'login_type' => 'google'
                 ];
             }
@@ -154,7 +155,8 @@ class googleauthcontroller
             'full_name' => trim($userRow['LastName'] . ' ' . $userRow['FirstName']),
             'phone' => $userRow['Phone'] ?? '',
             'address' => $userRow['Address'] ?? '',
-            'role' => 'customer',
+            'role' => (int)($userRow['RoleID'] ?? 2) === 1 ? 'admin' : 'customer',
+            'role_id' => (int)($userRow['RoleID'] ?? 2),
             'login_type' => 'google'
         ];
     }

@@ -48,6 +48,14 @@ function adminSidebar() {
         <li class="navbar__item"><a href="orders.php" class="navbar__link <?= activeClass('orders.php') ?>">Đơn hàng</a></li>
         <li class="navbar__item"><a href="users.php" class="navbar__link <?= activeClass('users.php') ?>">Người dùng</a></li>
         <li class="navbar__item"><a href="coupons.php" class="navbar__link <?= activeClass('coupons.php') ?>">Mã giảm giá</a></li>
+        <li class="navbar__item">
+          <a href="#" class="navbar__link" onclick="event.preventDefault(); document.getElementById('admin-logout-form').submit();" style="color: var(--color-error, #e53e3e);">
+            Đăng xuất
+          </a>
+          <form id="admin-logout-form" action="/WebBanSach/auth/pages/login.php" method="POST" style="display: none;">
+            <input type="hidden" name="action" value="logout">
+          </form>
+        </li>
       </ul>
     </nav>
   </header>

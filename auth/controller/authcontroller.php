@@ -118,7 +118,7 @@ class AuthController
      */
     public static function getRedirectUrl(array $user): string
     {
-        if (($user['role'] ?? '') === 'Admin') {
+        if (strtolower($user['role'] ?? '') === 'admin') {
             return '/WebBanSach/admin/index.php';
         }
 

@@ -18,7 +18,8 @@ if (isset($_SESSION['user'])) {
 }
 
 // Xử lý đăng nhập bằng form
-$error = '';
+$error = $_SESSION['error'] ?? '';
+unset($_SESSION['error']);
 $success = $_SESSION['success'] ?? '';
 unset($_SESSION['success']);
 

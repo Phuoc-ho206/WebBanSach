@@ -38,15 +38,7 @@ class Customer
     {
         $roles = [
             1 => 'admin',
-            2 => 'customer',
-            3 => 'manager',
-            4 => 'staff',
-            5 => 'shipper',
-            6 => 'accountant',
-            7 => 'editor',
-            8 => 'marketing',
-            9 => 'support',
-            10 => 'guest'
+            2 => 'customer'
         ];
         return $roles[$roleId] ?? 'customer';
     }
@@ -61,15 +53,7 @@ class Customer
     {
         $roles = [
             'admin' => 1,
-            'customer' => 2,
-            'manager' => 3,
-            'staff' => 4,
-            'shipper' => 5,
-            'accountant' => 6,
-            'editor' => 7,
-            'marketing' => 8,
-            'support' => 9,
-            'guest' => 10
+            'customer' => 2
         ];
         return $roles[strtolower($roleName)] ?? 2;
     }
@@ -92,6 +76,7 @@ class Customer
             'phone' => $row['Phone'] ?? '',
             'address' => $row['Address'] ?? '',
             'role' => $this->getRoleName((int) ($row['RoleID'] ?? 2)),
+            'role_id' => (int) ($row['RoleID'] ?? 2),
             'created_at' => $row['CreatedDate'] ?? null
         ];
     }
