@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+
+    --color-primary-dark: #1e4241;
+    /* Xanh đậm  */
+    --color-primary: #2d5f5d;
+    /* Xanh trung bình - màu chủ đạo */
+    --color-secondary: #f9b234;
+    /* Vàng ấm - nhấn nổi bật */
+    --color-accent: #e85d04;
+    /* Cam - nút, điểm nhấn */
+    --color-accent-dark: #c44d03;
+    /* Cam đậm  */
+    --color-background: #f8f9fa;
+    /* Nền sáng tổng thể */
+    --color-surface: #ffffff;
+    /* Nền thẻ, khu vực nội dung */
+    --color-border: #e0e0e0;
+    /* Viền trung tính */
+    --color-text: #222831;
+    /* Chữ chính */
+    --color-text-light: #6c757d;
+    /* Chữ phụ, mô tả */
+    --color-success: #4caf50;
+    /* Thành công */
+    --color-error: #e63946;
+    /* Lỗi, cảnh báo đỏ */
+    --color-warning: #ffb703;
+    /* Cảnh báo vàng */
+    --color-info: #2196f3;
+    /* Thông tin, nhắc nhở */
+
+
+    /* Typography - Biến chữ */
+    --font-family-base: 'Plus Jakarta Sans', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    /* Font chữ chính cho toàn trang */
+    --font-size-base: 15px;
+    /* Cỡ chữ mặc định */
+    --font-size-xxs: 0.733rem;
+    /* 11px - Chú thích siêu nhỏ */
+    --font-size-sm: 0.866rem;
+    /* 13px - Cỡ chữ nhỏ, chú thích */
+    --font-size-md: 1rem;
+    /* 15px - Cỡ chữ trung bình, nội dung */
+    --font-size-lg: 1.2rem;
+    /* 18px - Cỡ chữ lớn, tiêu đề phụ */
+    --font-size-xl: 1.466rem;
+    /* 22px - Cỡ chữ lớn cho tiêu đề chính */
+    --font-size-xxl: 1.866rem;
+    /* 28px - Cỡ chữ rất lớn, banner */
+    --font-size-3xl: 2.4rem;
+    /* 36px - Cỡ chữ cực lớn, hero banner */
+    --font-weight-normal: 400;
+    /* Độ đậm chữ thường */
+    --font-weight-medium: 500;
+    /* Độ đậm chữ vừa */
+    --font-weight-bold: 600;
+    /* Độ đậm chữ nổi bật */
+    --font-weight-extra-bold: 700;
+    /* Độ đậm chữ tiêu đề */
+    --line-height-base: 1.6;
+    /* Độ cao dòng mặc định */
+    /* Độ cao dòng mặc định */
+
+
+    /* Spacing - Khoảng cách */
+    --spacing-xxs: 2px;
+    /* Khoảng cách siêu nhỏ, viền hoặc icon nhỏ */
+    --spacing-xs: 4px;
+    /* Khoảng cách rất nhỏ, giữa các icon hoặc chữ nhỏ */
+    --spacing-sm: 8px;
+    /* Khoảng cách nhỏ, giữa các nút hoặc mục nhỏ */
+    --spacing-md: 16px;
+    /* Khoảng cách trung bình, giữa các phần nội dung */
+    --spacing-lg: 24px;
+    /* Khoảng cách lớn, giữa các section */
+    --spacing-xl: 40px;
+    /* Khoảng cách rất lớn, lề ngoài cùng */
+    --spacing-xxl: 64px;
+    /* Khoảng cách cực lớn, banner hoặc phân cách lớn */
+
+
+    /* Border & Shadow - Viền & Đổ bóng */
+    --border-radius-sm: 4px;
+    /* Bo góc nhỏ cho input, nút nhỏ */
+    --border-radius: 6px;
+    /* Bo góc mặc định cho thẻ, card */
+    --border-radius-lg: 12px;
+    /* Bo góc lớn cho banner, modal */
+    --border-width: 1px;
+    /* Độ dày viền mặc định */
+    --box-shadow-sm: 0 1px 3px rgba(44, 62, 80, 0.08);
+    /* Đổ bóng nhẹ cho nút, input */
+    --box-shadow-md: 0 4px 12px rgba(44, 62, 80, 0.12);
+    /* Đổ bóng trung bình cho card, popup nhỏ */
+    --box-shadow-lg: 0 8px 24px rgba(44, 62, 80, 0.16);
+    /* Đổ bóng lớn cho modal, banner */
+
+
+    /* Transition - Hiệu ứng chuyển động */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Hiệu ứng nhanh cho hover, click */
+    --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Hiệu ứng mặc định cho chuyển trạng thái */
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Hiệu ứng chậm cho modal, overlay */
+}
