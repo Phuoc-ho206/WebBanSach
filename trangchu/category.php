@@ -213,8 +213,8 @@ $publishers_query = $conn->query("SELECT DISTINCT Publisher FROM product WHERE P
                     <?php 
                         $imgSrc = getProductImage($product['ImageURL'] ?? ''); 
                     ?>
-                    <div style="text-align: center; background: var(--color-background); padding: var(--spacing-md);">
-                        <img src="<?= $imgSrc ?>" class="card__image" alt="<?= htmlspecialchars($product['ProductName']) ?>" style="height: 180px; object-fit: contain; width: 100%;">
+                    <div style="height: 220px; display: flex; align-items: center; justify-content: center; background: var(--color-background); padding: 12px; box-sizing: border-box; overflow: hidden;">
+                        <img src="<?= $imgSrc ?>" alt="<?= htmlspecialchars($product['ProductName']) ?>" style="max-height: 100%; max-width: 100%; object-fit: contain; border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); transition: transform 0.3s;">
                     </div>
                     
                     <div class="card__body">
