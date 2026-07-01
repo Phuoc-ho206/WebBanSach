@@ -135,7 +135,7 @@ include '../includes/header.php';
 
     <div class="product-layout">
         <div class="product-image-wrapper">
-            <?php $imgSrc = !empty($product['ImageURL']) ? url('assets' . $product['ImageURL']) : asset('images/default-book.png'); ?>
+            <?php $imgSrc = getProductImage($product['ImageURL'] ?? ''); ?>
             <img src="<?= $imgSrc ?>" class="product-main-image" alt="<?= htmlspecialchars($product['ProductName']) ?>">
         </div>
 
