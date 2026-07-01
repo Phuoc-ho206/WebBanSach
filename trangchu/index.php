@@ -53,7 +53,7 @@ $products = $conn->query($sql_products);
         align-items: center;
         justify-content: center;
         text-align: center;
-        color: white;
+        color: green;
         padding: var(--spacing-xl);
         min-height: 380px;
         box-shadow: var(--box-shadow-sm);
