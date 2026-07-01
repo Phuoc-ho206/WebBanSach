@@ -6,8 +6,13 @@ require_once '../controller/GoogleAuthController.php';
 
 // Xử lý logout
 if (isset($_POST['action']) && $_POST['action'] === 'logout') {
-    AuthController::logout();
-    header('Location: /WebBanSach/index.php');
+    $type = $_POST['type'] ?? 'user';
+    AuthController::logout($type);
+    if ($type === 'admin') {
+        header('Location: /WebBanSach/auth/pages/login.php');
+    } else {
+        header('Location: /WebBanSach/index.php');
+    }
     exit;
 }
 

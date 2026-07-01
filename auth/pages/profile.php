@@ -2,7 +2,8 @@
 session_start();
 
 // Kiểm tra đã login chưa
-if (!isset($_SESSION['user'])) {
+$sessionUser = $_SESSION['user'] ?? $_SESSION['admin'] ?? null;
+if (!$sessionUser) {
     header('Location: /WebBanSach/auth/pages/login.php');
     exit;
 }
@@ -13,7 +14,7 @@ require_once '../../auth/controller/profilecontroller.php';
 $pageTitle = 'Hồ sơ cá nhân';
 include '../../includes/header.php';
 
-$userId = $_SESSION['user']['id'];
+$userId = $sessionUser['id'];
 $error = '';
 $success = $_SESSION['success'] ?? '';
 unset($_SESSION['success']);
@@ -24,7 +25,7 @@ $userData = $profileController->getUserProfile($userId);
 
 // Nếu không load được data từ DB, dùng data từ session
 if (!$userData) {
-    $userData = $_SESSION['user'];
+    $userData = $sessionUser;
 }
 
 // Xử lý POST
@@ -59,7 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Reload user data
         $userData = $profileController->getUserProfile($userId);
         // Update session
-        $_SESSION['user'] = array_merge($_SESSION['user'], $userData);
+        if (isset($_SESSION['user']) && $_SESSION['user']['id'] == $userId) {
+            $_SESSION['user'] = array_merge($_SESSION['user'], $userData);
+        }
+        if (isset($_SESSION['admin']) && $_SESSION['admin']['id'] == $userId) {
+            $_SESSION['admin'] = array_merge($_SESSION['admin'], $userData);
+        }
         header('Location: /WebBanSach/auth/pages/profile.php');
         exit;
     } else {
@@ -442,7 +448,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             Đơn hàng của tôi
                         </a>
                     </li>
-                    <?php if (strtolower($_SESSION['user']['role'] ?? '') === 'admin'): ?>
+                    <?php if (strtolower($sessionUser['role'] ?? '') === 'admin'): ?>
                     <li class="profile-nav-item">
                         <a href="/WebBanSach/admin/index.php">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -473,6 +479,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <form id="logout-form-profile" action="/WebBanSach/auth/pages/login.php" method="POST"
                     style="display: none;">
                     <input type="hidden" name="action" value="logout">
+                    <input type="hidden" name="type" value="<?php echo isset($_SESSION['user']) ? 'user' : 'admin'; ?>">
                 </form>
             </aside>
 

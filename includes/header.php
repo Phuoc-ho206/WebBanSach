@@ -100,7 +100,7 @@ if (isset($conn)) {
                     </div>
                 </a>
 
-                <a href="<?= isset($_SESSION['user']) ? url('auth/pages/profile.php') : url('auth/pages/login.php') ?>"
+                <a href="<?= (isset($_SESSION['user']) || isset($_SESSION['admin'])) ? url('auth/pages/profile.php') : url('auth/pages/login.php') ?>"
                     class="header-action-item">
                     <div class="header-action-icon">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -110,7 +110,7 @@ if (isset($conn)) {
                         </svg>
                     </div>
                     <div class="header-action-text">
-                        <?php if (isset($_SESSION['user']) || isset($_SESSION['profile'])): ?>
+                        <?php if (isset($_SESSION['user']) || isset($_SESSION['admin']) || isset($_SESSION['profile'])): ?>
                             <span>Tài khoản</span>
                             <strong>Của tôi</strong>
                         <?php else: ?>

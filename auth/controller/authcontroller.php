@@ -67,8 +67,13 @@ class AuthController
 
         $jwt = JwtHelper::encode($payload, AUTH_JWT_SECRET);
 
-        $_SESSION['user'] = $user;
-        $_SESSION['auth_jti'] = $jti;
+        if (strtolower($user['role'] ?? '') === 'admin') {
+            $_SESSION['admin'] = $user;
+            $_SESSION['admin_auth_jti'] = $jti;
+        } else {
+            $_SESSION['user'] = $user;
+            $_SESSION['auth_jti'] = $jti;
+        }
 
         if ($remember) {
             self::setAuthCookie($jwt, $expiresAt);
@@ -82,10 +87,6 @@ class AuthController
      */
     public static function tryRestoreSession(): void
     {
-        if (isset($_SESSION['user'])) {
-            return;
-        }
-
         $jwt = $_COOKIE[AUTH_COOKIE_NAME] ?? '';
         if ($jwt === '') {
             return;
@@ -102,6 +103,14 @@ class AuthController
             return;
         }
 
+        $isForAdmin = strtolower($payload['role'] ?? '') === 'admin';
+        if ($isForAdmin && isset($_SESSION['admin'])) {
+            return;
+        }
+        if (!$isForAdmin && isset($_SESSION['user'])) {
+            return;
+        }
+
         $customerModel = new Customer();
         $user = $customerModel->findById((int) $payload['sub']);
         if (!$user) {
@@ -109,8 +118,13 @@ class AuthController
             return;
         }
 
-        $_SESSION['user'] = $user;
-        $_SESSION['auth_jti'] = $payload['jti'];
+        if ($isForAdmin) {
+            $_SESSION['admin'] = $user;
+            $_SESSION['admin_auth_jti'] = $payload['jti'];
+        } else {
+            $_SESSION['user'] = $user;
+            $_SESSION['auth_jti'] = $payload['jti'];
+        }
     }
 
     /**
@@ -128,27 +142,38 @@ class AuthController
     /**
      * Xử lý đăng xuất — thu hồi token DB và xóa cookie.
      */
-    public static function logout(): void
+    public static function logout(string $type = 'user'): void
     {
         self::revokeStoredSession();
-        self::clearAuthCookie();
 
-        $_SESSION = [];
-
-        if (ini_get('session.use_cookies')) {
-            $p = session_get_cookie_params();
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                $p['path'],
-                $p['domain'],
-                $p['secure'],
-                $p['httponly']
-            );
+        if ($type === 'admin') {
+            unset($_SESSION['admin']);
+            unset($_SESSION['admin_auth_jti']);
+        } else {
+            unset($_SESSION['user']);
+            unset($_SESSION['auth_jti']);
+            self::clearAuthCookie();
         }
 
-        session_destroy();
+        // Chỉ hủy session PHP hoàn toàn nếu cả 2 khóa đều đã trống
+        if (empty($_SESSION['user']) && empty($_SESSION['admin'])) {
+            $_SESSION = [];
+
+            if (ini_get('session.use_cookies')) {
+                $p = session_get_cookie_params();
+                setcookie(
+                    session_name(),
+                    '',
+                    time() - 42000,
+                    $p['path'],
+                    $p['domain'],
+                    $p['secure'],
+                    $p['httponly']
+                );
+            }
+
+            session_destroy();
+        }
     }
 
     private static function revokeStoredSession(): void
