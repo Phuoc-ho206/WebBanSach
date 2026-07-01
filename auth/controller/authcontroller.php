@@ -7,7 +7,6 @@
 require_once __DIR__ . '/../../config/auth.php';
 require_once __DIR__ . '/../helpers/JwtHelper.php';
 require_once __DIR__ . '/../models/Customer.php';
-require_once __DIR__ . '/../models/UserSession.php';
 
 class AuthController
 {
@@ -25,12 +24,12 @@ class AuthController
      * @param string $password  Mật khẩu gốc
      * @return array|null       Thông tin user nếu đúng, null nếu sai
      */
-    public static function login(string $identity, string $password): ?array
+    public static function login(string $username, string $password): ?array
     {
-        $identity = trim($identity);
+        $username = trim($username);
 
         $controller = new self();
-        $user = $controller->customerModel->findByIdentity($identity);
+        $user = $controller->customerModel->findByIdentity($username);
 
         if (!$user) {
             return null;
@@ -49,8 +48,6 @@ class AuthController
      */
     public static function establishSession(array $user, bool $remember = false): void
     {
-        self::revokeStoredSession();
-
         $controller = new self();
         $controller->customerModel->updateLastLogin((int) $user['id']);
 
@@ -69,18 +66,6 @@ class AuthController
         ];
 
         $jwt = JwtHelper::encode($payload, AUTH_JWT_SECRET);
-        $tokenHash = hash('sha256', $jwt);
-
-        $sessionModel = new UserSession();
-        $sessionModel->create(
-            (int) $user['id'],
-            $jti,
-            $tokenHash,
-            $remember,
-            date('Y-m-d H:i:s', $expiresAt),
-            substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255) ?: null,
-            $_SERVER['REMOTE_ADDR'] ?? null
-        );
 
         $_SESSION['user'] = $user;
         $_SESSION['auth_jti'] = $jti;
@@ -117,30 +102,15 @@ class AuthController
             return;
         }
 
-        $sessionModel = new UserSession();
-        $session = $sessionModel->findValidByJti($payload['jti']);
-        if (!$session) {
-            self::clearAuthCookie();
-            return;
-        }
-
-        if (!hash_equals($session['TokenHash'], hash('sha256', $jwt))) {
-            $sessionModel->revokeByJti($payload['jti']);
-            self::clearAuthCookie();
-            return;
-        }
-
         $customerModel = new Customer();
         $user = $customerModel->findById((int) $payload['sub']);
         if (!$user) {
-            $sessionModel->revokeByJti($payload['jti']);
             self::clearAuthCookie();
             return;
         }
 
         $_SESSION['user'] = $user;
         $_SESSION['auth_jti'] = $payload['jti'];
-        $sessionModel->touchLastUsed($payload['jti']);
     }
 
     /**
@@ -148,7 +118,7 @@ class AuthController
      */
     public static function getRedirectUrl(array $user): string
     {
-        if (($user['role'] ?? '') === 'admin') {
+        if (strtolower($user['role'] ?? '') === 'admin') {
             return '/WebBanSach/admin/index.php';
         }
 
@@ -183,20 +153,7 @@ class AuthController
 
     private static function revokeStoredSession(): void
     {
-        if (!empty($_SESSION['auth_jti'])) {
-            (new UserSession())->revokeByJti($_SESSION['auth_jti']);
-            return;
-        }
-
-        $jwt = $_COOKIE[AUTH_COOKIE_NAME] ?? '';
-        if ($jwt === '') {
-            return;
-        }
-
-        $payload = JwtHelper::decode($jwt, AUTH_JWT_SECRET);
-        if (!empty($payload['jti'])) {
-            (new UserSession())->revokeByJti($payload['jti']);
-        }
+        // Phiên JWT không trạng thái (stateless), không cần xóa trong database.
     }
 
     private static function setAuthCookie(string $jwt, int $expiresAt): void

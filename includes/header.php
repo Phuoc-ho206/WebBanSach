@@ -23,6 +23,7 @@ if (isset($conn)) {
     <title><?= htmlspecialchars($pageTitle) ?></title>
 
     <link rel="stylesheet" href="/WebBanSach/assets/css/variables.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="stylesheet" href="<?= asset('css/components/navbar.css') ?>?v=<?= time() ?>">
     <link rel="stylesheet" href="<?= asset('css/components/footer.css') ?>">
@@ -83,7 +84,7 @@ if (isset($conn)) {
                     </div>
                 </div>
 
-                <a href="<?= url('cart/history.php') ?>" class="header-action-item">
+                <a href="<?= url('cart/cart.php') ?>" class="header-action-item">
                     <div class="header-action-icon">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
@@ -91,7 +92,7 @@ if (isset($conn)) {
                             <circle cx="20" cy="21" r="1"></circle>
                             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                         </svg>
-                        <span class="header-cart-badge">0</span>
+                        <span class="header-cart-badge"><?= array_sum($_SESSION['cart'] ?? []) ?></span>
                     </div>
                     <div class="header-action-text">
                         <span style="opacity: 0; height: 0;">&nbsp;</span>
@@ -129,7 +130,7 @@ if (isset($conn)) {
 
             <div class="category-dropdown-wrapper <?= (isset($isHomepage) && $isHomepage) ? 'always-open' : '' ?>">
                 <div class="category-dropdown-header">
-                    ☰ TẤT CẢ DANH MỤC
+                    <i class="fa-solid fa-bars" style="margin-right: 8px;"></i> TẤT CẢ DANH MỤC
                 </div>
 
                 <ul class="category-sidebar-list">

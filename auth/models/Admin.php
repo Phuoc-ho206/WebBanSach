@@ -46,6 +46,7 @@ class Admin
             'phone' => $row['Phone'] ?? '',
             'address' => $row['Address'] ?? '',
             'role' => 'admin',
+            'role_id' => 1,
             'created_at' => $row['CreatedDate'] ?? null
         ];
     }

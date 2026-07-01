@@ -1,261 +1,253 @@
 <?php
 require_once '../config/db.php';
+
 $pageTitle = 'Lịch sử đơn hàng';
 $extraCss = ['css/cart.css'];
 include '../includes/header.php';
+
+// Trạng thái lọc từ URL
+$statusFilter = isset($_GET['status']) ? trim($_GET['status']) : 'all';
+$searchPhone = isset($_GET['search_phone']) ? trim($_GET['search_phone']) : ($_SESSION['guest_search_phone'] ?? '');
+
+$orders = [];
+$customerId = isset($_SESSION['user']) ? intval($_SESSION['user']['id']) : 0;
+
+// Xử lý truy vấn đơn hàng
+if ($customerId > 0) {
+    // Xóa session tra cứu khách vãng lai nếu đã đăng nhập thành viên
+    unset($_SESSION['guest_search_phone']);
+    
+    // Người dùng đăng nhập
+    $sql = "SELECT o.OrderID, o.OrderDate, o.ShippingAddress, o.OrderStatus, o.TotalAmount, p.PaymentStatus, p.PaymentMethod 
+            FROM `order` o
+            LEFT JOIN `payment` p ON o.OrderID = p.OrderID
+            WHERE o.CustomerID = ?";
+    
+    if ($statusFilter !== 'all') {
+        $sql .= " AND o.OrderStatus = ?";
+    }
+    $sql .= " ORDER BY o.OrderDate DESC";
+    
+    $stmt = $conn->prepare($sql);
+    if ($statusFilter !== 'all') {
+        $stmt->bind_param("is", $customerId, $statusFilter);
+    } else {
+        $stmt->bind_param("i", $customerId);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $orders[] = $row;
+    }
+    $stmt->close();
+} elseif (!empty($searchPhone)) {
+    // Lưu SĐT tra cứu của khách vãng lai vào session
+    $_SESSION['guest_search_phone'] = $searchPhone;
+    
+    // Khách vãng lai tra cứu bằng số điện thoại
+    $phonePattern = "%SĐT: " . $searchPhone . "%";
+    $sql = "SELECT o.OrderID, o.OrderDate, o.ShippingAddress, o.OrderStatus, o.TotalAmount, p.PaymentStatus, p.PaymentMethod 
+            FROM `order` o
+            LEFT JOIN `payment` p ON o.OrderID = p.OrderID
+            WHERE o.CustomerID IS NULL AND o.ShippingAddress LIKE ?";
+            
+    if ($statusFilter !== 'all') {
+        $sql .= " AND o.OrderStatus = ?";
+    }
+    $sql .= " ORDER BY o.OrderDate DESC";
+    
+    $stmt = $conn->prepare($sql);
+    if ($statusFilter !== 'all') {
+        $stmt->bind_param("ss", $phonePattern, $statusFilter);
+    } else {
+        $stmt->bind_param("s", $phonePattern);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $orders[] = $row;
+    }
+    $stmt->close();
+}
+
+// Lấy danh sách chi tiết sản phẩm cho các đơn hàng tìm thấy
+$orderDetails = [];
+if (!empty($orders)) {
+    $orderIds = array_column($orders, 'OrderID');
+    $placeholders = implode(',', array_fill(0, count($orderIds), '?'));
+    
+    $sqlDetails = "
+        SELECT od.OrderID, od.ProductID, od.Quantity, od.Price, od.UnitPrice, p.ProductName, i.ImageURL 
+        FROM `order_detail` od
+        JOIN `product` p ON od.ProductID = p.ProductID
+        LEFT JOIN `image` i ON p.ProductID = i.ProductID AND i.IsThumbnail = 1
+        WHERE od.OrderID IN ($placeholders)
+    ";
+    
+    $stmtD = $conn->prepare($sqlDetails);
+    $types = str_repeat('i', count($orderIds));
+    $stmtD->bind_param($types, ...$orderIds);
+    $stmtD->execute();
+    $resD = $stmtD->get_result();
+    
+    while ($detail = $resD->fetch_assoc()) {
+        $orderDetails[$detail['OrderID']][] = $detail;
+    }
+    $stmtD->close();
+}
+
+// Trực quan hóa tên trạng thái
+function getStatusBadgeClass($status) {
+    switch ($status) {
+        case 'Pending': return 'badge--info';
+        case 'Processing': return 'badge--warning';
+        case 'Shipped': return 'badge--primary';
+        case 'Delivered': return 'badge--success';
+        case 'Cancelled': return 'badge--error';
+        default: return 'badge--secondary';
+    }
+}
+
+function getStatusText($status) {
+    switch ($status) {
+        case 'Pending': return 'Chờ xác nhận';
+        case 'Processing': return 'Đang đóng gói';
+        case 'Shipped': return 'Đang vận chuyển';
+        case 'Delivered': return 'Giao thành công';
+        case 'Cancelled': return 'Đã hủy đơn';
+        default: return 'Chưa rõ';
+    }
+}
 ?>
 
-
-<!-- Main Content -->
 <main class="order-container">
-    <!-- Breadcrumbs -->
     <ul class="breadcrumbs">
         <li><a href="<?= url('/') ?>">Trang chủ</a></li>
-        <li><a href="<?= url('auth/pages/profile.php') ?>">Tài khoản</a></li>
+        <?php if ($customerId > 0): ?>
+            <li><a href="<?= url('auth/pages/profile.php') ?>">Tài khoản</a></li>
+        <?php endif; ?>
         <li>Lịch sử đơn hàng</li>
     </ul>
 
-    <!-- Title Section -->
     <div class="order-title-section">
-        <h1 class="order-title">Lịch sử đơn hàng</h1>
+        <h1 class="order-title"><i class="fa-solid fa-clipboard-list" style="margin-right: 10px; color: var(--color-primary);"></i>Lịch sử đơn hàng</h1>
     </div>
 
-    <!-- Filter Tabs -->
-    <div class="order-tabs">
-        <a href="?status=all" class="order-tab-item is-active">Tất cả</a>
-        <a href="?status=pending_payment" class="order-tab-item">Chờ thanh toán</a>
-        <a href="?status=pending" class="order-tab-item">Chờ xác nhận</a>
-        <a href="?status=shipping" class="order-tab-item">Đang giao</a>
-        <a href="?status=completed" class="order-tab-item">Đã giao</a>
-        <a href="?status=cancelled" class="order-tab-item">Đã hủy</a>
-    </div>
+    <!-- Giao diện tra cứu cho Khách vãng lai -->
+    <?php if ($customerId <= 0): ?>
+        <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); box-shadow: var(--box-shadow-sm);">
+            <h3 style="margin-top: 0; margin-bottom: var(--spacing-sm); color: var(--color-primary);"><i class="fa-solid fa-magnifying-glass" style="margin-right: 8px;"></i>Tra cứu đơn hàng của Khách vãng lai</h3>
+            <p style="font-size: 0.9rem; color: var(--color-text-light); margin-bottom: var(--spacing-md);">Vui lòng nhập số điện thoại bạn dùng khi đặt hàng để kiểm tra lịch sử và hành trình đơn hàng.</p>
+            <form method="GET" style="display: flex; gap: var(--spacing-xs); max-width: 450px;">
+                <input type="text" name="search_phone" class="form-control" placeholder="Nhập số điện thoại đặt hàng..." required value="<?= htmlspecialchars($searchPhone) ?>">
+                <button type="submit" class="btn btn--primary" style="padding: 10px 24px; font-weight: bold; white-space: nowrap;">Tra cứu</button>
+            </form>
+        </div>
+    <?php endif; ?>
 
-    <!-- Order List -->
+    <!-- Bộ lọc trạng thái đơn hàng -->
+    <?php if ($customerId > 0 || !empty($searchPhone)): ?>
+        <div class="order-tabs">
+            <?php 
+            $statuses = [
+                'all' => 'Tất cả',
+                'Pending' => 'Chờ xác nhận',
+                'Processing' => 'Đang đóng gói',
+                'Shipped' => 'Đang giao',
+                'Delivered' => 'Đã giao',
+                'Cancelled' => 'Đã hủy'
+            ];
+            foreach ($statuses as $val => $label): 
+                $activeClass = ($statusFilter === $val) ? 'is-active' : '';
+                $queryStr = "?status=" . $val;
+                if ($customerId <= 0 && !empty($searchPhone)) {
+                    $queryStr .= "&search_phone=" . urlencode($searchPhone);
+                }
+            ?>
+                <a href="<?= $queryStr ?>" class="order-tab-item <?= $activeClass ?>"><?= $label ?></a>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
+    <!-- Danh sách đơn hàng -->
     <div class="order-card-list">
-
-        <!-- Order 1: Delivered -->
-        <div class="order-card">
-            <div class="order-card__header">
-                <div class="order-card__header-left">
-                    <span class="order-card__id">Đơn hàng: #WBS-982103</span>
-                    <span class="order-card__date">Đặt ngày: 08/06/2026 09:15</span>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <span class="badge badge--success badge--dot">Đã giao hàng thành công</span>
-                    <span class="badge badge--secondary">Đã thanh toán</span>
-                </div>
-            </div>
-            <div class="order-card__products">
-                <!-- Product 1 -->
-                <a href="detail.php" class="order-card__product">
-                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o1)" />
-                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3" />
-                        <text x="12" y="36" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">ĐẮC
-                            NHÂN</text>
-                        <text x="12" y="44" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">TÂM</text>
-                        <defs>
-                            <linearGradient id="paint0_linear_o1" x1="0" y1="0" x2="64" y2="86"
-                                gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#4A9B7F" />
-                                <stop offset="1" stop-color="#2D5F5D" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div class="order-card__product-info">
-                        <h3 class="order-card__product-title">Đắc Nhân Tâm (Bìa Mềm)</h3>
-                        <span class="order-card__product-meta">Tác giả: Dale Carnegie</span>
+        <?php if (!empty($orders)): ?>
+            <?php foreach ($orders as $order): 
+                $oId = $order['OrderID'];
+                $items = $orderDetails[$oId] ?? [];
+                $totalQty = array_sum(array_column($items, 'Quantity'));
+            ?>
+                <div class="order-card">
+                    <div class="order-card__header">
+                        <div class="order-card__header-left">
+                            <span class="order-card__id">Đơn hàng: #WBS-<?= $oId ?></span>
+                            <span class="order-card__date">Đặt ngày: <?= date('d/m/Y H:i', strtotime($order['OrderDate'])) ?></span>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span class="badge <?= getStatusBadgeClass($order['OrderStatus']) ?> badge--dot">
+                                <?= getStatusText($order['OrderStatus']) ?>
+                            </span>
+                            <span class="badge badge--secondary">
+                                <?= $order['PaymentStatus'] === 'Completed' ? 'Đã thanh toán trực tuyến' : 'Thanh toán COD' ?>
+                            </span>
+                        </div>
                     </div>
-                    <div class="order-card__product-price">
-                        <span class="order-card__product-price-current">86.000 đ</span>
-                        <div class="order-card__product-price-qty">x 1</div>
+                    
+                    <div class="order-card__products">
+                        <?php foreach ($items as $item): 
+                            $imgSrc = !empty($item['ImageURL']) ? url('assets' . $item['ImageURL']) : asset('images/default-book.png');
+                        ?>
+                            <div class="order-card__product-row" style="display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-md); border-bottom: 1px dashed var(--color-border); padding-bottom: var(--spacing-sm); margin-bottom: 2px; width: 100%;">
+                                <a href="<?= url('cart/detail.php?id=' . $oId) ?>" class="order-card__product" style="flex: 1;">
+                                    <img class="order-card__product-img" src="<?= $imgSrc ?>" alt="<?= htmlspecialchars($item['ProductName']) ?>" style="width: 50px; height: 68px; object-fit: contain; background: var(--color-background); border-radius: var(--border-radius-sm); border: 1px solid var(--color-border); padding: 2px;">
+                                    <div class="order-card__product-info">
+                                        <h3 class="order-card__product-title"><?= htmlspecialchars($item['ProductName']) ?></h3>
+                                        <span class="order-card__product-meta">Đơn giá: <?= number_format($item['UnitPrice'], 0, ',', '.') ?> đ</span>
+                                    </div>
+                                    <div class="order-card__product-price">
+                                        <span class="order-card__product-price-current"><?= number_format($item['Price'], 0, ',', '.') ?> đ</span>
+                                        <div class="order-card__product-price-qty">x <?= $item['Quantity'] ?></div>
+                                    </div>
+                                </a>
+                                <?php if ($order['OrderStatus'] === 'Delivered'): ?>
+                                    <div style="flex-shrink: 0; padding-left: var(--spacing-md);">
+                                        <a href="<?= url('trangchu/detail.php?id=' . $item['ProductID']) ?>#review-form-section" class="btn btn--outline btn--sm" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 0.8rem; font-weight: bold; border-color: var(--color-secondary); color: var(--color-text); text-decoration: none; border-radius: var(--border-radius-sm);">
+                                            <i class="fa-solid fa-star" style="color: var(--color-secondary);"></i> Đánh giá
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                </a>
-
-                <!-- Product 2 -->
-                <a href="detail.php" class="order-card__product">
-                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o2)" />
-                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3" />
-                        <text x="12" y="36" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">NHÀ
-                            GIẢ</text>
-                        <text x="12" y="44" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">KIM</text>
-                        <defs>
-                            <linearGradient id="paint0_linear_o2" x1="0" y1="0" x2="64" y2="86"
-                                gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#FF7A3D" />
-                                <stop offset="1" stop-color="#E05B1E" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div class="order-card__product-info">
-                        <h3 class="order-card__product-title">Nhà Giả Kim</h3>
-                        <span class="order-card__product-meta">Tác giả: Paulo Coelho</span>
+                    
+                    <div class="order-card__footer">
+                        <span class="order-card__summary">
+                            Tổng cộng: <strong><?= $totalQty ?> sản phẩm</strong>
+                            <span class="order-card__total-price">Tổng thanh toán: <?= number_format($order['TotalAmount'], 0, ',', '.') ?> đ</span>
+                        </span>
+                        <div class="btn-group">
+                            <a href="<?= url('cart/detail.php?id=' . $oId) ?>" class="btn btn--outline btn--sm">Chi tiết đơn</a>
+                            <a href="<?= url('cart/tracking.php?id=' . $oId) ?>" class="btn btn--primary btn--sm">Theo dõi vận chuyển</a>
+                        </div>
                     </div>
-                    <div class="order-card__product-price">
-                        <span class="order-card__product-price-current">79.000 đ</span>
-                        <div class="order-card__product-price-qty">x 2</div>
-                    </div>
-                </a>
-            </div>
-            <div class="order-card__footer">
-                <span class="order-card__summary">
-                    Tổng số lượng: <strong>3 sản phẩm</strong>
-                    <span class="order-card__total-price">Tổng cộng: 244.000 đ</span>
-                </span>
-                <div class="btn-group">
-                    <a href="detail.php" class="btn btn--outline btn--sm">Xem chi tiết</a>
-                    <button class="btn btn--primary btn--sm">Mua lại</button>
                 </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div style="text-align: center; padding: 60px var(--spacing-md); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-lg); box-shadow: var(--box-shadow-sm);">
+                <i class="fa-solid fa-folder-open" style="font-size: 3.5rem; display: block; margin-bottom: var(--spacing-sm); color: var(--color-text-light);"></i>
+                <?php if ($customerId <= 0 && empty($searchPhone)): ?>
+                    <h3>Vui lòng nhập số điện thoại để tra cứu</h3>
+                    <p style="color: var(--color-text-light);">Nhập thông tin tại ô tra cứu phía trên.</p>
+                <?php else: ?>
+                    <h3>Không tìm thấy đơn hàng nào!</h3>
+                    <p style="color: var(--color-text-light);">Bạn chưa thực hiện giao dịch nào hoặc đơn hàng thuộc trạng thái khác.</p>
+                    <a href="<?= url('trangchu/index.php') ?>" class="btn btn--primary" style="margin-top: var(--spacing-md); font-weight: bold; padding: 10px 24px;">Mua sách ngay</a>
+                <?php endif; ?>
             </div>
-        </div>
-
-        <!-- Order 2: Shipping -->
-        <div class="order-card">
-            <div class="order-card__header">
-                <div class="order-card__header-left">
-                    <span class="order-card__id">Đơn hàng: #WBS-954021</span>
-                    <span class="order-card__date">Đặt ngày: 07/06/2026 14:30</span>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <span class="badge badge--info badge--dot">Đang giao hàng</span>
-                    <span class="badge badge--warning">Thanh toán COD (Chưa trả)</span>
-                </div>
-            </div>
-            <div class="order-card__products">
-                <!-- Product 1 -->
-                <a href="detail.php" class="order-card__product">
-                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o3)" />
-                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3" />
-                        <text x="12" y="32" fill="#fff" font-family="Arial" font-size="5" font-weight="bold">SÚNG, VI
-                            TRÙNG</text>
-                        <text x="12" y="38" fill="#fff" font-family="Arial" font-size="5" font-weight="bold">VÀ
-                            THÉP</text>
-                        <defs>
-                            <linearGradient id="paint0_linear_o3" x1="0" y1="0" x2="64" y2="86"
-                                gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#1565c0" />
-                                <stop offset="1" stop-color="#0d47a1" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div class="order-card__product-info">
-                        <h3 class="order-card__product-title">Súng, Vi Trùng Và Thép</h3>
-                        <span class="order-card__product-meta">Tác giả: Jared Diamond</span>
-                    </div>
-                    <div class="order-card__product-price">
-                        <span class="order-card__product-price-current">185.000 đ</span>
-                        <div class="order-card__product-price-qty">x 1</div>
-                    </div>
-                </a>
-            </div>
-            <div class="order-card__footer">
-                <span class="order-card__summary">
-                    Tổng số lượng: <strong>1 sản phẩm</strong>
-                    <span class="order-card__total-price">Tổng cộng: 215.000 đ</span>
-                </span>
-                <div class="btn-group">
-                    <a href="detail.php" class="btn btn--outline btn--sm">Xem chi tiết</a>
-                    <a href="tracking.php" class="btn btn--primary btn--sm">Theo dõi vận chuyển</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Order 3: Cancelled -->
-        <div class="order-card">
-            <div class="order-card__header">
-                <div class="order-card__header-left">
-                    <span class="order-card__id">Đơn hàng: #WBS-912803</span>
-                    <span class="order-card__date">Đặt ngày: 01/06/2026 10:20</span>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <span class="badge badge--error badge--dot">Đã hủy đơn</span>
-                    <span class="badge badge--outline">Đã hoàn tiền</span>
-                </div>
-            </div>
-            <div class="order-card__products">
-                <!-- Product 1 -->
-                <a href="detail.php" class="order-card__product">
-                    <svg class="order-card__product-img" width="64" height="86" viewBox="0 0 64 86" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <rect width="64" height="86" rx="4" fill="url(#paint0_linear_o4)" />
-                        <rect x="5" y="6" width="2" height="74" fill="#fff" opacity="0.3" />
-                        <text x="12" y="36" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">TƯ DUY
-                            NHANH</text>
-                        <text x="12" y="44" fill="#fff" font-family="Arial" font-size="6" font-weight="bold">&
-                            CHẬM</text>
-                        <defs>
-                            <linearGradient id="paint0_linear_o4" x1="0" y1="0" x2="64" y2="86"
-                                gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#E63946" />
-                                <stop offset="1" stop-color="#9A031E" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                    <div class="order-card__product-info">
-                        <h3 class="order-card__product-title">Tư Duy Nhanh Và Chậm</h3>
-                        <span class="order-card__product-meta">Tác giả: Daniel Kahneman</span>
-                    </div>
-                    <div class="order-card__product-price">
-                        <span class="order-card__product-price-current">150.000 đ</span>
-                        <div class="order-card__product-price-qty">x 1</div>
-                    </div>
-                </a>
-            </div>
-            <div class="order-card__footer">
-                <span class="order-card__summary">
-                    Tổng số lượng: <strong>1 sản phẩm</strong>
-                    <span class="order-card__total-price">Tổng cộng: 180.000 đ</span>
-                </span>
-                <div class="btn-group">
-                    <a href="detail.php" class="btn btn--outline btn--sm">Xem chi tiết</a>
-                    <button class="btn btn--primary btn--sm">Mua lại</button>
-                </div>
-            </div>
-        </div>
-
+        <?php endif; ?>
     </div>
 </main>
 
 <?php include '../includes/footer.php'; ?>
-
-<!-- Script to toggle navbar on mobile -->
-<script>
-    document.querySelector('.navbar__toggle').addEventListener('click', function () {
-        document.querySelector('.navbar').classList.toggle('is-open');
-    });
-
-    // Simulating tabs switching
-    const tabs = document.querySelectorAll('.order-tab-item');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', (e) => {
-            e.preventDefault();
-            tabs.forEach(t => t.classList.remove('is-active'));
-            tab.classList.add('is-active');
-
-            // Demo filtering feedback
-            const status = tab.getAttribute('href').split('=')[1];
-            const cards = document.querySelectorAll('.order-card');
-            cards.forEach(card => {
-                if (status === 'all') {
-                    card.style.display = 'block';
-                } else if (status === 'completed' && card.innerText.includes('Đã giao hàng thành công')) {
-                    card.style.display = 'block';
-                } else if (status === 'shipping' && card.innerText.includes('Đang giao hàng')) {
-                    card.style.display = 'block';
-                } else if (status === 'cancelled' && card.innerText.includes('Đã hủy đơn')) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    });
-</script>
 </body>
-
 </html>

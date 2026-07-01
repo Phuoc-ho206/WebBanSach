@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
 :root {
 
     --color-primary-dark: #1e4241;
@@ -31,25 +33,34 @@
 
 
     /* Typography - Biến chữ */
-    --font-family-base: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    --font-family-base: 'Plus Jakarta Sans', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     /* Font chữ chính cho toàn trang */
-    --font-size-base: 16px;
+    --font-size-base: 15px;
     /* Cỡ chữ mặc định */
-    --font-size-lg: 1.25rem;
-    /* Cỡ chữ lớn, tiêu đề phụ */
+    --font-size-xxs: 0.733rem;
+    /* 11px - Chú thích siêu nhỏ */
+    --font-size-sm: 0.866rem;
+    /* 13px - Cỡ chữ nhỏ, chú thích */
     --font-size-md: 1rem;
-    /* Cỡ chữ trung bình, nội dung */
-    --font-size-sm: 0.875rem;
-    /* Cỡ chữ nhỏ, chú thích */
-    --font-size-xl: 1.5rem;
-    /* Cỡ chữ lớn cho tiêu đề chính */
-    --font-size-xxl: 2rem;
-    /* Cỡ chữ rất lớn, banner */
+    /* 15px - Cỡ chữ trung bình, nội dung */
+    --font-size-lg: 1.2rem;
+    /* 18px - Cỡ chữ lớn, tiêu đề phụ */
+    --font-size-xl: 1.466rem;
+    /* 22px - Cỡ chữ lớn cho tiêu đề chính */
+    --font-size-xxl: 1.866rem;
+    /* 28px - Cỡ chữ rất lớn, banner */
+    --font-size-3xl: 2.4rem;
+    /* 36px - Cỡ chữ cực lớn, hero banner */
     --font-weight-normal: 400;
     /* Độ đậm chữ thường */
+    --font-weight-medium: 500;
+    /* Độ đậm chữ vừa */
     --font-weight-bold: 600;
     /* Độ đậm chữ nổi bật */
+    --font-weight-extra-bold: 700;
+    /* Độ đậm chữ tiêu đề */
     --line-height-base: 1.6;
+    /* Độ cao dòng mặc định */
     /* Độ cao dòng mặc định */
 
 

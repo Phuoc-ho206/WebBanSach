@@ -2,7 +2,7 @@
 session_start();
 require_once '../controller/authcontroller.php';
 require_once '../controller/GoogleAuthController.php';
-require_once '../controller/fbauthcontroller.php';
+// require_once '../controller/fbauthcontroller.php';
 
 // Xử lý logout
 if (isset($_POST['action']) && $_POST['action'] === 'logout') {
@@ -18,21 +18,28 @@ if (isset($_SESSION['user'])) {
 }
 
 // Xử lý đăng nhập bằng form
-$error = '';
+$error = $_SESSION['error'] ?? '';
+unset($_SESSION['error']);
 $success = $_SESSION['success'] ?? '';
 unset($_SESSION['success']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $identity = trim($_POST['identity'] ?? '');
+    $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if (empty($identity) || empty($password)) {
+    if (empty($username) || empty($password)) {
         $error = 'Vui lòng nhập đầy đủ thông tin đăng nhập.';
     } else {
-        $user = AuthController::login($identity, $password);
+        $user = AuthController::login($username, $password);
         if ($user) {
             $remember = isset($_POST['remember']) && $_POST['remember'] === 'on';
             AuthController::establishSession($user, $remember);
+            
+            // Đồng bộ giỏ hàng khi đăng nhập thành công (từ nhánh Payment-cart)
+            require_once '../../config/db.php';
+            sync_cart_to_db($conn, $user['id']);
+            write_user_log($conn, "Đăng nhập hệ thống");
+            
             header('Location: ' . AuthController::getRedirectUrl($user));
             exit;
         } else {
@@ -44,15 +51,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Xử lý callback từ Google
 if (isset($_GET['code'])) {
     $user = googleauthcontroller::handleCallback();
+
     if ($user) {
         AuthController::establishSession($user, false);
+        
+        // Đồng bộ giỏ hàng khi đăng nhập bằng Google thành công (từ nhánh Payment-cart)
+        require_once '../../config/db.php';
+        sync_cart_to_db($conn, $user['id']);
+        write_user_log($conn, "Đăng nhập hệ thống bằng Google");
+        
         header('Location: ' . AuthController::getRedirectUrl($user));
         exit;
+    } else {
+        $error = 'Đăng nhập bằng tài khoản Google thất bại. Vui lòng kiểm tra lại cấu hình hoặc thử lại.';
     }
 }
 
 $google_login_url = googleauthcontroller::getLoginUrl();
-$facebook_login_url = fbauthcontroller::getLoginUrl();
 ?>
 
 <!DOCTYPE html>
@@ -187,14 +202,19 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
         <?php endif; ?>
         <form action="/WebBanSach/auth/pages/login.php" method="POST">
             <div class="form-group">
-                <label for="identity">Email hoặc tên đăng nhập</label>
-                <input id="identity" name="identity" type="text" required placeholder="Tên đăng nhập hoặc email">
+                <label for="username">Tên đăng nhập hoặc Email</label>
+                <input id="username" name="username" type="text" required placeholder="Tên đăng nhập hoặc email">
             </div>
             <div class="form-group">
                 <label for="password">Mật khẩu</label>
-                <div class="input-row">
-                    <input id="password" name="password" type="password" required placeholder="Mật khẩu">
-
+                <div class="input-row" style="position: relative;">
+                    <input id="password" name="password" type="password" required placeholder="Mật khẩu" style="padding-right: 40px;">
+                    <button type="button" class="toggle-password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--color-text-light); display: flex; align-items: center; justify-content: center; z-index: 10; padding: 0;" aria-label="Hiện mật khẩu">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
                 </div>
             </div>
             <div class="remember-row">
@@ -214,19 +234,29 @@ $facebook_login_url = fbauthcontroller::getLoginUrl();
                         style="width: 24px; height: 24px; object-fit: contain; background: white; border-radius: 50%; padding: 2px;">
                     Đăng nhập với Google
                 </a>
-
-                <a href="<?= $facebook_login_url ?>" class="btn btn-primary"
-                    style="text-align:center; text-decoration:none; font-weight: bold; color: white; display:flex; align-items:center; justify-content:center; background-color: #3e24eaff; gap: 8px;">
-                    <img src="/WebBanSach/assets/images/icon/fb.png" alt="Facebook"
-                        style="width: 24px; height: 24px; object-fit: contain;">
-                    Đăng nhập với Facebook
-                </a>
             </div>
         </form>
         <div style="text-align:center; margin-top:12px">
             <a href="/WebBanSach/auth/pages/Forgetpassword/index.php">Quên mật khẩu?</a>
         </div>
     </div>
+    <script>
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const icon = this.querySelector('svg');
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.setAttribute('aria-label', 'Ẩn mật khẩu');
+                icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            } else {
+                input.type = 'password';
+                this.setAttribute('aria-label', 'Hiện mật khẩu');
+                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            }
+        });
+    });
+    </script>
 </body>
 
 </html>
