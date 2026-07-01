@@ -16,7 +16,6 @@ if (isset($conn)) {
 ?>
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,7 +43,6 @@ if (isset($conn)) {
         <?php endforeach; ?>
     <?php endif; ?>
 </head>
-
 <body>
 
     <header class="header-top">
