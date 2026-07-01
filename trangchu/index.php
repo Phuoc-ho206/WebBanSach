@@ -53,12 +53,23 @@ $products = $conn->query($sql_products);
         align-items: center;
         justify-content: center;
         text-align: center;
-        color: green;
+        color: #2F5D45;
         padding: var(--spacing-xl);
         min-height: 380px;
         box-shadow: var(--box-shadow-sm);
     }
 
+    .hero-title{
+        color:#fff;
+        text-shadow:
+            0 3px 10px rgba(0,0,0,.45);
+    }
+
+    .hero-subtitle{
+        color:#f5f5f5;
+        text-shadow:
+            0 2px 6px rgba(0,0,0,.4);
+    }
     /* SECTION LAYOUT */
     .section-container {
         max-width: 1200px;
@@ -103,7 +114,7 @@ $products = $conn->query($sql_products);
                 <p style="font-size: 1.15rem; margin-bottom: var(--spacing-xl); opacity: 0.95;">Khám phá hàng ngàn đầu sách chọn lọc tinh hoa cùng WebBanSach</p>
                 
                 <!-- Đã thay thế ô tìm kiếm thừa bằng Nút bấm điều hướng -->
-                <a href="category.php" class="btn btn--primary" style="background-color: white; color: var(--color-primary); border-radius: 999px; padding: 12px 36px; font-size: 1.1rem; font-weight: 900; box-shadow: var(--box-shadow-md); text-decoration: none; display: inline-block;">
+                <a href="category.php" class="btn btn--primary" style="background-color: #2F5D45; color: white; border-radius: 999px; padding: 12px 36px; font-size: 1.1rem; font-weight: 900; box-shadow: var(--box-shadow-md); text-decoration: none; display: inline-block;">
                     MUA SẮM NGAY
                 </a>
             </div>
