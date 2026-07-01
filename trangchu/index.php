@@ -89,7 +89,7 @@ $products = $conn->query($sql_products);
         <div class="sidebar-placeholder"></div>
 
         <!-- CỘT PHẢI: BANNER CHÍNH CỦA TRANG CHỦ -->
-        <div class="homepage-banner">
+        <div class="homepage-banner" style="background-image: url('<?= asset('images/uploads/banner_homepage.jpg') ?>'); background-size: cover; background-position: center;">
             <div>
                 <h1 style="font-size: 2.6rem; margin: 0 0 var(--spacing-sm); font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.15);">Khơi Nguồn Tri Thức</h1>
                 <p style="font-size: 1.15rem; margin-bottom: var(--spacing-xl); opacity: 0.95;">Khám phá hàng ngàn đầu sách chọn lọc tinh hoa cùng WebBanSach</p>
