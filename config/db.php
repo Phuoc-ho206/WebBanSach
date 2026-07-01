@@ -171,13 +171,16 @@ if (!function_exists('getGuestInfoFromAddress')) {
 if (!function_exists('write_user_log')) {
     function write_user_log($conn, $action, $customerId = null, $employeeId = null) {
         // Tự động nhận diện CustomerID / EmployeeID từ session
-        if ($customerId === null && $employeeId === null && isset($_SESSION['user'])) {
-            $userId = intval($_SESSION['user']['id']);
-            $roleId = intval($_SESSION['user']['role_id'] ?? 2);
-            if ($roleId === 2) { // 2 là Customer
-                $customerId = $userId;
-            } else { // Các vai trò khác là nhân viên (Admin, Staff, Manager...)
-                $employeeId = $userId;
+        if ($customerId === null && $employeeId === null) {
+            $sessionUser = $_SESSION['user'] ?? $_SESSION['admin'] ?? null;
+            if ($sessionUser) {
+                $userId = intval($sessionUser['id']);
+                $roleId = intval($sessionUser['role_id'] ?? 2);
+                if ($roleId === 2) { // 2 là Customer
+                    $customerId = $userId;
+                } else { // Các vai trò khác là nhân viên (Admin, Staff, Manager...)
+                    $employeeId = $userId;
+                }
             }
         }
         

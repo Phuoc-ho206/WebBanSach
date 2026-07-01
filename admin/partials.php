@@ -54,6 +54,7 @@ function adminSidebar() {
           </a>
           <form id="admin-logout-form" action="/WebBanSach/auth/pages/login.php" method="POST" style="display: none;">
             <input type="hidden" name="action" value="logout">
+            <input type="hidden" name="type" value="admin">
           </form>
         </li>
       </ul>

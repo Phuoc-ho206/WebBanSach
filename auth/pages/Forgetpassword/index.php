@@ -30,13 +30,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($result->num_rows === 0) {
                 $error = 'Email không tồn tại trong hệ thống';
             } else {
-                // 3. Tạo OTP
-                $otp = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+                // 3. Tạo OTP (6 chữ số)
+                $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
                 // 4. Lưu vào DB
                 $expiresAt = date('Y-m-d H:i:s', strtotime('+30 minutes'));
-                $stmt = $conn->prepare("INSERT INTO password_reset_tokens (email, token, expires_at) VALUES (?, ?, ?)");
-                $stmt->bind_param("sss", $email, $otp, $expiresAt);
+                $stmt = $conn->prepare("UPDATE user SET ResetToken = ?, ResetTokenExpires = ? WHERE Email = ?");
+                $stmt->bind_param("sss", $otp, $expiresAt, $email);
 
                 if ($stmt->execute()) {
                     // 5. Gửi email

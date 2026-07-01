@@ -48,32 +48,24 @@ class ForgetPasswordController
 
         $stmt->close();
 
-        // Bước 3: Tạo OTP (4 chữ số)
-        $otp = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        // Bước 3: Tạo OTP (6 chữ số)
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        // Bước 4: Xóa các token cũ của email này (nếu có)
-        $deleteSql = "DELETE FROM password_reset_tokens WHERE email = ?";
-        $deleteStmt = $this->conn->prepare($deleteSql);
-        $deleteStmt->bind_param('s', $email);
-        $deleteStmt->execute();
-        $deleteStmt->close();
-
-        // Bước 5: Lưu OTP vào database
+        // Bước 4 & 5: Lưu OTP vào database (bảng user)
         $expiresAt = date('Y-m-d H:i:s', strtotime('+30 minutes'));
-        $insertSql = "INSERT INTO password_reset_tokens (email, token, expires_at, used, created_at) 
-                      VALUES (?, ?, ?, 0, NOW())";
-        $insertStmt = $this->conn->prepare($insertSql);
-        $insertStmt->bind_param('sss', $email, $otp, $expiresAt);
+        $updateSql = "UPDATE user SET ResetToken = ?, ResetTokenExpires = ? WHERE Email = ?";
+        $updateStmt = $this->conn->prepare($updateSql);
+        $updateStmt->bind_param('sss', $otp, $expiresAt, $email);
 
-        if (!$insertStmt->execute()) {
-            $insertStmt->close();
+        if (!$updateStmt->execute()) {
+            $updateStmt->close();
             return [
                 'success' => false,
                 'message' => 'Lỗi hệ thống. Vui lòng thử lại sau.'
             ];
         }
 
-        $insertStmt->close();
+        $updateStmt->close();
 
         // Bước 6: Gửi email OTP
         $emailSent = $this->sendOTPEmail($email, $otp);
@@ -108,11 +100,10 @@ class ForgetPasswordController
             ];
         }
 
-        // Bước 2: Lấy token từ database
-        $sql = "SELECT id, token, expires_at, used 
-                FROM password_reset_tokens 
-                WHERE email = ? 
-                ORDER BY created_at DESC 
+        // Bước 2: Lấy token từ database (bảng user)
+        $sql = "SELECT CustomerID, ResetToken, ResetTokenExpires 
+                FROM user 
+                WHERE Email = ? 
                 LIMIT 1";
 
         $stmt = $this->conn->prepare($sql);
@@ -128,19 +119,19 @@ class ForgetPasswordController
             ];
         }
 
-        $tokenData = $result->fetch_assoc();
+        $userData = $result->fetch_assoc();
         $stmt->close();
 
-        // Bước 3: Kiểm tra token đã được sử dụng chưa
-        if ($tokenData['used']) {
+        // Bước 3: Kiểm tra token có trống không
+        if (empty($userData['ResetToken'])) {
             return [
                 'success' => false,
-                'message' => 'Mã OTP đã được sử dụng. Vui lòng yêu cầu mã mới.'
+                'message' => 'Mã OTP không hợp lệ hoặc đã hết hạn.'
             ];
         }
 
         // Bước 4: Kiểm tra token có khớp không
-        if ($tokenData['token'] !== $otp) {
+        if ($userData['ResetToken'] !== $otp) {
             return [
                 'success' => false,
                 'message' => 'Mã OTP không đúng.'
@@ -148,21 +139,17 @@ class ForgetPasswordController
         }
 
         // Bước 5: Kiểm tra token có hết hạn không
-        if (strtotime($tokenData['expires_at']) < time()) {
+        if (strtotime($userData['ResetTokenExpires']) < time()) {
             // Xóa token hết hạn
-            $this->deleteToken($tokenData['id']);
+            $this->deleteTokenByEmail($email);
             return [
                 'success' => false,
                 'message' => 'Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới.'
             ];
         }
 
-        // Bước 6: Đánh dấu token đã sử dụng
-        $updateSql = "UPDATE password_reset_tokens SET used = 1 WHERE id = ?";
-        $updateStmt = $this->conn->prepare($updateSql);
-        $updateStmt->bind_param('i', $tokenData['id']);
-        $updateStmt->execute();
-        $updateStmt->close();
+        // Bước 6: Đánh dấu token đã sử dụng (gán về NULL)
+        $this->deleteTokenByEmail($email);
 
         return [
             'success' => true,
@@ -277,7 +264,7 @@ class ForgetPasswordController
      */
     private function deleteTokenByEmail(string $email): bool
     {
-        $sql = "DELETE FROM password_reset_tokens WHERE email = ?";
+        $sql = "UPDATE user SET ResetToken = NULL, ResetTokenExpires = NULL WHERE Email = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('s', $email);
         $result = $stmt->execute();
@@ -290,12 +277,7 @@ class ForgetPasswordController
      */
     private function deleteToken(int $tokenId): bool
     {
-        $sql = "DELETE FROM password_reset_tokens WHERE id = ?";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param('i', $tokenId);
-        $result = $stmt->execute();
-        $stmt->close();
-        return $result;
+        return true;
     }
 
     /**
@@ -355,7 +337,7 @@ class ForgetPasswordController
      */
     public function cleanExpiredTokens(): bool
     {
-        $sql = "DELETE FROM password_reset_tokens WHERE expires_at < NOW()";
+        $sql = "UPDATE user SET ResetToken = NULL, ResetTokenExpires = NULL WHERE ResetTokenExpires < NOW()";
         return $this->conn->query($sql);
     }
 }
