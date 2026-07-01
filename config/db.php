@@ -43,6 +43,20 @@ if (!function_exists('url')) {
     }
 }
 
+// Hàm lấy nguồn ảnh sản phẩm (hỗ trợ cả ảnh Cloudinary và ảnh local)
+if (!function_exists('getProductImage')) {
+    function getProductImage($imageUrl)
+    {
+        if (empty($imageUrl)) {
+            return asset('images/default-book.png');
+        }
+        if (preg_match('/^https?:\/\//i', $imageUrl)) {
+            return $imageUrl;
+        }
+        return url('assets' . $imageUrl);
+    }
+}
+
 // Khôi phục đăng nhập từ JWT remember-me (chạy một lần mỗi request)
 if (!defined('AUTH_SESSION_RESTORED')) {
     define('AUTH_SESSION_RESTORED', true);

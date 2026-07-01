@@ -85,7 +85,7 @@ if (!empty($keyword)) {
             <?php while($product = $products->fetch_assoc()): ?>
                 <div class="card card--interactive">
                     <?php 
-                        $imgSrc = !empty($product['ImageURL']) ? url('assets' . $product['ImageURL']) : asset('images/default-book.png'); 
+                        $imgSrc = getProductImage($product['ImageURL'] ?? ''); 
                     ?>
                     <div style="text-align: center; background: var(--color-background); padding: var(--spacing-md);">
                         <img src="<?= $imgSrc ?>" class="card__image" alt="<?= htmlspecialchars($product['ProductName']) ?>" style="height: 180px; object-fit: contain; width: 100%;">

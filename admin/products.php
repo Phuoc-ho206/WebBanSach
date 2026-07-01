@@ -3,12 +3,24 @@ require_once 'data.php';
 require_once 'partials.php';
 
 $editProduct = null;
+$editProductImage = null;
 if (isset($_GET['edit'])) {
   $stmt = $conn->prepare("SELECT * FROM product WHERE ProductID = ?");
   $stmt->bind_param("i", $_GET['edit']);
   $stmt->execute();
   $editProduct = $stmt->get_result()->fetch_assoc();
   $stmt->close();
+  
+  if ($editProduct) {
+    $imgStmt = $conn->prepare("SELECT ImageURL FROM image WHERE ProductID = ? AND IsThumbnail = 1 LIMIT 1");
+    $imgStmt->bind_param("i", $editProduct['ProductID']);
+    $imgStmt->execute();
+    $imgRes = $imgStmt->get_result();
+    if ($imgRes->num_rows > 0) {
+      $editProductImage = $imgRes->fetch_assoc()['ImageURL'];
+    }
+    $imgStmt->close();
+  }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,11 +38,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Tự động cập nhật trạng thái nếu hết hàng
     $status = ($stock <= 0) ? 'Hết hàng' : trim($_POST['status'] ?? 'Còn hàng');
 
+    // Xử lý upload ảnh bìa (Cloudinary)
+    $uploadedImageUrl = null;
+    if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPLOAD_ERR_OK) {
+      require_once __DIR__ . '/../config/cloudinary.php';
+      $uploadedImageUrl = CloudinaryHelper::uploadImage($_FILES['product_image']['tmp_name']);
+    }
+
     if ($id) {
       $stmt = $conn->prepare("UPDATE product SET CategoryID = ?, ProductName = ?, Price = ?, Quantity = ?, Status = ?, Publisher = ?, Description = ? WHERE ProductID = ?");
       $stmt->bind_param("isiisssi", $categoryId, $name, $price, $stock, $status, $publisher, $description, $id);
       $stmt->execute();
       $stmt->close();
+      
+      // Nếu có ảnh mới upload thành công
+      if ($uploadedImageUrl) {
+        $checkStmt = $conn->prepare("SELECT ImageID FROM image WHERE ProductID = ? AND IsThumbnail = 1 LIMIT 1");
+        $checkStmt->bind_param("i", $id);
+        $checkStmt->execute();
+        $checkRes = $checkStmt->get_result();
+        if ($checkRes->num_rows > 0) {
+          $imgId = $checkRes->fetch_assoc()['ImageID'];
+          $updateImgStmt = $conn->prepare("UPDATE image SET ImageURL = ? WHERE ImageID = ?");
+          $updateImgStmt->bind_param("si", $uploadedImageUrl, $imgId);
+          $updateImgStmt->execute();
+          $updateImgStmt->close();
+        } else {
+          $altText = 'Bìa sách ' . $name;
+          $insertImgStmt = $conn->prepare("INSERT INTO image (ProductID, ImageURL, AltText, IsThumbnail, SortOrder) VALUES (?, ?, ?, 1, 1)");
+          $insertImgStmt->bind_param("iss", $id, $uploadedImageUrl, $altText);
+          $insertImgStmt->execute();
+          $insertImgStmt->close();
+        }
+        $checkStmt->close();
+      }
+      
       write_user_log($conn, "Cập nhật sản phẩm ID " . $id . " - Tên: " . $name);
     } else {
       $stmt = $conn->prepare("INSERT INTO product (CategoryID, ProductName, Price, Quantity, Status, Publisher, Description) VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -38,6 +80,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->execute();
       $newId = $stmt->insert_id;
       $stmt->close();
+      
+      // Nếu có ảnh mới upload thành công
+      if ($uploadedImageUrl) {
+        $altText = 'Bìa sách ' . $name;
+        $insertImgStmt = $conn->prepare("INSERT INTO image (ProductID, ImageURL, AltText, IsThumbnail, SortOrder) VALUES (?, ?, ?, 1, 1)");
+        $insertImgStmt->bind_param("iss", $newId, $uploadedImageUrl, $altText);
+        $insertImgStmt->execute();
+        $insertImgStmt->close();
+      }
+      
       write_user_log($conn, "Thêm mới sản phẩm ID " . $newId . " - Tên: " . $name);
     }
   }
@@ -91,7 +143,7 @@ if ($resProds) {
     <main class="page-content">
       <header class="page-header"><div><h1>Quản lý sản phẩm</h1><p>Thêm, sửa, xóa sản phẩm sách</p></div></header>
 
-      <form method="post" class="card">
+      <form method="post" class="card" enctype="multipart/form-data">
         <input type="hidden" name="action" value="save">
         <input type="hidden" name="id" value="<?= h($editProduct['ProductID'] ?? '') ?>">
         <div class="card__body form">
@@ -142,6 +194,20 @@ if ($resProds) {
             <div class="form-group" style="width: 100%;">
               <label class="form-label">Mô tả sản phẩm</label>
               <textarea class="form-control" name="description" rows="3"><?= h($editProduct['Description'] ?? '') ?></textarea>
+            </div>
+          </div>
+          <div class="form-row" style="gap: 20px; align-items: flex-end;">
+            <?php if ($editProductImage): ?>
+              <div class="form-group" style="flex: 0 0 auto;">
+                <label class="form-label">Ảnh bìa hiện tại</label>
+                <?php $previewSrc = getProductImage($editProductImage); ?>
+                <img src="<?= $previewSrc ?>" style="max-height: 100px; max-width: 150px; object-fit: contain; border-radius: 4px; border: 1px solid var(--color-border); display: block; background: #f9f9f9; padding: 4px;">
+              </div>
+            <?php endif; ?>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label">Ảnh bìa sản phẩm (Tải lên Cloudinary)</label>
+              <input class="form-control" type="file" name="product_image" accept="image/*">
+              <small style="color: var(--color-text-light); margin-top: 4px; display: block;">Nếu không chọn ảnh bìa mới, ảnh cũ (nếu có) sẽ được giữ nguyên.</small>
             </div>
           </div>
           <div class="btn-group">
