@@ -241,8 +241,10 @@ $google_login_url = googleauthcontroller::getLoginUrl();
                 </a>
             </div>
         </form>
-        <div style="text-align:center; margin-top:12px">
-            <a href="/WebBanSach/auth/pages/Forgetpassword/index.php">Quên mật khẩu?</a>
+        <div style="text-align:center; margin-top:16px; border-top: 1px solid var(--color-border); padding-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <a href="/WebBanSach/auth/pages/Forgetpassword/index.php" style="color: var(--color-text-light); text-decoration: none; font-size: 0.9rem;">Quên mật khẩu?</a>
+            <span style="color: var(--color-border);">|</span>
+            <a href="/WebBanSach/trangchu/index.php" style="color: var(--color-primary); text-decoration: none; font-size: 0.9rem; font-weight: bold;">Quay lại trang chủ</a>
         </div>
     </div>
     <script>

@@ -10,10 +10,12 @@ if ($orderId <= 0) {
 // 1. Truy vấn thông tin đơn hàng
 $sqlOrder = "
     SELECT o.OrderID, o.CustomerID, o.OrderDate, o.ShippingAddress, o.OrderStatus, o.TotalAmount,
-           p.PaymentMethod, p.PaymentStatus, d.DeliveryStatus, d.ShippingFee
+           p.PaymentMethod, p.PaymentStatus, d.DeliveryStatus, d.ShippingFee,
+           u.FirstName, u.LastName, u.Phone
     FROM `order` o
     LEFT JOIN `payment` p ON o.OrderID = p.OrderID
     LEFT JOIN `delivery` d ON o.OrderID = d.OrderID
+    LEFT JOIN `user` u ON o.CustomerID = u.CustomerID
     WHERE o.OrderID = ?
 ";
 $stmt = $conn->prepare($sqlOrder);
@@ -191,15 +193,21 @@ function getDeliveryStatusText($status) {
                             <span class="info-details-label" style="display:inline-block; width: 140px;">Địa chỉ giao hàng:</span>
                             <span class="info-details-value"><?= htmlspecialchars($guestInfo['address']) ?></span>
                         </div>
-                    <?php else: ?>
+                    <?php else: 
+                        $memberFullName = trim(($order['FirstName'] ?? '') . ' ' . ($order['LastName'] ?? ''));
+                        if (empty($memberFullName)) {
+                            $memberFullName = $_SESSION['user']['full_name'] ?? 'Thành viên';
+                        }
+                        $memberPhone = !empty($order['Phone']) ? $order['Phone'] : ($_SESSION['user']['phone'] ?? 'Chưa rõ');
+                    ?>
                         <!-- Định dạng thành viên đăng nhập -->
                         <div class="info-details-item">
                             <span class="info-details-label" style="display:inline-block; width: 140px;">Người nhận:</span>
-                            <span class="info-details-value"><?= htmlspecialchars($_SESSION['user']['full_name'] ?? 'Thành viên') ?></span>
+                            <span class="info-details-value"><?= htmlspecialchars($memberFullName) ?></span>
                         </div>
                         <div class="info-details-item" style="margin-top: 6px;">
                             <span class="info-details-label" style="display:inline-block; width: 140px;">Số điện thoại:</span>
-                            <span class="info-details-value"><?= htmlspecialchars($order['Phone'] ?? $_SESSION['user']['phone'] ?? 'Chưa rõ') ?></span>
+                            <span class="info-details-value"><?= htmlspecialchars($memberPhone) ?></span>
                         </div>
                         <div class="info-details-item" style="margin-top: 6px;">
                             <span class="info-details-label" style="display:inline-block; width: 140px;">Địa chỉ giao hàng:</span>
@@ -256,7 +264,7 @@ function getDeliveryStatusText($status) {
                         </thead>
                         <tbody>
                             <?php foreach ($items as $item): 
-                                $imgSrc = !empty($item['ImageURL']) ? url('assets' . $item['ImageURL']) : asset('images/default-book.png');
+                                $imgSrc = getProductImage($item['ImageURL'] ?? '');
                             ?>
                                 <tr>
                                     <td>
