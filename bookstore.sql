@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jul 01, 2026 at 06:37 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: 127.0.0.1:3306
+-- Generation Time: Jul 02, 2026 at 12:35 AM
+-- Server version: 8.4.7
+-- PHP Version: 8.3.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -27,14 +27,17 @@ SET time_zone = "+00:00";
 -- Table structure for table `address`
 --
 
-CREATE TABLE `address` (
-  `AddressID` int(11) NOT NULL,
-  `CustomerID` int(11) DEFAULT NULL,
-  `ReceiverName` varchar(100) NOT NULL,
-  `Phone` varchar(20) NOT NULL,
-  `FullAddress` text NOT NULL,
-  `IsDefault` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `address`;
+CREATE TABLE IF NOT EXISTS `address` (
+  `AddressID` int NOT NULL AUTO_INCREMENT,
+  `CustomerID` int DEFAULT NULL,
+  `ReceiverName` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `FullAddress` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `IsDefault` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`AddressID`),
+  KEY `fk_address_user` (`CustomerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -42,12 +45,15 @@ CREATE TABLE `address` (
 -- Table structure for table `cart`
 --
 
-CREATE TABLE `cart` (
-  `CartID` int(11) NOT NULL,
-  `CustomerID` int(11) DEFAULT NULL,
-  `CreatedDate` datetime DEFAULT current_timestamp(),
-  `Status` enum('Active','Abandoned','Completed') DEFAULT 'Active'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `cart`;
+CREATE TABLE IF NOT EXISTS `cart` (
+  `CartID` int NOT NULL AUTO_INCREMENT,
+  `CustomerID` int DEFAULT NULL,
+  `CreatedDate` datetime DEFAULT CURRENT_TIMESTAMP,
+  `Status` enum('Active','Abandoned','Completed') COLLATE utf8mb4_unicode_ci DEFAULT 'Active',
+  PRIMARY KEY (`CartID`),
+  KEY `fk_cart_user` (`CustomerID`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `cart`
@@ -64,12 +70,15 @@ INSERT INTO `cart` (`CartID`, `CustomerID`, `CreatedDate`, `Status`) VALUES
 -- Table structure for table `cart_detail`
 --
 
-CREATE TABLE `cart_detail` (
-  `CartID` int(11) NOT NULL,
-  `ProductID` int(11) NOT NULL,
-  `SizeID` int(11) DEFAULT NULL,
-  `Quantity` int(11) NOT NULL DEFAULT 1,
-  `AddedAt` datetime DEFAULT current_timestamp()
+DROP TABLE IF EXISTS `cart_detail`;
+CREATE TABLE IF NOT EXISTS `cart_detail` (
+  `CartID` int NOT NULL,
+  `ProductID` int NOT NULL,
+  `SizeID` int DEFAULT NULL,
+  `Quantity` int NOT NULL DEFAULT '1',
+  `AddedAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`CartID`,`ProductID`),
+  KEY `fk_cartdetail_product` (`ProductID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -78,11 +87,13 @@ CREATE TABLE `cart_detail` (
 -- Table structure for table `category`
 --
 
-CREATE TABLE `category` (
-  `CategoryID` int(11) NOT NULL,
-  `CategoryName` varchar(100) NOT NULL,
-  `Description` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `category`;
+CREATE TABLE IF NOT EXISTS `category` (
+  `CategoryID` int NOT NULL AUTO_INCREMENT,
+  `CategoryName` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Description` text COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`CategoryID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `category`
@@ -106,13 +117,16 @@ INSERT INTO `category` (`CategoryID`, `CategoryName`, `Description`) VALUES
 -- Table structure for table `delivery`
 --
 
-CREATE TABLE `delivery` (
-  `DeliveryID` int(11) NOT NULL,
-  `OrderID` int(11) DEFAULT NULL,
-  `DeliveryStatus` enum('Preparing','Shipping','Delivered','Failed') DEFAULT 'Preparing',
+DROP TABLE IF EXISTS `delivery`;
+CREATE TABLE IF NOT EXISTS `delivery` (
+  `DeliveryID` int NOT NULL AUTO_INCREMENT,
+  `OrderID` int DEFAULT NULL,
+  `DeliveryStatus` enum('Preparing','Shipping','Delivered','Failed') COLLATE utf8mb4_unicode_ci DEFAULT 'Preparing',
   `DeliveryDate` datetime DEFAULT NULL,
-  `ShippingFee` decimal(10,2) DEFAULT 0.00
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `ShippingFee` decimal(10,2) DEFAULT '0.00',
+  PRIMARY KEY (`DeliveryID`),
+  KEY `fk_delivery_order` (`OrderID`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `delivery`
@@ -135,30 +149,34 @@ INSERT INTO `delivery` (`DeliveryID`, `OrderID`, `DeliveryStatus`, `DeliveryDate
 -- Table structure for table `image`
 --
 
-CREATE TABLE `image` (
-  `ImageID` int(11) NOT NULL,
-  `ProductID` int(11) DEFAULT NULL,
-  `ImageURL` varchar(255) NOT NULL,
-  `AltText` varchar(255) DEFAULT NULL,
-  `IsThumbnail` tinyint(1) DEFAULT 0,
-  `SortOrder` int(11) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `image`;
+CREATE TABLE IF NOT EXISTS `image` (
+  `ImageID` int NOT NULL AUTO_INCREMENT,
+  `ProductID` int DEFAULT NULL,
+  `ImageURL` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `AltText` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `IsThumbnail` tinyint(1) DEFAULT '0',
+  `SortOrder` int DEFAULT '0',
+  PRIMARY KEY (`ImageID`),
+  KEY `fk_image_product` (`ProductID`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `image`
 --
 
 INSERT INTO `image` (`ImageID`, `ProductID`, `ImageURL`, `AltText`, `IsThumbnail`, `SortOrder`) VALUES
-(1, 1, '/images/matbiec_thumb.jpg', 'Bìa sách Mắt Biếc', 1, 1),
+(1, 1, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916527/xlruilawulto7o0oz08m.jpg', 'Bìa sách Mắt Biếc', 1, 1),
 (2, 1, '/images/matbiec_back.jpg', 'Mặt sau sách Mắt Biếc', 0, 2),
-(3, 2, '/images/nhagiakim_thumb.jpg', 'Bìa sách Nhà Giả Kim', 1, 1),
-(4, 3, '/images/books/richdad_thumb.jpg', 'Bìa sách Cha Giàu Cha Nghèo', 1, 1),
-(5, 4, '/images/books/dac-nhan-tam.jpg', 'Bìa sách Đắc Nhân Tâm', 1, 1),
-(6, 5, '/images/cleancode_thumb.jpg', 'Bìa sách Clean Code', 1, 1),
-(7, 6, '/images/doremon1_thumb.jpg', 'Bìa sách Doraemon Tập 1', 1, 1),
-(8, 7, '/images/daiviet_thumb.jpg', 'Bìa sách Đại Việt Sử Ký Toàn Thư', 1, 1),
-(9, 8, '/images/triethoc_thumb.jpg', 'Bìa sách Triết học Mác-Lênin', 1, 1),
-(10, 9, '/images/hacknao_thumb.jpg', 'Bìa sách Hack Não 1500', 1, 1);
+(3, 2, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916499/urs15cuf6pd3vfdp22dx.jpg', 'Bìa sách Nhà Giả Kim', 1, 1),
+(4, 3, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916482/qcxhpysdbhugu2nkscc3.jpg', 'Bìa sách Cha Giàu Cha Nghèo', 1, 1),
+(5, 4, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916470/oqq6dp5xhtg0m3pz4wpx.webp', 'Bìa sách Đắc Nhân Tâm', 1, 1),
+(6, 5, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916458/sxrtn4kcwejt5ympd6mr.webp', 'Bìa sách Clean Code', 1, 1),
+(7, 6, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916448/nhqbp8vahdmhp7kiszho.jpg', 'Bìa sách Doraemon Tập 1', 1, 1),
+(8, 7, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916437/dmngvwmdhh8ebfjisaj6.jpg', 'Bìa sách Đại Việt Sử Ký Toàn Thư', 1, 1),
+(9, 8, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916425/iio8zncgh7lhyjiuvwuu.png', 'Bìa sách Triết học Mác-Lênin', 1, 1),
+(10, 9, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916402/vzeojocu5rxtmh4rk0rz.jpg', 'Bìa sách Hack Não 1500', 1, 1),
+(11, 10, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782922014/tddojwxlatvwrev9oqpg.jpg', 'Bìa sách Computer Networking: A Top-Down Approach', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -166,16 +184,21 @@ INSERT INTO `image` (`ImageID`, `ProductID`, `ImageURL`, `AltText`, `IsThumbnail
 -- Table structure for table `order`
 --
 
-CREATE TABLE `order` (
-  `OrderID` int(11) NOT NULL,
-  `CustomerID` int(11) DEFAULT NULL,
-  `EmployeeID` int(11) DEFAULT NULL,
-  `VoucherID` int(11) DEFAULT NULL,
-  `OrderDate` datetime DEFAULT current_timestamp(),
-  `ShippingAddress` text NOT NULL,
-  `OrderStatus` enum('Pending','Processing','Shipped','Delivered','Cancelled') DEFAULT 'Pending',
-  `TotalAmount` decimal(15,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `order`;
+CREATE TABLE IF NOT EXISTS `order` (
+  `OrderID` int NOT NULL AUTO_INCREMENT,
+  `CustomerID` int DEFAULT NULL,
+  `EmployeeID` int DEFAULT NULL,
+  `VoucherID` int DEFAULT NULL,
+  `OrderDate` datetime DEFAULT CURRENT_TIMESTAMP,
+  `ShippingAddress` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `OrderStatus` enum('Pending','Processing','Shipped','Delivered','Cancelled') COLLATE utf8mb4_unicode_ci DEFAULT 'Pending',
+  `TotalAmount` decimal(15,2) NOT NULL,
+  PRIMARY KEY (`OrderID`),
+  KEY `fk_order_user` (`CustomerID`),
+  KEY `fk_order_voucher` (`VoucherID`),
+  KEY `fk_order_employee` (`EmployeeID`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `order`
@@ -198,13 +221,16 @@ INSERT INTO `order` (`OrderID`, `CustomerID`, `EmployeeID`, `VoucherID`, `OrderD
 -- Table structure for table `order_detail`
 --
 
-CREATE TABLE `order_detail` (
-  `OrderID` int(11) NOT NULL,
-  `ProductID` int(11) NOT NULL,
-  `SizeID` int(11) DEFAULT NULL,
-  `Quantity` int(11) NOT NULL,
-  `Price` int(11) NOT NULL DEFAULT 0,
-  `UnitPrice` decimal(15,2) NOT NULL
+DROP TABLE IF EXISTS `order_detail`;
+CREATE TABLE IF NOT EXISTS `order_detail` (
+  `OrderID` int NOT NULL,
+  `ProductID` int NOT NULL,
+  `SizeID` int DEFAULT NULL,
+  `Quantity` int NOT NULL,
+  `Price` int NOT NULL DEFAULT '0',
+  `UnitPrice` decimal(15,2) NOT NULL,
+  PRIMARY KEY (`OrderID`,`ProductID`),
+  KEY `fk_orderdetail_product` (`ProductID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -228,13 +254,16 @@ INSERT INTO `order_detail` (`OrderID`, `ProductID`, `SizeID`, `Quantity`, `Price
 -- Table structure for table `payment`
 --
 
-CREATE TABLE `payment` (
-  `PaymentID` int(11) NOT NULL,
-  `OrderID` int(11) DEFAULT NULL,
-  `PaymentMethod` varchar(50) NOT NULL,
-  `PaymentStatus` enum('Pending','Completed','Failed','Refunded') DEFAULT 'Pending',
-  `PaymentDate` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `payment`;
+CREATE TABLE IF NOT EXISTS `payment` (
+  `PaymentID` int NOT NULL AUTO_INCREMENT,
+  `OrderID` int DEFAULT NULL,
+  `PaymentMethod` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `PaymentStatus` enum('Pending','Completed','Failed','Refunded') COLLATE utf8mb4_unicode_ci DEFAULT 'Pending',
+  `PaymentDate` datetime DEFAULT NULL,
+  PRIMARY KEY (`PaymentID`),
+  KEY `fk_payment_order` (`OrderID`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `payment`
@@ -257,18 +286,21 @@ INSERT INTO `payment` (`PaymentID`, `OrderID`, `PaymentMethod`, `PaymentStatus`,
 -- Table structure for table `product`
 --
 
-CREATE TABLE `product` (
-  `ProductID` int(11) NOT NULL,
-  `CategoryID` int(11) DEFAULT NULL,
-  `BrandID` int(11) DEFAULT NULL,
-  `ProductName` varchar(255) NOT NULL,
-  `Brand` varchar(100) DEFAULT NULL,
-  `Price` int(11) NOT NULL DEFAULT 0,
-  `Quantity` int(11) DEFAULT 0,
-  `Description` text DEFAULT NULL,
-  `Publisher` varchar(100) DEFAULT 'AlphaBooks',
-  `Status` enum('Còn hàng','Hết hàng') DEFAULT 'Còn hàng'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `product`;
+CREATE TABLE IF NOT EXISTS `product` (
+  `ProductID` int NOT NULL AUTO_INCREMENT,
+  `CategoryID` int DEFAULT NULL,
+  `BrandID` int DEFAULT NULL,
+  `ProductName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Brand` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Price` int NOT NULL DEFAULT '0',
+  `Quantity` int DEFAULT '0',
+  `Description` text COLLATE utf8mb4_unicode_ci,
+  `Publisher` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT 'AlphaBooks',
+  `Status` enum('Còn hàng','Hết hàng') COLLATE utf8mb4_unicode_ci DEFAULT 'Còn hàng',
+  PRIMARY KEY (`ProductID`),
+  KEY `fk_product_category` (`CategoryID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `product`
@@ -292,13 +324,15 @@ INSERT INTO `product` (`ProductID`, `CategoryID`, `BrandID`, `ProductName`, `Bra
 -- Table structure for table `promotion`
 --
 
-CREATE TABLE `promotion` (
-  `PromotionID` int(11) NOT NULL,
-  `PromotionName` varchar(255) NOT NULL,
+DROP TABLE IF EXISTS `promotion`;
+CREATE TABLE IF NOT EXISTS `promotion` (
+  `PromotionID` int NOT NULL AUTO_INCREMENT,
+  `PromotionName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `DiscountPercent` decimal(5,2) NOT NULL,
   `StartDate` datetime DEFAULT NULL,
-  `EndDate` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `EndDate` datetime DEFAULT NULL,
+  PRIMARY KEY (`PromotionID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `promotion`
@@ -322,12 +356,15 @@ INSERT INTO `promotion` (`PromotionID`, `PromotionName`, `DiscountPercent`, `Sta
 -- Table structure for table `promotion_detail`
 --
 
-CREATE TABLE `promotion_detail` (
-  `ProductID` int(11) NOT NULL,
-  `PromotionID` int(11) NOT NULL,
+DROP TABLE IF EXISTS `promotion_detail`;
+CREATE TABLE IF NOT EXISTS `promotion_detail` (
+  `ProductID` int NOT NULL,
+  `PromotionID` int NOT NULL,
   `DiscountRate` decimal(5,2) NOT NULL,
   `StartDate` datetime DEFAULT NULL,
-  `EndDate` datetime DEFAULT NULL
+  `EndDate` datetime DEFAULT NULL,
+  PRIMARY KEY (`ProductID`,`PromotionID`),
+  KEY `fk_promodetail_promo` (`PromotionID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -345,14 +382,18 @@ INSERT INTO `promotion_detail` (`ProductID`, `PromotionID`, `DiscountRate`, `Sta
 -- Table structure for table `review`
 --
 
-CREATE TABLE `review` (
-  `ReviewID` int(11) NOT NULL,
-  `CustomerID` int(11) DEFAULT NULL,
-  `ProductID` int(11) DEFAULT NULL,
-  `Rating` int(11) DEFAULT NULL,
-  `Comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ReviewDate` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `review`;
+CREATE TABLE IF NOT EXISTS `review` (
+  `ReviewID` int NOT NULL AUTO_INCREMENT,
+  `CustomerID` int DEFAULT NULL,
+  `ProductID` int DEFAULT NULL,
+  `Rating` int DEFAULT NULL,
+  `Comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `ReviewDate` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ReviewID`),
+  KEY `fk_review_user` (`CustomerID`),
+  KEY `fk_review_product` (`ProductID`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -360,11 +401,13 @@ CREATE TABLE `review` (
 -- Table structure for table `role`
 --
 
-CREATE TABLE `role` (
-  `RoleID` int(11) NOT NULL,
-  `RoleName` varchar(50) NOT NULL,
-  `Description` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `role`;
+CREATE TABLE IF NOT EXISTS `role` (
+  `RoleID` int NOT NULL AUTO_INCREMENT,
+  `RoleName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Description` text COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`RoleID`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `role`
@@ -380,20 +423,24 @@ INSERT INTO `role` (`RoleID`, `RoleName`, `Description`) VALUES
 -- Table structure for table `user`
 --
 
-CREATE TABLE `user` (
-  `CustomerID` int(11) NOT NULL,
-  `RoleID` int(11) DEFAULT NULL,
-  `LastName` varchar(50) NOT NULL,
-  `FirstName` varchar(50) NOT NULL,
-  `Email` varchar(100) NOT NULL,
-  `Password` varchar(255) NOT NULL,
-  `Phone` varchar(20) DEFAULT NULL,
-  `Address` text DEFAULT NULL,
-  `CreatedDate` datetime DEFAULT current_timestamp(),
-  `username` varchar(100) DEFAULT NULL,
-  `ResetToken` varchar(10) DEFAULT NULL,
-  `ResetTokenExpires` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE IF NOT EXISTS `user` (
+  `CustomerID` int NOT NULL AUTO_INCREMENT,
+  `RoleID` int DEFAULT NULL,
+  `LastName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `FirstName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Address` text COLLATE utf8mb4_unicode_ci,
+  `CreatedDate` datetime DEFAULT CURRENT_TIMESTAMP,
+  `username` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ResetToken` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ResetTokenExpires` datetime DEFAULT NULL,
+  PRIMARY KEY (`CustomerID`),
+  UNIQUE KEY `Email` (`Email`),
+  KEY `fk_user_role` (`RoleID`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `user`
@@ -409,13 +456,17 @@ INSERT INTO `user` (`CustomerID`, `RoleID`, `LastName`, `FirstName`, `Email`, `P
 -- Table structure for table `user_log`
 --
 
-CREATE TABLE `user_log` (
-  `LogID` int(11) NOT NULL,
-  `CustomerID` int(11) DEFAULT NULL,
-  `EmployeeID` int(11) DEFAULT NULL,
-  `Action` varchar(255) NOT NULL,
-  `LogDate` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `user_log`;
+CREATE TABLE IF NOT EXISTS `user_log` (
+  `LogID` int NOT NULL AUTO_INCREMENT,
+  `CustomerID` int DEFAULT NULL,
+  `EmployeeID` int DEFAULT NULL,
+  `Action` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `LogDate` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`LogID`),
+  KEY `fk_userlog_user` (`CustomerID`),
+  KEY `fk_userlog_employee` (`EmployeeID`)
+) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `user_log`
@@ -462,7 +513,24 @@ INSERT INTO `user_log` (`LogID`, `CustomerID`, `EmployeeID`, `Action`, `LogDate`
 (56, 17, NULL, 'Đăng nhập hệ thống', '2026-07-01 11:08:30'),
 (57, 17, NULL, 'Đăng nhập hệ thống', '2026-07-01 11:08:30'),
 (58, 17, NULL, 'Đăng nhập hệ thống', '2026-07-01 11:22:18'),
-(59, 17, NULL, 'Đăng nhập hệ thống', '2026-07-01 11:22:18');
+(59, 17, NULL, 'Đăng nhập hệ thống', '2026-07-01 11:22:18'),
+(60, 16, NULL, 'Đăng nhập hệ thống', '2026-07-01 20:55:45'),
+(61, NULL, 16, 'Đăng nhập hệ thống', '2026-07-01 20:55:45'),
+(62, 16, NULL, 'Đăng nhập hệ thống', '2026-07-01 21:08:13'),
+(63, NULL, 16, 'Đăng nhập hệ thống', '2026-07-01 21:08:13'),
+(64, NULL, 16, 'Cập nhật sản phẩm ID 10 - Tên: Computer Networking: A Top-Down Approach', '2026-07-01 21:32:48'),
+(65, NULL, 16, 'Cập nhật sản phẩm ID 9 - Tên: Hack Não 1500 Từ Tiếng Anh', '2026-07-01 21:33:24'),
+(66, NULL, 16, 'Cập nhật sản phẩm ID 8 - Tên: Giáo trình Triết học Mác-Lênin', '2026-07-01 21:33:46'),
+(67, NULL, 16, 'Cập nhật sản phẩm ID 7 - Tên: Đại Việt Sử Ký Toàn Thư', '2026-07-01 21:33:59'),
+(68, NULL, 16, 'Cập nhật sản phẩm ID 6 - Tên: Doraemon Tập 1', '2026-07-01 21:34:10'),
+(69, NULL, 16, 'Cập nhật sản phẩm ID 5 - Tên: Clean Code', '2026-07-01 21:34:20'),
+(70, NULL, 16, 'Cập nhật sản phẩm ID 4 - Tên: Đắc Nhân Tâm', '2026-07-01 21:34:32'),
+(71, NULL, 16, 'Cập nhật sản phẩm ID 3 - Tên: Cha Giàu Cha Nghèo', '2026-07-01 21:34:44'),
+(72, NULL, 16, 'Cập nhật sản phẩm ID 2 - Tên: Nhà Giả Kim', '2026-07-01 21:35:01'),
+(73, NULL, 16, 'Cập nhật sản phẩm ID 1 - Tên: Mắt Biếc', '2026-07-01 21:35:04'),
+(74, NULL, 16, 'Cập nhật sản phẩm ID 1 - Tên: Mắt Biếc', '2026-07-01 21:35:29'),
+(75, NULL, 16, 'Cập nhật sản phẩm ID 1 - Tên: Mắt Biếc', '2026-07-01 22:01:32'),
+(76, NULL, 16, 'Cập nhật sản phẩm ID 10 - Tên: Computer Networking: A Top-Down Approach', '2026-07-01 23:06:56');
 
 -- --------------------------------------------------------
 
@@ -470,15 +538,18 @@ INSERT INTO `user_log` (`LogID`, `CustomerID`, `EmployeeID`, `Action`, `LogDate`
 -- Table structure for table `user_provider`
 --
 
-CREATE TABLE `user_provider` (
-  `ProviderID` int(11) NOT NULL,
-  `User_ID` int(11) NOT NULL,
-  `ProviderName` varchar(50) NOT NULL,
-  `Provider_userID` varchar(255) NOT NULL,
-  `access_token` text DEFAULT NULL,
-  `refresh_token` text DEFAULT NULL,
-  `CreatedAt` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `user_provider`;
+CREATE TABLE IF NOT EXISTS `user_provider` (
+  `ProviderID` int NOT NULL AUTO_INCREMENT,
+  `User_ID` int NOT NULL,
+  `ProviderName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Provider_userID` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `access_token` text COLLATE utf8mb4_unicode_ci,
+  `refresh_token` text COLLATE utf8mb4_unicode_ci,
+  `CreatedAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ProviderID`),
+  KEY `fk_userprovider_user` (`User_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -486,12 +557,15 @@ CREATE TABLE `user_provider` (
 -- Table structure for table `voucher`
 --
 
-CREATE TABLE `voucher` (
-  `VoucherID` int(11) NOT NULL,
-  `VoucherCode` varchar(50) NOT NULL,
+DROP TABLE IF EXISTS `voucher`;
+CREATE TABLE IF NOT EXISTS `voucher` (
+  `VoucherID` int NOT NULL AUTO_INCREMENT,
+  `VoucherCode` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `DiscountValue` decimal(10,2) NOT NULL,
-  `ExpiredDate` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `ExpiredDate` datetime DEFAULT NULL,
+  PRIMARY KEY (`VoucherID`),
+  UNIQUE KEY `VoucherCode` (`VoucherCode`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `voucher`
@@ -515,11 +589,14 @@ INSERT INTO `voucher` (`VoucherID`, `VoucherCode`, `DiscountValue`, `ExpiredDate
 -- Table structure for table `voucher_detail`
 --
 
-CREATE TABLE `voucher_detail` (
-  `CustomerID` int(11) NOT NULL,
-  `VoucherID` int(11) NOT NULL,
-  `ReceivedDate` datetime DEFAULT current_timestamp(),
-  `UsedStatus` tinyint(1) DEFAULT 0
+DROP TABLE IF EXISTS `voucher_detail`;
+CREATE TABLE IF NOT EXISTS `voucher_detail` (
+  `CustomerID` int NOT NULL,
+  `VoucherID` int NOT NULL,
+  `ReceivedDate` datetime DEFAULT CURRENT_TIMESTAMP,
+  `UsedStatus` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`CustomerID`,`VoucherID`),
+  KEY `fk_voucherdetail_voucher` (`VoucherID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -528,239 +605,6 @@ CREATE TABLE `voucher_detail` (
 
 INSERT INTO `voucher_detail` (`CustomerID`, `VoucherID`, `ReceivedDate`, `UsedStatus`) VALUES
 (17, 1, '2026-07-01 10:56:00', 1);
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `address`
---
-ALTER TABLE `address`
-  ADD PRIMARY KEY (`AddressID`),
-  ADD KEY `fk_address_user` (`CustomerID`);
-
---
--- Indexes for table `cart`
---
-ALTER TABLE `cart`
-  ADD PRIMARY KEY (`CartID`),
-  ADD KEY `fk_cart_user` (`CustomerID`);
-
---
--- Indexes for table `cart_detail`
---
-ALTER TABLE `cart_detail`
-  ADD PRIMARY KEY (`CartID`,`ProductID`),
-  ADD KEY `fk_cartdetail_product` (`ProductID`);
-
---
--- Indexes for table `category`
---
-ALTER TABLE `category`
-  ADD PRIMARY KEY (`CategoryID`);
-
---
--- Indexes for table `delivery`
---
-ALTER TABLE `delivery`
-  ADD PRIMARY KEY (`DeliveryID`),
-  ADD KEY `fk_delivery_order` (`OrderID`);
-
---
--- Indexes for table `image`
---
-ALTER TABLE `image`
-  ADD PRIMARY KEY (`ImageID`),
-  ADD KEY `fk_image_product` (`ProductID`);
-
---
--- Indexes for table `order`
---
-ALTER TABLE `order`
-  ADD PRIMARY KEY (`OrderID`),
-  ADD KEY `fk_order_user` (`CustomerID`),
-  ADD KEY `fk_order_voucher` (`VoucherID`),
-  ADD KEY `fk_order_employee` (`EmployeeID`);
-
---
--- Indexes for table `order_detail`
---
-ALTER TABLE `order_detail`
-  ADD PRIMARY KEY (`OrderID`,`ProductID`),
-  ADD KEY `fk_orderdetail_product` (`ProductID`);
-
---
--- Indexes for table `payment`
---
-ALTER TABLE `payment`
-  ADD PRIMARY KEY (`PaymentID`),
-  ADD KEY `fk_payment_order` (`OrderID`);
-
---
--- Indexes for table `product`
---
-ALTER TABLE `product`
-  ADD PRIMARY KEY (`ProductID`),
-  ADD KEY `fk_product_category` (`CategoryID`);
-
---
--- Indexes for table `promotion`
---
-ALTER TABLE `promotion`
-  ADD PRIMARY KEY (`PromotionID`);
-
---
--- Indexes for table `promotion_detail`
---
-ALTER TABLE `promotion_detail`
-  ADD PRIMARY KEY (`ProductID`,`PromotionID`),
-  ADD KEY `fk_promodetail_promo` (`PromotionID`);
-
---
--- Indexes for table `review`
---
-ALTER TABLE `review`
-  ADD PRIMARY KEY (`ReviewID`),
-  ADD KEY `fk_review_user` (`CustomerID`),
-  ADD KEY `fk_review_product` (`ProductID`);
-
---
--- Indexes for table `role`
---
-ALTER TABLE `role`
-  ADD PRIMARY KEY (`RoleID`);
-
---
--- Indexes for table `user`
---
-ALTER TABLE `user`
-  ADD PRIMARY KEY (`CustomerID`),
-  ADD UNIQUE KEY `Email` (`Email`),
-  ADD KEY `fk_user_role` (`RoleID`);
-
---
--- Indexes for table `user_log`
---
-ALTER TABLE `user_log`
-  ADD PRIMARY KEY (`LogID`),
-  ADD KEY `fk_userlog_user` (`CustomerID`),
-  ADD KEY `fk_userlog_employee` (`EmployeeID`);
-
---
--- Indexes for table `user_provider`
---
-ALTER TABLE `user_provider`
-  ADD PRIMARY KEY (`ProviderID`),
-  ADD KEY `fk_userprovider_user` (`User_ID`);
-
---
--- Indexes for table `voucher`
---
-ALTER TABLE `voucher`
-  ADD PRIMARY KEY (`VoucherID`),
-  ADD UNIQUE KEY `VoucherCode` (`VoucherCode`);
-
---
--- Indexes for table `voucher_detail`
---
-ALTER TABLE `voucher_detail`
-  ADD PRIMARY KEY (`CustomerID`,`VoucherID`),
-  ADD KEY `fk_voucherdetail_voucher` (`VoucherID`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `address`
---
-ALTER TABLE `address`
-  MODIFY `AddressID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `cart`
---
-ALTER TABLE `cart`
-  MODIFY `CartID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
-
---
--- AUTO_INCREMENT for table `category`
---
-ALTER TABLE `category`
-  MODIFY `CategoryID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `delivery`
---
-ALTER TABLE `delivery`
-  MODIFY `DeliveryID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
-
---
--- AUTO_INCREMENT for table `image`
---
-ALTER TABLE `image`
-  MODIFY `ImageID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `order`
---
-ALTER TABLE `order`
-  MODIFY `OrderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
-
---
--- AUTO_INCREMENT for table `payment`
---
-ALTER TABLE `payment`
-  MODIFY `PaymentID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
-
---
--- AUTO_INCREMENT for table `product`
---
-ALTER TABLE `product`
-  MODIFY `ProductID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `promotion`
---
-ALTER TABLE `promotion`
-  MODIFY `PromotionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `review`
---
-ALTER TABLE `review`
-  MODIFY `ReviewID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- AUTO_INCREMENT for table `role`
---
-ALTER TABLE `role`
-  MODIFY `RoleID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `user`
---
-ALTER TABLE `user`
-  MODIFY `CustomerID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
--- AUTO_INCREMENT for table `user_log`
---
-ALTER TABLE `user_log`
-  MODIFY `LogID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
-
---
--- AUTO_INCREMENT for table `user_provider`
---
-ALTER TABLE `user_provider`
-  MODIFY `ProviderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `voucher`
---
-ALTER TABLE `voucher`
-  MODIFY `VoucherID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
