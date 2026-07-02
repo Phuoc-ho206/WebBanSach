@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jul 02, 2026 at 12:35 AM
+-- Generation Time: Jul 02, 2026 at 01:34 AM
 -- Server version: 8.4.7
 -- PHP Version: 8.3.28
 
@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS `image` (
   `SortOrder` int DEFAULT '0',
   PRIMARY KEY (`ImageID`),
   KEY `fk_image_product` (`ProductID`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `image`
@@ -176,7 +176,37 @@ INSERT INTO `image` (`ImageID`, `ProductID`, `ImageURL`, `AltText`, `IsThumbnail
 (8, 7, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916437/dmngvwmdhh8ebfjisaj6.jpg', 'Bìa sách Đại Việt Sử Ký Toàn Thư', 1, 1),
 (9, 8, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916425/iio8zncgh7lhyjiuvwuu.png', 'Bìa sách Triết học Mác-Lênin', 1, 1),
 (10, 9, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782916402/vzeojocu5rxtmh4rk0rz.jpg', 'Bìa sách Hack Não 1500', 1, 1),
-(11, 10, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782922014/tddojwxlatvwrev9oqpg.jpg', 'Bìa sách Computer Networking: A Top-Down Approach', 1, 1);
+(11, 10, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782922014/tddojwxlatvwrev9oqpg.jpg', 'Bìa sách Computer Networking: A Top-Down Approach', 1, 1),
+(12, 11, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782956020/vf7akeetzfruxjjolb91.jpg', 'Bìa sách Lập trình Web với PHP', 1, 1),
+(13, 12, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782956008/uhfmlhgcrvvrtj9jct9f.jpg', 'Bìa sách Cấu trúc dữ liệu C++', 1, 1),
+(14, 13, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955998/apfb9rd1sqoekd5jpszn.jpg', 'Bìa sách Quản trị mạng Cisco', 1, 1),
+(15, 14, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955986/btkwvzov1v1gqcw4jblw.jpg', 'Bìa sách Responsive Bootstrap', 1, 1),
+(16, 15, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955976/wfqsyaf7borjkqezhero.jpg', 'Bìa sách Triết học Kỷ nguyên số', 1, 1),
+(17, 16, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955966/hgn2rbt65iwvfchmqebi.jpg', 'Bìa sách Hệ thống thu phí ETC', 1, 1),
+(18, 17, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955955/zmz6qepdpzwx23oqyzz5.jpg', 'Bìa sách Selenium Python', 1, 1),
+(19, 18, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955945/zkvxvfw1ir4ygakzbbfw.jpg', 'Bìa sách Kiến trúc Smartphone', 1, 1),
+(20, 19, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955936/b1ypj4tlgx0o1sgevxfp.jpg', 'Bìa sách Phân tích dữ liệu TMĐT', 1, 1),
+(21, 20, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955913/ylx1gjg32yehhqn9q5d9.jpg', 'Bìa sách Phân tích Thiết kế HT', 1, 1),
+(22, 21, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955900/xfwxwhs6tcqcnh27bs07.jpg', 'Bìa sách Số Đỏ', 1, 1),
+(23, 22, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955888/yuz6hsfyeb3n8iaiqtrw.jpg', 'Bìa sách Bố Già', 1, 1),
+(24, 23, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955875/meksbe78btodwcah44zz.jpg', 'Bìa sách Atomic Habits', 1, 1),
+(25, 24, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955855/amb14ykvv3j2algvxlcj.jpg', 'Bìa sách Sapiens', 1, 1),
+(26, 25, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955836/adrhjaax8q7bi6is4zom.jpg', 'Bìa sách English for IT', 1, 1),
+(27, 26, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955809/yms7yaikos72el4swung.png', 'Bìa sách Bản chất và Hiện tượng', 1, 1),
+(28, 27, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955794/e5tgcqqjxosjodoxxavf.jpg', 'Bìa sách Kỹ thuật lưu lượng mạng', 1, 1),
+(29, 28, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955780/zrytwrn2kiz58vuspyto.jpg', 'Bìa sách Lập trình Android', 1, 1),
+(30, 29, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955753/gaeoqs1kc97cgwam9ngu.jpg', 'Bìa sách Bí mật DotCom', 1, 1),
+(31, 30, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955730/sbmosb8km0rw7b7rcgbi.jpg', 'Bìa sách Harry Potter', 1, 1),
+(32, 31, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955696/tkfnk9nf8leepmfxn4kk.jpg', 'Bìa sách Bảo mật Mạng', 1, 1),
+(33, 32, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955680/nhvpvktgpgpbnteyswg2.jpg', 'Giáo trình Cơ sở dữ liệu', 1, 1),
+(34, 33, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955639/mqrnvwdoaqrnidp3sxeo.jpg', 'Bìa sách Tư duy nhanh và chậm', 1, 1),
+(35, 34, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955613/y2fsym3lgwjwt0duvvmf.jpg', 'Bìa sách Dế Mèn Phiêu Lưu Ký', 1, 1),
+(36, 35, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955626/k7no90qydbfarhcwu5g3.jpg', 'Bìa sách Việt Nam Sử Lược', 1, 1),
+(37, 36, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955602/iriiur8rck773ax2ewdr.jpg', 'Bìa sách Lập trình C++', 1, 1),
+(38, 37, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955592/avpob52fkwblcscmpugi.jpg', 'Bìa sách Giai cấp và Dân tộc', 1, 1),
+(39, 38, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955566/gj3w6skzn3caz3ztnjlb.png', 'Bìa sách Thiết kế LAN WAN', 1, 1),
+(40, 39, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782954933/oclumlr7kaf5p0fw79vt.jpg', 'Bìa sách Ngữ pháp Tiếng Anh', 1, 1),
+(41, 40, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782954922/ie8glejtov6jgmr0saxl.jpg', 'Bìa sách Kiểm thử tự động', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -300,23 +330,53 @@ CREATE TABLE IF NOT EXISTS `product` (
   `Status` enum('Còn hàng','Hết hàng') COLLATE utf8mb4_unicode_ci DEFAULT 'Còn hàng',
   PRIMARY KEY (`ProductID`),
   KEY `fk_product_category` (`CategoryID`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `product`
 --
 
 INSERT INTO `product` (`ProductID`, `CategoryID`, `BrandID`, `ProductName`, `Brand`, `Price`, `Quantity`, `Description`, `Publisher`, `Status`) VALUES
-(1, 1, NULL, 'Mắt Biếc', NULL, 85000, 149, 'Tiểu thuyết của Nguyễn Nhật Ánh', 'AlphaBooks', 'Còn hàng'),
-(2, 2, NULL, 'Nhà Giả Kim', NULL, 75000, 200, 'Tiểu thuyết của Paulo Coelho', 'AlphaBooks', 'Còn hàng'),
-(3, 3, NULL, 'Cha Giàu Cha Nghèo', NULL, 110000, 48, 'Sách tài chính cá nhân', 'AlphaBooks', 'Còn hàng'),
-(4, 4, NULL, 'Đắc Nhân Tâm', NULL, 90000, 300, 'Sách kỹ năng giao tiếp', 'AlphaBooks', 'Còn hàng'),
-(5, 5, NULL, 'Clean Code', NULL, 350000, 19, 'Kỹ thuật viết mã sạch', 'AlphaBooks', 'Còn hàng'),
-(6, 6, NULL, 'Doraemon Tập 1', NULL, 20000, 500, 'Truyện tranh thiếu nhi', 'AlphaBooks', 'Còn hàng'),
-(7, 7, NULL, 'Đại Việt Sử Ký Toàn Thư', NULL, 450000, 9, 'Lịch sử Việt Nam', 'AlphaBooks', 'Còn hàng'),
-(8, 8, NULL, 'Giáo trình Triết học Mác-Lênin', NULL, 65000, 92, 'Giáo trình đại học chuẩn', 'AlphaBooks', 'Còn hàng'),
-(9, 9, NULL, 'Hack Não 1500 Từ Tiếng Anh', NULL, 395000, 80, 'Sách học từ vựng hiệu quả', 'AlphaBooks', 'Còn hàng'),
-(10, 5, NULL, 'Computer Networking: A Top-Down Approach', NULL, 550000, 0, 'Giáo trình mạng máy tính', 'AlphaBooks', 'Hết hàng');
+(1, 1, NULL, 'Mắt Biếc', NULL, 85000, 149, 'Tiểu thuyết nổi tiếng của Nguyễn Nhật Ánh kể về mối tình trong sáng nhưng đầy tiếc nuối giữa Ngạn và Hà Lan. Với lối kể chuyện nhẹ nhàng và giàu cảm xúc, tác phẩm khắc họa vẻ đẹp của tuổi học trò và những rung động đầu đời.', 'Nhà xuất bản Trẻ', 'Còn hàng'),
+(2, 2, NULL, 'Nhà Giả Kim', NULL, 75000, 200, 'Câu chuyện kể về hành trình theo đuổi ước mơ của chàng chăn cừu Santiago. Tác phẩm truyền tải thông điệp sâu sắc về lòng dũng cảm, niềm tin và việc lắng nghe tiếng gọi của trái tim để thực hiện vận mệnh của mỗi người.', 'Nhà xuất bản Hội Nhà Văn', 'Còn hàng'),
+(3, 3, NULL, 'Cha Giàu Cha Nghèo', NULL, 110000, 48, 'Cuốn sách truyền cảm hứng về tư duy tài chính thông qua những bài học từ hai hình mẫu \"cha giàu\" và \"cha nghèo\". Tác phẩm giúp người đọc hiểu cách quản lý tiền bạc, đầu tư và xây dựng sự tự do tài chính.', 'Nhà xuất bản Trẻ', 'Còn hàng'),
+(4, 4, NULL, 'Đắc Nhân Tâm', NULL, 90000, 300, 'Một trong những cuốn sách nổi tiếng nhất về nghệ thuật giao tiếp và ứng xử. Tác phẩm giúp người đọc xây dựng các mối quan hệ tốt đẹp, tạo ảnh hưởng tích cực và phát triển bản thân trong cuộc sống cũng như công việc.', 'Nhà xuất bản Tổng hợp Thành phố Hồ Chí Minh', 'Còn hàng'),
+(5, 5, NULL, 'Clean Code', NULL, 350000, 19, 'Tập đầu tiên mở ra thế giới của chú mèo máy Doraemon đến từ tương lai cùng những bảo bối thần kỳ giúp Nobita vượt qua khó khăn. Những câu chuyện hài hước, nhân văn và giàu trí tưởng tượng đã trở thành tuổi thơ của nhiều thế hệ độc giả.', 'Prentice Hall', 'Còn hàng'),
+(6, 6, NULL, 'Doraemon Tập 1', NULL, 20000, 500, 'Tập đầu tiên mở ra thế giới của chú mèo máy Doraemon đến từ tương lai cùng những bảo bối thần kỳ giúp Nobita vượt qua khó khăn. Những câu chuyện hài hước, nhân văn và giàu trí tưởng tượng đã trở thành tuổi thơ của nhiều thế hệ độc giả.', 'Nhà xuất bản Kim Đồng', 'Còn hàng'),
+(7, 7, NULL, 'Đại Việt Sử Ký Toàn Thư', NULL, 450000, 9, 'Đây là bộ chính sử đầy đủ và quan trọng nhất của Việt Nam thời phong kiến, ghi chép lịch sử dân tộc từ thời Hồng Bàng đến triều Lê. Tác phẩm là nguồn tư liệu quý giá cho việc nghiên cứu lịch sử và văn hóa Việt Nam.', 'NXB Khoa học Xã hội', 'Còn hàng'),
+(8, 8, NULL, 'Giáo trình Triết học Mác-Lênin', NULL, 65000, 92, 'Giáo trình cung cấp những kiến thức nền tảng về triết học Mác – Lênin, bao gồm chủ nghĩa duy vật biện chứng và chủ nghĩa duy vật lịch sử. Đây là tài liệu chính thức dành cho sinh viên các trường đại học và cao đẳng tại Việt Nam.', 'Nhà xuất bản Chính trị quốc gia Sự thật', 'Còn hàng'),
+(9, 9, NULL, 'Hack Não 1500 Từ Tiếng Anh', NULL, 395000, 80, 'Cuốn sách giúp người học ghi nhớ 1.500 từ vựng tiếng Anh thông dụng bằng phương pháp hình ảnh, âm thanh và liên tưởng. Nội dung được thiết kế khoa học, giúp tăng khả năng ghi nhớ lâu dài và cải thiện vốn từ nhanh chóng.', 'NXB Thế Giới', 'Còn hàng'),
+(10, 5, NULL, 'Computer Networking: A Top-Down Approach', NULL, 550000, 230, 'Cuốn sách kinh điển về mạng máy tính, tiếp cận từ góc nhìn ứng dụng trước khi đi sâu vào các tầng giao thức bên dưới. Sách trình bày rõ ràng các khái niệm về Internet, TCP/IP, định tuyến, bảo mật và mạng không dây, phù hợp cho sinh viên và lập trình viên.', 'Pearson', 'Còn hàng'),
+(11, 5, NULL, 'Lập trình Web với PHP và MySQL', NULL, 185000, 45, 'Hướng dẫn xây dựng website e-commerce toàn diện', 'NXB Khoa Học Kỹ Thuật', 'Còn hàng'),
+(12, 5, NULL, 'Cấu trúc dữ liệu và Giải thuật với C++', NULL, 195000, 30, 'Nền tảng thuật toán, cây nhị phân và tối ưu hóa', 'NXB Bách Khoa', 'Còn hàng'),
+(13, 5, NULL, 'Quản trị mạng Cisco Thực Hành (CCNA)', NULL, 220000, 15, 'Cấu hình Router, Switch, VLAN và ACL', 'NXB Thông Tin', 'Còn hàng'),
+(14, 5, NULL, 'Thiết kế Web chuẩn Responsive với Bootstrap', NULL, 120000, 50, 'Xây dựng giao diện frontend hiện đại và tối ưu', 'NXB Trẻ', 'Còn hàng'),
+(15, 8, NULL, 'Phép biện chứng duy vật trong Kỷ nguyên số', NULL, 95000, 60, 'Ứng dụng triết học vào đời sống và công nghệ', 'Nhà xuất bản Chính trị Quốc gia Sự thật', 'Còn hàng'),
+(16, 5, NULL, 'Tổng quan Hệ thống thu phí tự động (ETC)', NULL, 150000, 20, 'Kiến trúc và giải pháp giao thông thông minh (ITS)', 'NXB Giao Thông', 'Còn hàng'),
+(17, 5, NULL, 'Tự động hóa với Selenium và Python', NULL, 160000, 40, 'Kỹ thuật scraping dữ liệu và automated testing', 'NXB Bách Khoa', 'Còn hàng'),
+(18, 5, NULL, 'Kiến trúc Smartphone Hiện Đại', NULL, 210000, 25, 'Phân tích chipset, hiệu năng và hệ điều hành di động', 'NXB Công Nghệ', 'Còn hàng'),
+(19, 3, NULL, 'Phân tích dữ liệu Thương mại điện tử', NULL, 180000, 35, 'Tối ưu hóa doanh thu bán hàng trên các sàn TMĐT', 'AlphaBooks', 'Còn hàng'),
+(20, 10, NULL, 'Giáo trình Phân tích và Thiết kế Hệ thống', NULL, 130000, 80, 'Tài liệu chuẩn cho sinh viên ngành CNTT', 'NXB Đại Học Quốc Gia', 'Còn hàng'),
+(21, 1, NULL, 'Số Đỏ', NULL, 75000, 120, 'Tác phẩm văn học trào phúng của Vũ Trọng Phụng', 'NXB Văn Học', 'Còn hàng'),
+(22, 2, NULL, 'Bố Già (The Godfather)', NULL, 115000, 90, 'Tiểu thuyết kinh điển của Mario Puzo', 'NXB Văn Học', 'Còn hàng'),
+(23, 4, NULL, 'Atomic Habits - Thay Đổi Tý Hon, Hiệu Quả Bất Ngờ', NULL, 140000, 200, 'Cách xây dựng thói quen tốt và loại bỏ thói quen xấu', '1980 Books', 'Còn hàng'),
+(24, 7, NULL, 'Sapiens - Lược sử loài người', NULL, 250000, 45, 'Hành trình phát triển của nhân loại', 'NXB Tri Thức', 'Còn hàng'),
+(25, 9, NULL, 'English for Information Technology', NULL, 165000, 55, 'Tiếng Anh chuyên ngành Công nghệ thông tin', 'Oxford University Press', 'Còn hàng'),
+(26, 8, NULL, 'Bản chất và Hiện tượng', NULL, 85000, 40, 'Chuyên đề triết học chuyên sâu', 'Nhà xuất bản Chính trị Quốc gia Sự thật', 'Còn hàng'),
+(27, 5, NULL, 'Kỹ thuật lưu lượng mạng (Traffic Engineering)', NULL, 230000, 10, 'Tối ưu hóa băng thông và luồng dữ liệu mạng', 'NXB Khoa Học Kỹ Thuật', 'Còn hàng'),
+(28, 5, NULL, 'Lập trình Android với Kotlin', NULL, 175000, 25, 'Phát triển ứng dụng di động hiệu suất cao', 'NXB Thanh Niên', 'Còn hàng'),
+(29, 3, NULL, 'Bí mật DotCom', NULL, 150000, 70, 'Chiến lược phát triển công ty online', 'AlphaBooks', 'Còn hàng'),
+(30, 6, NULL, 'Harry Potter và Hòn Đá Phù Thủy', NULL, 145000, 150, 'Tập 1 của series truyện ma thuật kinh điển', 'NXB Trẻ', 'Còn hàng'),
+(31, 5, NULL, 'Bảo mật Mạng máy tính', NULL, 215000, 18, 'Phòng chống tấn công và quản lý rủi ro', 'NXB Bách Khoa', 'Còn hàng'),
+(32, 10, NULL, 'Giáo trình Cơ sở dữ liệu', NULL, 110000, 100, 'Nguyên lý và ứng dụng các hệ quản trị CSDL', 'NXB Đại Học Quốc Gia', 'Còn hàng'),
+(33, 4, NULL, 'Tư duy nhanh và chậm', NULL, 190000, 65, 'Khám phá hai hệ thống tư duy của con người', 'AlphaBooks', 'Còn hàng'),
+(34, 1, NULL, 'Dế Mèn Phiêu Lưu Ký', NULL, 45000, 250, 'Tác phẩm thiếu nhi kinh điển của Tô Hoài', 'NXB Kim Đồng', 'Còn hàng'),
+(35, 7, NULL, 'Việt Nam Sử Lược', NULL, 125000, 30, 'Cuốn sử Việt Nam đầu tiên viết bằng chữ quốc ngữ', 'NXB Văn Học', 'Còn hàng'),
+(36, 5, NULL, 'Lập trình C++ Cơ bản đến Nâng cao', NULL, 155000, 55, 'Làm chủ ngôn ngữ lập trình C++', 'NXB Thông Tin', 'Còn hàng'),
+(37, 8, NULL, 'Giai cấp và Dân tộc', NULL, 75000, 20, 'Nghiên cứu về mối quan hệ giữa giai cấp và dân tộc', 'Nhà xuất bản Chính trị Quốc gia Sự thật', 'Còn hàng'),
+(38, 5, NULL, 'Thiết kế Mạng LAN và WAN', NULL, 195000, 22, 'Quy hoạch IP, Subnetting và cấu hình định tuyến', 'NXB Bách Khoa', 'Còn hàng'),
+(39, 9, NULL, 'Ngữ pháp Tiếng Anh Toàn Diện', NULL, 120000, 110, 'Sách tham khảo ngữ pháp từ cơ bản đến nâng cao', 'NXB Tổng Hợp', 'Còn hàng'),
+(40, 5, NULL, 'Kiểm thử phần mềm tự động', NULL, 185000, 35, 'Đảm bảo chất lượng phần mềm với Automation Test', 'NXB Khoa Học Kỹ Thuật', 'Còn hàng');
 
 -- --------------------------------------------------------
 
@@ -466,7 +526,7 @@ CREATE TABLE IF NOT EXISTS `user_log` (
   PRIMARY KEY (`LogID`),
   KEY `fk_userlog_user` (`CustomerID`),
   KEY `fk_userlog_employee` (`EmployeeID`)
-) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=132 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `user_log`
@@ -530,7 +590,62 @@ INSERT INTO `user_log` (`LogID`, `CustomerID`, `EmployeeID`, `Action`, `LogDate`
 (73, NULL, 16, 'Cập nhật sản phẩm ID 1 - Tên: Mắt Biếc', '2026-07-01 21:35:04'),
 (74, NULL, 16, 'Cập nhật sản phẩm ID 1 - Tên: Mắt Biếc', '2026-07-01 21:35:29'),
 (75, NULL, 16, 'Cập nhật sản phẩm ID 1 - Tên: Mắt Biếc', '2026-07-01 22:01:32'),
-(76, NULL, 16, 'Cập nhật sản phẩm ID 10 - Tên: Computer Networking: A Top-Down Approach', '2026-07-01 23:06:56');
+(76, NULL, 16, 'Cập nhật sản phẩm ID 10 - Tên: Computer Networking: A Top-Down Approach', '2026-07-01 23:06:56'),
+(77, 16, NULL, 'Đăng nhập hệ thống', '2026-07-02 07:54:08'),
+(78, NULL, 16, 'Đăng nhập hệ thống', '2026-07-02 07:54:08'),
+(79, NULL, 16, 'Cập nhật sản phẩm ID 10 - Tên: Computer Networking: A Top-Down Approach', '2026-07-02 07:54:47'),
+(80, NULL, 16, 'Cập nhật sản phẩm ID 9 - Tên: Hack Não 1500 Từ Tiếng Anh', '2026-07-02 07:55:49'),
+(81, NULL, 16, 'Cập nhật sản phẩm ID 8 - Tên: Giáo trình Triết học Mác-Lênin', '2026-07-02 07:56:24'),
+(82, NULL, 16, 'Cập nhật sản phẩm ID 7 - Tên: Đại Việt Sử Ký Toàn Thư', '2026-07-02 07:56:59'),
+(83, NULL, 16, 'Cập nhật sản phẩm ID 6 - Tên: Doraemon Tập 1', '2026-07-02 07:57:36'),
+(84, NULL, 16, 'Cập nhật sản phẩm ID 5 - Tên: Clean Code', '2026-07-02 07:59:00'),
+(85, NULL, 16, 'Cập nhật sản phẩm ID 4 - Tên: Đắc Nhân Tâm', '2026-07-02 07:59:23'),
+(86, NULL, 16, 'Cập nhật sản phẩm ID 3 - Tên: Cha Giàu Cha Nghèo', '2026-07-02 07:59:48'),
+(87, NULL, 16, 'Cập nhật sản phẩm ID 2 - Tên: Nhà Giả Kim', '2026-07-02 08:00:18'),
+(88, NULL, 16, 'Cập nhật sản phẩm ID 1 - Tên: Mắt Biếc', '2026-07-02 08:00:27'),
+(89, NULL, 16, 'Cập nhật sản phẩm ID 10 - Tên: Computer Networking: A Top-Down Approach', '2026-07-02 08:01:18'),
+(90, NULL, 16, 'Cập nhật sản phẩm ID 9 - Tên: Hack Não 1500 Từ Tiếng Anh', '2026-07-02 08:01:29'),
+(91, NULL, 16, 'Cập nhật sản phẩm ID 8 - Tên: Giáo trình Triết học Mác-Lênin', '2026-07-02 08:01:42'),
+(92, NULL, 16, 'Cập nhật sản phẩm ID 7 - Tên: Đại Việt Sử Ký Toàn Thư', '2026-07-02 08:01:53'),
+(93, NULL, 16, 'Cập nhật sản phẩm ID 6 - Tên: Doraemon Tập 1', '2026-07-02 08:02:03'),
+(94, NULL, 16, 'Cập nhật sản phẩm ID 5 - Tên: Clean Code', '2026-07-02 08:02:15'),
+(95, NULL, 16, 'Cập nhật sản phẩm ID 4 - Tên: Đắc Nhân Tâm', '2026-07-02 08:02:24'),
+(96, NULL, 16, 'Cập nhật sản phẩm ID 3 - Tên: Cha Giàu Cha Nghèo', '2026-07-02 08:02:34'),
+(97, NULL, 16, 'Cập nhật sản phẩm ID 2 - Tên: Nhà Giả Kim', '2026-07-02 08:02:46'),
+(98, NULL, 16, 'Cập nhật sản phẩm ID 1 - Tên: Mắt Biếc', '2026-07-02 08:02:55'),
+(99, NULL, 16, 'Cập nhật sản phẩm ID 40 - Tên: Kiểm thử phần mềm tự động', '2026-07-02 08:13:57'),
+(100, NULL, 16, 'Cập nhật sản phẩm ID 40 - Tên: Kiểm thử phần mềm tự động', '2026-07-02 08:15:24'),
+(101, NULL, 16, 'Cập nhật sản phẩm ID 39 - Tên: Ngữ pháp Tiếng Anh Toàn Diện', '2026-07-02 08:15:36'),
+(102, NULL, 16, 'Cập nhật sản phẩm ID 11 - Tên: Lập trình Web với PHP và MySQL', '2026-07-02 08:25:34'),
+(103, NULL, 16, 'Cập nhật sản phẩm ID 38 - Tên: Thiết kế Mạng LAN và WAN', '2026-07-02 08:26:09'),
+(104, NULL, 16, 'Cập nhật sản phẩm ID 37 - Tên: Giai cấp và Dân tộc', '2026-07-02 08:26:35'),
+(105, NULL, 16, 'Cập nhật sản phẩm ID 36 - Tên: Lập trình C++ Cơ bản đến Nâng cao', '2026-07-02 08:26:45'),
+(106, NULL, 16, 'Cập nhật sản phẩm ID 34 - Tên: Dế Mèn Phiêu Lưu Ký', '2026-07-02 08:26:55'),
+(107, NULL, 16, 'Cập nhật sản phẩm ID 35 - Tên: Việt Nam Sử Lược', '2026-07-02 08:27:09'),
+(108, NULL, 16, 'Cập nhật sản phẩm ID 33 - Tên: Tư duy nhanh và chậm', '2026-07-02 08:27:22'),
+(109, NULL, 16, 'Cập nhật sản phẩm ID 32 - Tên: Giáo trình Cơ sở dữ liệu', '2026-07-02 08:28:02'),
+(110, NULL, 16, 'Cập nhật sản phẩm ID 31 - Tên: Bảo mật Mạng máy tính', '2026-07-02 08:28:19'),
+(111, NULL, 16, 'Cập nhật sản phẩm ID 30 - Tên: Harry Potter và Hòn Đá Phù Thủy', '2026-07-02 08:28:39'),
+(112, NULL, 16, 'Cập nhật sản phẩm ID 30 - Tên: Harry Potter và Hòn Đá Phù Thủy', '2026-07-02 08:28:53'),
+(113, NULL, 16, 'Cập nhật sản phẩm ID 29 - Tên: Bí mật DotCom', '2026-07-02 08:29:15'),
+(114, NULL, 16, 'Cập nhật sản phẩm ID 28 - Tên: Lập trình Android với Kotlin', '2026-07-02 08:29:43'),
+(115, NULL, 16, 'Cập nhật sản phẩm ID 27 - Tên: Kỹ thuật lưu lượng mạng (Traffic Engineering)', '2026-07-02 08:29:56'),
+(116, NULL, 16, 'Cập nhật sản phẩm ID 26 - Tên: Bản chất và Hiện tượng', '2026-07-02 08:30:11'),
+(117, NULL, 16, 'Cập nhật sản phẩm ID 25 - Tên: English for Information Technology', '2026-07-02 08:30:38'),
+(118, NULL, 16, 'Cập nhật sản phẩm ID 24 - Tên: Sapiens - Lược sử loài người', '2026-07-02 08:30:58'),
+(119, NULL, 16, 'Cập nhật sản phẩm ID 23 - Tên: Atomic Habits - Thay Đổi Tý Hon, Hiệu Quả Bất Ngờ', '2026-07-02 08:31:18'),
+(120, NULL, 16, 'Cập nhật sản phẩm ID 22 - Tên: Bố Già (The Godfather)', '2026-07-02 08:31:30'),
+(121, NULL, 16, 'Cập nhật sản phẩm ID 21 - Tên: Số Đỏ', '2026-07-02 08:31:43'),
+(122, NULL, 16, 'Cập nhật sản phẩm ID 20 - Tên: Giáo trình Phân tích và Thiết kế Hệ thống', '2026-07-02 08:31:55'),
+(123, NULL, 16, 'Cập nhật sản phẩm ID 19 - Tên: Phân tích dữ liệu Thương mại điện tử', '2026-07-02 08:32:18'),
+(124, NULL, 16, 'Cập nhật sản phẩm ID 18 - Tên: Kiến trúc Smartphone Hiện Đại', '2026-07-02 08:32:28'),
+(125, NULL, 16, 'Cập nhật sản phẩm ID 17 - Tên: Tự động hóa với Selenium và Python', '2026-07-02 08:32:37'),
+(126, NULL, 16, 'Cập nhật sản phẩm ID 16 - Tên: Tổng quan Hệ thống thu phí tự động (ETC)', '2026-07-02 08:32:48'),
+(127, NULL, 16, 'Cập nhật sản phẩm ID 15 - Tên: Phép biện chứng duy vật trong Kỷ nguyên số', '2026-07-02 08:32:59'),
+(128, NULL, 16, 'Cập nhật sản phẩm ID 14 - Tên: Thiết kế Web chuẩn Responsive với Bootstrap', '2026-07-02 08:33:09'),
+(129, NULL, 16, 'Cập nhật sản phẩm ID 13 - Tên: Quản trị mạng Cisco Thực Hành (CCNA)', '2026-07-02 08:33:20'),
+(130, NULL, 16, 'Cập nhật sản phẩm ID 12 - Tên: Cấu trúc dữ liệu và Giải thuật với C++', '2026-07-02 08:33:30'),
+(131, NULL, 16, 'Cập nhật sản phẩm ID 11 - Tên: Lập trình Web với PHP và MySQL', '2026-07-02 08:33:42');
 
 -- --------------------------------------------------------
 
