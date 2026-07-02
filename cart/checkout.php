@@ -240,7 +240,7 @@ if (isset($_SESSION['user'])) {
                     <?php foreach ($cartProducts as $item): ?>
                         <div class="checkout-summary-item">
                             <?php 
-                            $imgSrc = !empty($item['ImageURL']) ? url('assets' . $item['ImageURL']) : asset('images/default-book.png'); 
+                            $imgSrc = getProductImage($item['ImageURL'] ?? ''); 
                             ?>
                             <img src="<?= $imgSrc ?>" alt="<?= htmlspecialchars($item['ProductName']) ?>" class="checkout-summary-img">
                             

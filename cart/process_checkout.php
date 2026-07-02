@@ -149,6 +149,19 @@ try {
     
     $finalTotalAmount = max(0, $totalAmount + $shippingFee - $voucherDiscount);
 
+    // 2.5 Cập nhật Số điện thoại và Địa chỉ vào bảng user cho thành viên đăng nhập
+    if ($customerId !== null) {
+        $stmtUser = $conn->prepare("UPDATE `user` SET `Phone` = ?, `Address` = ? WHERE `CustomerID` = ?");
+        $stmtUser->bind_param("ssi", $phone, $address, $customerId);
+        if (!$stmtUser->execute()) {
+            throw new Exception("Không thể cập nhật thông tin số điện thoại và địa chỉ tài khoản.");
+        }
+        $stmtUser->close();
+        
+        $_SESSION['user']['phone'] = $phone;
+        $_SESSION['user']['address'] = $address;
+    }
+
     // 3. Thêm vào bảng `order`
     $sqlOrder = "INSERT INTO `order` (CustomerID, VoucherID, ShippingAddress, OrderStatus, TotalAmount) VALUES (?, ?, ?, 'Pending', ?)";
     $stmtOrder = $conn->prepare($sqlOrder);
