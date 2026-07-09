@@ -339,15 +339,16 @@ if (!empty($cart)) {
                     <!-- Khu vực nhập Voucher -->
                     <div style="border-top: 1px dashed var(--color-border); margin-top: var(--spacing-md); padding-top: var(--spacing-md);">
                         <?php if (isset($_SESSION['user'])): ?>
-                            <?php if (!$appliedVoucher): ?>
-                                <form action="<?= url('cart/apply_voucher.php') ?>" method="POST" style="display: flex; gap: var(--spacing-xs); margin-bottom: 0;">
-                                    <input type="hidden" name="action" value="apply">
-                                    <input type="text" name="voucher_code" class="form-control" placeholder="Nhập mã giảm giá..." style="padding: 8px 12px; font-size: 0.9rem; margin-bottom: 0;" required>
-                                    <button type="submit" class="btn btn--primary" style="padding: 0 16px; font-size: 0.9rem; font-weight: bold; white-space: nowrap; height: 38px;">Áp dụng</button>
-                                </form>
-                            <?php else: ?>
-                                <div style="font-size: 0.85rem; color: #2e7d32; display: flex; align-items: center; gap: 4px;">
-                                    <i class="fa-solid fa-circle-check"></i> Đã áp dụng mã giảm giá thành công!
+                            <form action="<?= url('cart/apply_voucher.php') ?>" method="POST" style="display: flex; gap: var(--spacing-xs); margin-bottom: 8px;">
+                                <input type="hidden" name="action" value="apply">
+                                <input type="text" name="voucher_code" class="form-control" placeholder="Nhập mã giảm giá..." style="padding: 8px 12px; font-size: 0.9rem; margin-bottom: 0;" required value="<?= $appliedVoucher ? htmlspecialchars($appliedVoucher['code']) : '' ?>">
+                                <button type="submit" class="btn btn--primary" style="padding: 0 16px; font-size: 0.9rem; font-weight: bold; white-space: nowrap; height: 38px;">
+                                    <?= $appliedVoucher ? 'Thay đổi' : 'Áp dụng' ?>
+                                </button>
+                            </form>
+                            <?php if ($appliedVoucher): ?>
+                                <div style="font-size: 0.85rem; color: #2e7d32; display: flex; align-items: center; gap: 4px; margin-top: 4px;">
+                                    <i class="fa-solid fa-circle-check"></i> Đang áp dụng mã: <strong><?= htmlspecialchars($appliedVoucher['code']) ?></strong> (-<?= number_format($voucherDiscount, 0, ',', '.') ?> đ)
                                 </div>
                             <?php endif; ?>
                         <?php else: ?>

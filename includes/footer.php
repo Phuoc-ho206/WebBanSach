@@ -94,3 +94,4 @@
     </script>
     <?php unset($_SESSION['log_toast']); ?>
 <?php endif; ?>
+<script src="/WebBanSach/assets/js/main.js?v=<?= time() ?>"></script>

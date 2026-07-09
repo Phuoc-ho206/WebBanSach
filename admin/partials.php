@@ -39,6 +39,9 @@ function badgeClass($status) {
 function adminSidebar() {
   ?>
   <header class="navbar admin-navbar">
+    <button class="navbar__toggle" aria-label="Toggle menu" onclick="this.closest('.navbar').classList.toggle('is-open')">
+      <i class="fa-solid fa-bars"></i>
+    </button>
     <a href="index.php" class="navbar__brand">Book Admin</a>
     <nav>
       <ul class="navbar__menu">

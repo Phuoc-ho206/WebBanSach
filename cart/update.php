@@ -40,6 +40,7 @@ if ($action === 'delete') {
         $stmtCart->close();
     }
     unset($_SESSION['cart'][$productId]);
+    unset($_SESSION['applied_voucher']);
     $_SESSION['success'] = 'Đã xóa sản phẩm khỏi giỏ hàng.';
 } else {
     // Trường hợp cập nhật số lượng
@@ -61,6 +62,7 @@ if ($action === 'delete') {
             $stmtCart->close();
         }
         unset($_SESSION['cart'][$productId]);
+        unset($_SESSION['applied_voucher']);
         $_SESSION['success'] = 'Đã xóa sản phẩm khỏi giỏ hàng.';
     } else {
         // Kiểm tra tồn kho của sản phẩm

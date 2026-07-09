@@ -1,18 +1,51 @@
 <?php
 require_once '../config/db.php';
 
+function sendResponse($redirectUrl) {
+    global $_SESSION;
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        
+        $status = 'success';
+        $message = '';
+        if (isset($_SESSION['error'])) {
+            $status = 'error';
+            $message = $_SESSION['error'];
+            unset($_SESSION['error']);
+        } elseif (isset($_SESSION['warning'])) {
+            $status = 'warning';
+            $message = $_SESSION['warning'];
+            unset($_SESSION['warning']);
+        } elseif (isset($_SESSION['success'])) {
+            $status = 'success';
+            $message = $_SESSION['success'];
+            unset($_SESSION['success']);
+        } elseif (isset($_SESSION['log_toast'])) {
+            $message = $_SESSION['log_toast'];
+            unset($_SESSION['log_toast']);
+        }
+        
+        echo json_encode([
+            'status' => $status,
+            'message' => $message,
+            'cart_count' => array_sum($_SESSION['cart'] ?? [])
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    header('Location: ' . $redirectUrl);
+    exit;
+}
+
 // Kiểm tra phương thức gửi lên
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ' . url('trangchu/index.php'));
-    exit;
+    sendResponse(url('trangchu/index.php'));
 }
 
 $productId = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
 $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 1;
 
 if ($productId <= 0) {
-    header('Location: ' . url('trangchu/index.php'));
-    exit;
+    sendResponse(url('trangchu/index.php'));
 }
 
 if ($quantity <= 0) {
@@ -27,8 +60,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
     // Sản phẩm không tồn tại
-    header('Location: ' . url('trangchu/index.php'));
-    exit;
+    sendResponse(url('trangchu/index.php'));
 }
 
 $product = $result->fetch_assoc();
@@ -38,8 +70,7 @@ $stmt->close();
 if ($product['Quantity'] <= 0 || $product['Status'] === 'Hết hàng') {
     // Hết hàng
     $_SESSION['error'] = 'Sản phẩm "' . $product['ProductName'] . '" đã hết hàng!';
-    header('Location: ' . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : url('trangchu/index.php')));
-    exit;
+    sendResponse(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : url('trangchu/index.php'));
 }
 
 // Khởi tạo giỏ hàng nếu chưa có
@@ -119,6 +150,9 @@ if ($customerId !== null && $customerId > 0) {
     }
 }
 
+// Hủy áp dụng voucher cũ khi thêm sản phẩm mới
+unset($_SESSION['applied_voucher']);
+
 // Thiết lập Toast popup hiển thị ở giỏ hàng (không ghi CSDL)
 if (isset($_SESSION['warning'])) {
     $_SESSION['log_toast'] = $_SESSION['warning'];
@@ -126,6 +160,5 @@ if (isset($_SESSION['warning'])) {
     $_SESSION['log_toast'] = $_SESSION['success'];
 }
 
-header('Location: ' . url('cart/cart.php'));
-exit;
+sendResponse(url('cart/cart.php'));
 ?>

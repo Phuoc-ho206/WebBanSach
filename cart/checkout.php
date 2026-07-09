@@ -281,12 +281,9 @@ if (isset($_SESSION['user'])) {
                         </span>
                         <span style="display: flex; align-items: center; gap: 8px;">
                             -<?= number_format($voucherDiscount, 0, ',', '.') ?> đ
-                            <form action="<?= url('cart/apply_voucher.php') ?>" method="POST" style="margin: 0; display: inline;">
-                                <input type="hidden" name="action" value="remove">
-                                <button type="submit" style="background: none; border: none; color: var(--color-error); cursor: pointer; padding: 0; font-size: 0.95rem;" title="Gỡ mã">
-                                    <i class="fa-solid fa-circle-xmark"></i>
-                                </button>
-                            </form>
+                            <button type="submit" form="voucher-remove-form" style="background: none; border: none; color: var(--color-error); cursor: pointer; padding: 0; font-size: 0.95rem;" title="Gỡ mã">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                            </button>
                         </span>
                     </div>
                 <?php endif; ?>
@@ -304,15 +301,15 @@ if (isset($_SESSION['user'])) {
                 <!-- Khu vực nhập Voucher phụ tại trang thanh toán -->
                 <div style="border-top: 1px dashed var(--color-border); margin-top: var(--spacing-md); padding-top: var(--spacing-md);">
                     <?php if (isset($_SESSION['user'])): ?>
-                        <?php if (!$appliedVoucher): ?>
-                            <form action="<?= url('cart/apply_voucher.php') ?>" method="POST" style="display: flex; gap: var(--spacing-xs); margin-bottom: 0;">
-                                <input type="hidden" name="action" value="apply">
-                                <input type="text" name="voucher_code" class="form-control" placeholder="Nhập mã giảm giá..." style="padding: 8px 12px; font-size: 0.9rem; margin-bottom: 0;" required>
-                                <button type="submit" class="btn btn--primary" style="padding: 0 16px; font-size: 0.9rem; font-weight: bold; white-space: nowrap; height: 38px;">Áp dụng</button>
-                            </form>
-                        <?php else: ?>
-                            <div style="font-size: 0.85rem; color: #2e7d32; display: flex; align-items: center; gap: 4px;">
-                                <i class="fa-solid fa-circle-check"></i> Đã áp dụng mã giảm giá thành công!
+                        <div style="display: flex; gap: var(--spacing-xs); margin-bottom: 8px;">
+                            <input type="text" name="voucher_code" form="voucher-form" class="form-control" placeholder="Nhập mã giảm giá..." style="padding: 8px 12px; font-size: 0.9rem; margin-bottom: 0;" required value="<?= $appliedVoucher ? htmlspecialchars($appliedVoucher['code']) : '' ?>">
+                            <button type="submit" form="voucher-form" class="btn btn--primary" style="padding: 0 16px; font-size: 0.9rem; font-weight: bold; white-space: nowrap; height: 38px;">
+                                <?= $appliedVoucher ? 'Thay đổi' : 'Áp dụng' ?>
+                            </button>
+                        </div>
+                        <?php if ($appliedVoucher): ?>
+                            <div style="font-size: 0.85rem; color: #2e7d32; display: flex; align-items: center; gap: 4px; margin-top: 4px;">
+                                <i class="fa-solid fa-circle-check"></i> Đang áp dụng mã: <strong><?= htmlspecialchars($appliedVoucher['code']) ?></strong> (-<?= number_format($voucherDiscount, 0, ',', '.') ?> đ)
                             </div>
                         <?php endif; ?>
                     <?php else: ?>
@@ -332,6 +329,14 @@ if (isset($_SESSION['user'])) {
                 </div>
             </div>
         </div>
+    </form>
+
+    <!-- Các form ẩn xử lý mã giảm giá nằm ngoài form đặt hàng chính -->
+    <form id="voucher-form" action="<?= url('cart/apply_voucher.php') ?>" method="POST" style="display: none;">
+        <input type="hidden" name="action" value="apply">
+    </form>
+    <form id="voucher-remove-form" action="<?= url('cart/apply_voucher.php') ?>" method="POST" style="display: none;">
+        <input type="hidden" name="action" value="remove">
     </form>
 </main>
 
