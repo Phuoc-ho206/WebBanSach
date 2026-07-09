@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jul 02, 2026 at 01:34 AM
+-- Generation Time: Jul 09, 2026 at 05:20 PM
 -- Server version: 8.4.7
 -- PHP Version: 8.3.28
 
@@ -31,9 +31,9 @@ DROP TABLE IF EXISTS `address`;
 CREATE TABLE IF NOT EXISTS `address` (
   `AddressID` int NOT NULL AUTO_INCREMENT,
   `CustomerID` int DEFAULT NULL,
-  `ReceiverName` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `FullAddress` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ReceiverName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `FullAddress` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `IsDefault` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`AddressID`),
   KEY `fk_address_user` (`CustomerID`)
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `cart` (
   `CartID` int NOT NULL AUTO_INCREMENT,
   `CustomerID` int DEFAULT NULL,
   `CreatedDate` datetime DEFAULT CURRENT_TIMESTAMP,
-  `Status` enum('Active','Abandoned','Completed') COLLATE utf8mb4_unicode_ci DEFAULT 'Active',
+  `Status` enum('Active','Abandoned','Completed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'Active',
   PRIMARY KEY (`CartID`),
   KEY `fk_cart_user` (`CustomerID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -90,8 +90,8 @@ CREATE TABLE IF NOT EXISTS `cart_detail` (
 DROP TABLE IF EXISTS `category`;
 CREATE TABLE IF NOT EXISTS `category` (
   `CategoryID` int NOT NULL AUTO_INCREMENT,
-  `CategoryName` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Description` text COLLATE utf8mb4_unicode_ci,
+  `CategoryName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`CategoryID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -121,7 +121,7 @@ DROP TABLE IF EXISTS `delivery`;
 CREATE TABLE IF NOT EXISTS `delivery` (
   `DeliveryID` int NOT NULL AUTO_INCREMENT,
   `OrderID` int DEFAULT NULL,
-  `DeliveryStatus` enum('Preparing','Shipping','Delivered','Failed') COLLATE utf8mb4_unicode_ci DEFAULT 'Preparing',
+  `DeliveryStatus` enum('Preparing','Shipping','Delivered','Failed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'Preparing',
   `DeliveryDate` datetime DEFAULT NULL,
   `ShippingFee` decimal(10,2) DEFAULT '0.00',
   PRIMARY KEY (`DeliveryID`),
@@ -153,13 +153,13 @@ DROP TABLE IF EXISTS `image`;
 CREATE TABLE IF NOT EXISTS `image` (
   `ImageID` int NOT NULL AUTO_INCREMENT,
   `ProductID` int DEFAULT NULL,
-  `ImageURL` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `AltText` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ImageURL` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `AltText` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `IsThumbnail` tinyint(1) DEFAULT '0',
   `SortOrder` int DEFAULT '0',
   PRIMARY KEY (`ImageID`),
   KEY `fk_image_product` (`ProductID`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=120 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `image`
@@ -206,7 +206,81 @@ INSERT INTO `image` (`ImageID`, `ProductID`, `ImageURL`, `AltText`, `IsThumbnail
 (38, 37, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955592/avpob52fkwblcscmpugi.jpg', 'Bìa sách Giai cấp và Dân tộc', 1, 1),
 (39, 38, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782955566/gj3w6skzn3caz3ztnjlb.png', 'Bìa sách Thiết kế LAN WAN', 1, 1),
 (40, 39, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782954933/oclumlr7kaf5p0fw79vt.jpg', 'Bìa sách Ngữ pháp Tiếng Anh', 1, 1),
-(41, 40, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782954922/ie8glejtov6jgmr0saxl.jpg', 'Bìa sách Kiểm thử tự động', 1, 1);
+(41, 40, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1782954922/ie8glejtov6jgmr0saxl.jpg', 'Bìa sách Kiểm thử tự động', 1, 1),
+(42, 40, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611363/oecqr7hzp8sjegqillef.jpg', 'Ảnh sản phẩm Kiểm thử phần mềm tự động', 0, 2),
+(43, 40, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611365/envqw98zcgzuckwpr1ad.jpg', 'Ảnh sản phẩm Kiểm thử phần mềm tự động', 0, 3),
+(44, 40, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611491/dyfa1cokcrzajhs5aucw.png', 'Ảnh sản phẩm Kiểm thử phần mềm tự động', 0, 2),
+(45, 40, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611493/oqb6ix1ega8cuyqd6fjc.jpg', 'Ảnh sản phẩm Kiểm thử phần mềm tự động', 0, 3),
+(46, 39, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611601/phvshrjcxxyxsizj65cw.jpg', 'Ảnh sản phẩm Ngữ pháp Tiếng Anh Toàn Diện', 0, 2),
+(47, 39, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611603/upvvooifjt8ugbxoj4ev.jpg', 'Ảnh sản phẩm Ngữ pháp Tiếng Anh Toàn Diện', 0, 3),
+(48, 39, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611605/xwfemyxox0yuauzauarq.jpg', 'Ảnh sản phẩm Ngữ pháp Tiếng Anh Toàn Diện', 0, 4),
+(49, 39, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611608/c3dsqjv7kjiajsmqbts6.webp', 'Ảnh sản phẩm Ngữ pháp Tiếng Anh Toàn Diện', 0, 5),
+(50, 38, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611669/ulxbjeqryrdwg07jacen.jpg', 'Ảnh sản phẩm Thiết kế Mạng LAN và WAN', 0, 2),
+(51, 38, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611671/tuanui1gd3ffvzjbvyci.jpg', 'Ảnh sản phẩm Thiết kế Mạng LAN và WAN', 0, 3),
+(52, 37, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611735/tdrtrlbaz5hadvpmo2kh.jpg', 'Ảnh sản phẩm Giai cấp và Dân tộc', 0, 2),
+(53, 37, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611737/ojhdn1c4wsgxevjd0zio.jpg', 'Ảnh sản phẩm Giai cấp và Dân tộc', 0, 3),
+(54, 37, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611739/bdwggcmwmizsfhtyirov.jpg', 'Ảnh sản phẩm Giai cấp và Dân tộc', 0, 4),
+(55, 36, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611814/yodkrbb4nxzca6ook1mj.webp', 'Ảnh sản phẩm Lập trình C++ Cơ bản đến Nâng cao', 0, 2),
+(56, 36, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611816/slwzojutzo3xjom99coq.jpg', 'Ảnh sản phẩm Lập trình C++ Cơ bản đến Nâng cao', 0, 3),
+(57, 36, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611819/jx8xwpzg0sjhe60ao4dy.jpg', 'Ảnh sản phẩm Lập trình C++ Cơ bản đến Nâng cao', 0, 4),
+(58, 35, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611860/s3tfryyfzo0wnhzzntnb.jpg', 'Ảnh sản phẩm Việt Nam Sử Lược', 0, 2),
+(59, 35, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611862/mh0tjo6o9vz9jtwjfzop.jpg', 'Ảnh sản phẩm Việt Nam Sử Lược', 0, 3),
+(60, 35, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611864/kh51uwo22ijnyl09vcw5.jpg', 'Ảnh sản phẩm Việt Nam Sử Lược', 0, 4),
+(61, 34, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611905/iyfsxk2oszxt9jek2ugt.jpg', 'Ảnh sản phẩm Dế Mèn Phiêu Lưu Ký', 0, 2),
+(62, 34, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611907/eo9q1x0ulksnxe7eikhl.jpg', 'Ảnh sản phẩm Dế Mèn Phiêu Lưu Ký', 0, 3),
+(63, 34, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611909/pb2tmaupdqa2ch4yrdcc.jpg', 'Ảnh sản phẩm Dế Mèn Phiêu Lưu Ký', 0, 4),
+(64, 33, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611940/oy4iqeqldsnavssu2wz2.jpg', 'Ảnh sản phẩm Tư duy nhanh và chậm', 0, 2),
+(65, 33, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611942/yb3kimw7skbq03ukmcpq.webp', 'Ảnh sản phẩm Tư duy nhanh và chậm', 0, 3),
+(66, 32, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783611997/rwwga4ecwlbbphxa7bte.png', 'Ảnh sản phẩm Giáo trình Cơ sở dữ liệu', 0, 2),
+(67, 32, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612000/osrnm9efcvi4avzlhs9u.jpg', 'Ảnh sản phẩm Giáo trình Cơ sở dữ liệu', 0, 3),
+(68, 32, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612002/grplos5b9r2pdevbtaps.jpg', 'Ảnh sản phẩm Giáo trình Cơ sở dữ liệu', 0, 4),
+(69, 31, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612348/x5gz7fdygr7zrywsv12t.jpg', 'Ảnh sản phẩm Bảo mật Mạng máy tính', 0, 2),
+(73, 31, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612371/gd4r05um8pb2zaicgtvl.jpg', 'Ảnh sản phẩm Bảo mật Mạng máy tính', 0, 3),
+(74, 31, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612372/fg7pkf8ttbwdl6mvdoqg.jpg', 'Ảnh sản phẩm Bảo mật Mạng máy tính', 0, 4),
+(75, 30, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612497/mc9zx9q1fhbj7m3fbgqx.jpg', 'Ảnh sản phẩm Harry Potter và Hòn Đá Phù Thủy', 0, 2),
+(76, 30, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612498/u8crw32ug5fphjejj6ab.jpg', 'Ảnh sản phẩm Harry Potter và Hòn Đá Phù Thủy', 0, 3),
+(77, 30, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612499/pams5hdbrkyz2vio2rcn.jpg', 'Ảnh sản phẩm Harry Potter và Hòn Đá Phù Thủy', 0, 4),
+(78, 29, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612538/jleuotkdlvccwxswgquh.jpg', 'Ảnh sản phẩm Bí mật DotCom', 0, 2),
+(79, 29, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612540/ze6lctdkr0cxadkzapsv.jpg', 'Ảnh sản phẩm Bí mật DotCom', 0, 3),
+(80, 28, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612580/yvxhyy0hkgq3ewrfe9h4.jpg', 'Ảnh sản phẩm Lập trình Android với Kotlin', 0, 2),
+(81, 28, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612583/wwpkcodzzvcot8e5l8mx.jpg', 'Ảnh sản phẩm Lập trình Android với Kotlin', 0, 3),
+(82, 28, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612585/hkjieq6gm568knjoymsz.jpg', 'Ảnh sản phẩm Lập trình Android với Kotlin', 0, 4),
+(83, 27, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612641/honc3lf1d8wuyubs6omk.jpg', 'Ảnh sản phẩm Kỹ thuật lưu lượng mạng (Traffic Engineering)', 0, 2),
+(84, 27, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612643/tzfb9jvtviimzitbkwxc.jpg', 'Ảnh sản phẩm Kỹ thuật lưu lượng mạng (Traffic Engineering)', 0, 3),
+(85, 27, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783612644/ktlyhzpkrs1cgjo18m2z.jpg', 'Ảnh sản phẩm Kỹ thuật lưu lượng mạng (Traffic Engineering)', 0, 4),
+(86, 26, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783613893/eaizrrjeaxwisw2530w1.jpg', 'Ảnh sản phẩm Bản chất và Hiện tượng', 0, 2),
+(87, 26, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783613895/yohzntyoqvfpam4wgyvs.jpg', 'Ảnh sản phẩm Bản chất và Hiện tượng', 0, 3),
+(88, 25, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783613941/skhrh0yvnvn3zxonb3ti.jpg', 'Ảnh sản phẩm English for Information Technology', 0, 2),
+(89, 25, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783613943/ekkpfhnb2lv56zwtimf7.jpg', 'Ảnh sản phẩm English for Information Technology', 0, 3),
+(90, 25, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783613945/fink5jxkn9bfksmvssum.jpg', 'Ảnh sản phẩm English for Information Technology', 0, 4),
+(91, 24, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783613978/ksntbrvjlmysn4zkkkmk.jpg', 'Ảnh sản phẩm Sapiens - Lược sử loài người', 0, 2),
+(92, 24, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783613980/ofywtv0qvaxxifodleyl.jpg', 'Ảnh sản phẩm Sapiens - Lược sử loài người', 0, 3),
+(93, 24, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783613984/xitjkifwge2dyptf5fnj.jpg', 'Ảnh sản phẩm Sapiens - Lược sử loài người', 0, 4),
+(94, 23, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614010/snk71fbz7sik5q0ba0ko.jpg', 'Ảnh sản phẩm Atomic Habits - Thay Đổi Tý Hon, Hiệu Quả Bất Ngờ', 0, 2),
+(95, 23, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614012/mny1pmrgxsounuvyowvh.jpg', 'Ảnh sản phẩm Atomic Habits - Thay Đổi Tý Hon, Hiệu Quả Bất Ngờ', 0, 3),
+(96, 23, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614014/mzyrsqf8asuy9xepjuu1.jpg', 'Ảnh sản phẩm Atomic Habits - Thay Đổi Tý Hon, Hiệu Quả Bất Ngờ', 0, 4),
+(97, 22, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614049/xhulpkohon9txcf09swq.jpg', 'Ảnh sản phẩm Bố Già (The Godfather)', 0, 2),
+(98, 22, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614051/fmsp4zi5xu2qo1fhiw5x.jpg', 'Ảnh sản phẩm Bố Già (The Godfather)', 0, 3),
+(99, 21, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614241/jhcdpmaxdre9utdotszi.jpg', 'Ảnh sản phẩm Số Đỏ', 0, 2),
+(100, 21, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614243/g5ajfl8vnqleukuiqdww.jpg', 'Ảnh sản phẩm Số Đỏ', 0, 3),
+(101, 21, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614245/dpdsoosvlfq8pc4bqobx.jpg', 'Ảnh sản phẩm Số Đỏ', 0, 4),
+(102, 20, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614356/gdnrkhazqvjmseswztxf.jpg', 'Ảnh sản phẩm Giáo trình Phân tích và Thiết kế Hệ thống', 0, 2),
+(103, 20, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614358/d9ybxxcdo6zbclhq1np1.jpg', 'Ảnh sản phẩm Giáo trình Phân tích và Thiết kế Hệ thống', 0, 3),
+(104, 20, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614360/xjdkwdlcnvvjgtoqs6pv.jpg', 'Ảnh sản phẩm Giáo trình Phân tích và Thiết kế Hệ thống', 0, 4),
+(105, 19, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783614388/ie8b3jiu1debmqjqvarv.jpg', 'Ảnh sản phẩm Phân tích dữ liệu Thương mại điện tử', 0, 2),
+(107, 18, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617184/gzbuv6jip1trhfvrdi8q.jpg', 'Ảnh sản phẩm Kiến trúc Smartphone Hiện Đại', 0, 2),
+(108, 18, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617186/z1bbwv3ndjkilmidddak.jpg', 'Ảnh sản phẩm Kiến trúc Smartphone Hiện Đại', 0, 3),
+(109, 17, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617229/gwbv7tp6ttx79by5e0at.jpg', 'Ảnh sản phẩm Tự động hóa với Selenium và Python', 0, 2),
+(110, 17, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617230/yybuazwjx1ub2cblc8gm.jpg', 'Ảnh sản phẩm Tự động hóa với Selenium và Python', 0, 3),
+(111, 16, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617264/ixysj6ylag3yhrqq2vwf.jpg', 'Ảnh sản phẩm Tổng quan Hệ thống thu phí tự động (ETC)', 0, 2),
+(112, 15, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617390/vjwmnje8hqb2hq9ettm2.jpg', 'Ảnh sản phẩm Phép biện chứng duy vật trong Kỷ nguyên số', 0, 2),
+(113, 15, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617392/casbefikxaiif3p0nci5.jpg', 'Ảnh sản phẩm Phép biện chứng duy vật trong Kỷ nguyên số', 0, 3),
+(114, 14, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617497/dff3yd9tfvhyrmkir4mf.jpg', 'Ảnh sản phẩm Thiết kế Web chuẩn Responsive với Bootstrap', 0, 2),
+(115, 14, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617499/zcf3blaurj26pypwvspb.jpg', 'Ảnh sản phẩm Thiết kế Web chuẩn Responsive với Bootstrap', 0, 3),
+(116, 13, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617535/q17qtsfxdfdq7leaxvz3.jpg', 'Ảnh sản phẩm Quản trị mạng Cisco Thực Hành (CCNA)', 0, 2),
+(117, 13, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617537/athdax3x9xlb85ynaoez.jpg', 'Ảnh sản phẩm Quản trị mạng Cisco Thực Hành (CCNA)', 0, 3),
+(118, 12, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617573/ovo83xw80jhblyvlbmhi.jpg', 'Ảnh sản phẩm Cấu trúc dữ liệu và Giải thuật với C++', 0, 2),
+(119, 12, 'https://res.cloudinary.com/k0v8tr4m/image/upload/v1783617574/vlnaknhzbivvjgj5pbof.jpg', 'Ảnh sản phẩm Cấu trúc dữ liệu và Giải thuật với C++', 0, 3);
 
 -- --------------------------------------------------------
 
@@ -221,8 +295,8 @@ CREATE TABLE IF NOT EXISTS `order` (
   `EmployeeID` int DEFAULT NULL,
   `VoucherID` int DEFAULT NULL,
   `OrderDate` datetime DEFAULT CURRENT_TIMESTAMP,
-  `ShippingAddress` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `OrderStatus` enum('Pending','Processing','Shipped','Delivered','Cancelled') COLLATE utf8mb4_unicode_ci DEFAULT 'Pending',
+  `ShippingAddress` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `OrderStatus` enum('Pending','Processing','Shipped','Delivered','Cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'Pending',
   `TotalAmount` decimal(15,2) NOT NULL,
   PRIMARY KEY (`OrderID`),
   KEY `fk_order_user` (`CustomerID`),
@@ -288,8 +362,8 @@ DROP TABLE IF EXISTS `payment`;
 CREATE TABLE IF NOT EXISTS `payment` (
   `PaymentID` int NOT NULL AUTO_INCREMENT,
   `OrderID` int DEFAULT NULL,
-  `PaymentMethod` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `PaymentStatus` enum('Pending','Completed','Failed','Refunded') COLLATE utf8mb4_unicode_ci DEFAULT 'Pending',
+  `PaymentMethod` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `PaymentStatus` enum('Pending','Completed','Failed','Refunded') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'Pending',
   `PaymentDate` datetime DEFAULT NULL,
   PRIMARY KEY (`PaymentID`),
   KEY `fk_payment_order` (`OrderID`)
@@ -321,13 +395,13 @@ CREATE TABLE IF NOT EXISTS `product` (
   `ProductID` int NOT NULL AUTO_INCREMENT,
   `CategoryID` int DEFAULT NULL,
   `BrandID` int DEFAULT NULL,
-  `ProductName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Brand` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ProductName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Brand` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Price` int NOT NULL DEFAULT '0',
   `Quantity` int DEFAULT '0',
-  `Description` text COLLATE utf8mb4_unicode_ci,
-  `Publisher` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT 'AlphaBooks',
-  `Status` enum('Còn hàng','Hết hàng') COLLATE utf8mb4_unicode_ci DEFAULT 'Còn hàng',
+  `Description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `Publisher` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'AlphaBooks',
+  `Status` enum('Còn hàng','Hết hàng') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'Còn hàng',
   PRIMARY KEY (`ProductID`),
   KEY `fk_product_category` (`CategoryID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -387,7 +461,7 @@ INSERT INTO `product` (`ProductID`, `CategoryID`, `BrandID`, `ProductName`, `Bra
 DROP TABLE IF EXISTS `promotion`;
 CREATE TABLE IF NOT EXISTS `promotion` (
   `PromotionID` int NOT NULL AUTO_INCREMENT,
-  `PromotionName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `PromotionName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `DiscountPercent` decimal(5,2) NOT NULL,
   `StartDate` datetime DEFAULT NULL,
   `EndDate` datetime DEFAULT NULL,
@@ -464,8 +538,8 @@ CREATE TABLE IF NOT EXISTS `review` (
 DROP TABLE IF EXISTS `role`;
 CREATE TABLE IF NOT EXISTS `role` (
   `RoleID` int NOT NULL AUTO_INCREMENT,
-  `RoleName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Description` text COLLATE utf8mb4_unicode_ci,
+  `RoleName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`RoleID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -487,15 +561,15 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
   `CustomerID` int NOT NULL AUTO_INCREMENT,
   `RoleID` int DEFAULT NULL,
-  `LastName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `FirstName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Address` text COLLATE utf8mb4_unicode_ci,
+  `LastName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `FirstName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Address` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `CreatedDate` datetime DEFAULT CURRENT_TIMESTAMP,
-  `username` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ResetToken` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ResetToken` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ResetTokenExpires` datetime DEFAULT NULL,
   PRIMARY KEY (`CustomerID`),
   UNIQUE KEY `Email` (`Email`),
@@ -521,12 +595,12 @@ CREATE TABLE IF NOT EXISTS `user_log` (
   `LogID` int NOT NULL AUTO_INCREMENT,
   `CustomerID` int DEFAULT NULL,
   `EmployeeID` int DEFAULT NULL,
-  `Action` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Action` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `LogDate` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`LogID`),
   KEY `fk_userlog_user` (`CustomerID`),
   KEY `fk_userlog_employee` (`EmployeeID`)
-) ENGINE=InnoDB AUTO_INCREMENT=132 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=168 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `user_log`
@@ -645,7 +719,43 @@ INSERT INTO `user_log` (`LogID`, `CustomerID`, `EmployeeID`, `Action`, `LogDate`
 (128, NULL, 16, 'Cập nhật sản phẩm ID 14 - Tên: Thiết kế Web chuẩn Responsive với Bootstrap', '2026-07-02 08:33:09'),
 (129, NULL, 16, 'Cập nhật sản phẩm ID 13 - Tên: Quản trị mạng Cisco Thực Hành (CCNA)', '2026-07-02 08:33:20'),
 (130, NULL, 16, 'Cập nhật sản phẩm ID 12 - Tên: Cấu trúc dữ liệu và Giải thuật với C++', '2026-07-02 08:33:30'),
-(131, NULL, 16, 'Cập nhật sản phẩm ID 11 - Tên: Lập trình Web với PHP và MySQL', '2026-07-02 08:33:42');
+(131, NULL, 16, 'Cập nhật sản phẩm ID 11 - Tên: Lập trình Web với PHP và MySQL', '2026-07-02 08:33:42'),
+(132, 16, NULL, 'Đăng nhập hệ thống', '2026-07-09 22:31:53'),
+(133, NULL, 16, 'Đăng nhập hệ thống', '2026-07-09 22:31:53'),
+(134, NULL, 16, 'Cập nhật sản phẩm ID 40 - Tên: Kiểm thử phần mềm tự động', '2026-07-09 22:36:06'),
+(135, NULL, 16, 'Cập nhật sản phẩm ID 40 - Tên: Kiểm thử phần mềm tự động', '2026-07-09 22:38:14'),
+(136, NULL, 16, 'Cập nhật sản phẩm ID 39 - Tên: Ngữ pháp Tiếng Anh Toàn Diện', '2026-07-09 22:40:09'),
+(137, NULL, 16, 'Cập nhật sản phẩm ID 38 - Tên: Thiết kế Mạng LAN và WAN', '2026-07-09 22:41:12'),
+(138, NULL, 16, 'Cập nhật sản phẩm ID 37 - Tên: Giai cấp và Dân tộc', '2026-07-09 22:42:20'),
+(139, NULL, 16, 'Cập nhật sản phẩm ID 36 - Tên: Lập trình C++ Cơ bản đến Nâng cao', '2026-07-09 22:43:40'),
+(140, NULL, 16, 'Cập nhật sản phẩm ID 35 - Tên: Việt Nam Sử Lược', '2026-07-09 22:44:26'),
+(141, NULL, 16, 'Cập nhật sản phẩm ID 34 - Tên: Dế Mèn Phiêu Lưu Ký', '2026-07-09 22:45:10'),
+(142, NULL, 16, 'Cập nhật sản phẩm ID 33 - Tên: Tư duy nhanh và chậm', '2026-07-09 22:45:43'),
+(143, NULL, 16, 'Cập nhật sản phẩm ID 32 - Tên: Giáo trình Cơ sở dữ liệu', '2026-07-09 22:46:43'),
+(144, NULL, 16, 'Cập nhật sản phẩm ID 31 - Tên: Bảo mật Mạng máy tính', '2026-07-09 22:52:31'),
+(145, NULL, 16, 'Cập nhật sản phẩm ID 31 - Tên: Bảo mật Mạng máy tính', '2026-07-09 22:52:53'),
+(146, NULL, 16, 'Cập nhật sản phẩm ID 31 - Tên: Bảo mật Mạng máy tính', '2026-07-09 22:54:08'),
+(147, NULL, 16, 'Cập nhật sản phẩm ID 30 - Tên: Harry Potter và Hòn Đá Phù Thủy', '2026-07-09 22:55:00'),
+(148, NULL, 16, 'Cập nhật sản phẩm ID 29 - Tên: Bí mật DotCom', '2026-07-09 22:55:41'),
+(149, NULL, 16, 'Cập nhật sản phẩm ID 28 - Tên: Lập trình Android với Kotlin', '2026-07-09 22:56:26'),
+(150, NULL, 16, 'Cập nhật sản phẩm ID 27 - Tên: Kỹ thuật lưu lượng mạng (Traffic Engineering)', '2026-07-09 22:57:25'),
+(151, NULL, 16, 'Cập nhật sản phẩm ID 26 - Tên: Bản chất và Hiện tượng', '2026-07-09 23:18:16'),
+(152, NULL, 16, 'Cập nhật sản phẩm ID 25 - Tên: English for Information Technology', '2026-07-09 23:19:06'),
+(153, NULL, 16, 'Cập nhật sản phẩm ID 24 - Tên: Sapiens - Lược sử loài người', '2026-07-09 23:19:45'),
+(154, NULL, 16, 'Cập nhật sản phẩm ID 23 - Tên: Atomic Habits - Thay Đổi Tý Hon, Hiệu Quả Bất Ngờ', '2026-07-09 23:20:14'),
+(155, NULL, 16, 'Cập nhật sản phẩm ID 22 - Tên: Bố Già (The Godfather)', '2026-07-09 23:20:52'),
+(156, NULL, 16, 'Cập nhật sản phẩm ID 21 - Tên: Số Đỏ', '2026-07-09 23:24:06'),
+(157, NULL, 16, 'Cập nhật sản phẩm ID 20 - Tên: Giáo trình Phân tích và Thiết kế Hệ thống', '2026-07-09 23:26:01'),
+(158, NULL, 16, 'Cập nhật sản phẩm ID 19 - Tên: Phân tích dữ liệu Thương mại điện tử', '2026-07-09 23:26:29'),
+(159, NULL, 16, 'Cập nhật sản phẩm ID 18 - Tên: Kiến trúc Smartphone Hiện Đại', '2026-07-09 23:27:16'),
+(160, NULL, 16, 'Cập nhật sản phẩm ID 18 - Tên: Kiến trúc Smartphone Hiện Đại', '2026-07-10 00:12:32'),
+(161, NULL, 16, 'Cập nhật sản phẩm ID 18 - Tên: Kiến trúc Smartphone Hiện Đại', '2026-07-10 00:13:07'),
+(162, NULL, 16, 'Cập nhật sản phẩm ID 17 - Tên: Tự động hóa với Selenium và Python', '2026-07-10 00:13:52'),
+(163, NULL, 16, 'Cập nhật sản phẩm ID 16 - Tên: Tổng quan Hệ thống thu phí tự động (ETC)', '2026-07-10 00:14:25'),
+(164, NULL, 16, 'Cập nhật sản phẩm ID 15 - Tên: Phép biện chứng duy vật trong Kỷ nguyên số', '2026-07-10 00:16:33'),
+(165, NULL, 16, 'Cập nhật sản phẩm ID 14 - Tên: Thiết kế Web chuẩn Responsive với Bootstrap', '2026-07-10 00:18:20'),
+(166, NULL, 16, 'Cập nhật sản phẩm ID 13 - Tên: Quản trị mạng Cisco Thực Hành (CCNA)', '2026-07-10 00:18:58'),
+(167, NULL, 16, 'Cập nhật sản phẩm ID 12 - Tên: Cấu trúc dữ liệu và Giải thuật với C++', '2026-07-10 00:19:35');
 
 -- --------------------------------------------------------
 
@@ -657,10 +767,10 @@ DROP TABLE IF EXISTS `user_provider`;
 CREATE TABLE IF NOT EXISTS `user_provider` (
   `ProviderID` int NOT NULL AUTO_INCREMENT,
   `User_ID` int NOT NULL,
-  `ProviderName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Provider_userID` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `access_token` text COLLATE utf8mb4_unicode_ci,
-  `refresh_token` text COLLATE utf8mb4_unicode_ci,
+  `ProviderName` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Provider_userID` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `access_token` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `refresh_token` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `CreatedAt` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`ProviderID`),
   KEY `fk_userprovider_user` (`User_ID`)
@@ -675,7 +785,7 @@ CREATE TABLE IF NOT EXISTS `user_provider` (
 DROP TABLE IF EXISTS `voucher`;
 CREATE TABLE IF NOT EXISTS `voucher` (
   `VoucherID` int NOT NULL AUTO_INCREMENT,
-  `VoucherCode` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `VoucherCode` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `DiscountValue` decimal(10,2) NOT NULL,
   `ExpiredDate` datetime DEFAULT NULL,
   PRIMARY KEY (`VoucherID`),
