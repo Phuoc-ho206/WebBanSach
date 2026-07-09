@@ -92,6 +92,26 @@ while ($row = $res_rev->fetch_assoc()) {
 }
 $stmt_rev->close();
 
+// Truy vấn tất cả hình ảnh của sản phẩm, ảnh đại diện lên đầu
+$sql_images = "SELECT ImageURL, IsThumbnail FROM image WHERE ProductID = ? ORDER BY IsThumbnail DESC, SortOrder ASC";
+$stmt_images = $conn->prepare($sql_images);
+$stmt_images->bind_param("i", $productId);
+$stmt_images->execute();
+$res_images = $stmt_images->get_result();
+$productImages = [];
+while ($row = $res_images->fetch_assoc()) {
+    $productImages[] = $row;
+}
+$stmt_images->close();
+
+// Fallback nếu sản phẩm chưa có ảnh nào
+if (empty($productImages)) {
+    $productImages[] = [
+        'ImageURL' => '',
+        'IsThumbnail' => 1
+    ];
+}
+
 include '../includes/header.php';
 ?>
 
@@ -105,8 +125,14 @@ include '../includes/header.php';
     .product-layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--spacing-xl); background-color: var(--color-surface); border: var(--border-width) solid var(--color-border); border-radius: var(--border-radius-lg); padding: var(--spacing-xl); box-shadow: var(--box-shadow-sm); }
     @media (max-width: 768px) { .product-layout { grid-template-columns: 1fr; gap: var(--spacing-lg); padding: var(--spacing-md); } }
     
-    .product-image-wrapper { text-align: center; border: var(--border-width) solid var(--color-border); border-radius: var(--border-radius); padding: var(--spacing-md); background-color: var(--color-background); display: flex; align-items: center; justify-content: center; min-height: 350px; }
-    .product-main-image { max-width: 100%; max-height: 400px; object-fit: contain; border-radius: var(--border-radius-sm); }
+    .product-image-wrapper { display: flex; flex-direction: column; gap: var(--spacing-md); }
+    .product-main-image-container { text-align: center; border: var(--border-width) solid var(--color-border); border-radius: var(--border-radius); padding: var(--spacing-md); background-color: var(--color-background); display: flex; align-items: center; justify-content: center; height: 380px; overflow: hidden; }
+    .product-main-image { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: var(--border-radius-sm); transition: opacity 0.2s ease-in-out; }
+    .product-image-gallery { display: flex; gap: var(--spacing-xs); overflow-x: auto; padding: 4px 0; justify-content: center; }
+    .gallery-thumb-item { width: 70px; height: 70px; border-radius: var(--border-radius-sm); border: 2px solid var(--color-border); overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--color-surface); flex-shrink: 0; padding: 2px; transition: all 0.2s ease; }
+    .gallery-thumb-item:hover { border-color: var(--color-primary-light, #5c6bc0) !important; transform: translateY(-2px); }
+    .gallery-thumb-item.active { border-color: var(--color-primary) !important; }
+    .gallery-thumb-item img { max-height: 100%; max-width: 100%; object-fit: contain; }
     
     .product-info-wrapper { display: flex; flex-direction: column; gap: var(--spacing-md); }
     .product-detail-title { font-size: 1.75rem; font-weight: var(--font-weight-bold); color: var(--color-text); margin: 0; line-height: 1.3; }
@@ -135,8 +161,20 @@ include '../includes/header.php';
 
     <div class="product-layout">
         <div class="product-image-wrapper">
-            <?php $imgSrc = getProductImage($product['ImageURL'] ?? ''); ?>
-            <img src="<?= $imgSrc ?>" class="product-main-image" alt="<?= htmlspecialchars($product['ProductName']) ?>">
+            <div class="product-main-image-container">
+                <?php $defaultImg = getProductImage($productImages[0]['ImageURL']); ?>
+                <img id="main-product-image" src="<?= $defaultImg ?>" class="product-main-image" alt="<?= htmlspecialchars($product['ProductName']) ?>">
+            </div>
+            
+            <?php if (count($productImages) > 1): ?>
+                <div class="product-image-gallery">
+                    <?php foreach ($productImages as $index => $img): ?>
+                        <div class="gallery-thumb-item <?= $index === 0 ? 'active' : '' ?>" data-src="<?= getProductImage($img['ImageURL']) ?>">
+                            <img src="<?= getProductImage($img['ImageURL']) ?>" alt="Ảnh phụ <?= $index + 1 ?>">
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
 
         <div class="product-info-wrapper">
@@ -392,6 +430,26 @@ include '../includes/header.php';
                 }, 300); // Trì hoãn nhẹ để trang ổn định giao diện trước khi cuộn
             }
         }
+
+        // Xử lý chuyển đổi hình ảnh trong thư viện (gallery)
+        const mainImg = document.getElementById('main-product-image');
+        const thumbs = document.querySelectorAll('.gallery-thumb-item');
+        
+        thumbs.forEach(thumb => {
+            thumb.addEventListener('click', function() {
+                const newSrc = this.getAttribute('data-src');
+                if (mainImg) {
+                    mainImg.style.opacity = 0;
+                    setTimeout(() => {
+                        mainImg.src = newSrc;
+                        mainImg.style.opacity = 1;
+                    }, 150);
+                }
+                
+                thumbs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
     });
 </script>
 </body>

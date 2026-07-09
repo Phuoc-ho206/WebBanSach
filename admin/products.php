@@ -3,7 +3,7 @@ require_once 'data.php';
 require_once 'partials.php';
 
 $editProduct = null;
-$editProductImage = null;
+$editProductImages = [];
 if (isset($_GET['edit'])) {
   $stmt = $conn->prepare("SELECT * FROM product WHERE ProductID = ?");
   $stmt->bind_param("i", $_GET['edit']);
@@ -12,12 +12,12 @@ if (isset($_GET['edit'])) {
   $stmt->close();
   
   if ($editProduct) {
-    $imgStmt = $conn->prepare("SELECT ImageURL FROM image WHERE ProductID = ? AND IsThumbnail = 1 LIMIT 1");
+    $imgStmt = $conn->prepare("SELECT * FROM image WHERE ProductID = ? ORDER BY IsThumbnail DESC, SortOrder ASC");
     $imgStmt->bind_param("i", $editProduct['ProductID']);
     $imgStmt->execute();
     $imgRes = $imgStmt->get_result();
-    if ($imgRes->num_rows > 0) {
-      $editProductImage = $imgRes->fetch_assoc()['ImageURL'];
+    while ($row = $imgRes->fetch_assoc()) {
+      $editProductImages[] = $row;
     }
     $imgStmt->close();
   }
@@ -38,14 +38,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Tự động cập nhật trạng thái nếu hết hàng
     $status = ($stock <= 0) ? 'Hết hàng' : trim($_POST['status'] ?? 'Còn hàng');
 
-    // Xử lý upload ảnh bìa (Cloudinary)
-    $uploadedImageUrl = null;
+    // Xử lý upload nhiều ảnh (Cloudinary)
+    $uploadedImageUrls = [];
     $uploadFailed = false;
-    if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPLOAD_ERR_OK) {
-      require_once __DIR__ . '/../config/cloudinary.php';
-      $uploadedImageUrl = CloudinaryHelper::uploadImage($_FILES['product_image']['tmp_name']);
-      if (!$uploadedImageUrl) {
-        $uploadFailed = true;
+    if (isset($_FILES['product_images'])) {
+      $files = $_FILES['product_images'];
+      $fileCount = is_array($files['name']) ? count($files['name']) : 0;
+      
+      for ($i = 0; $i < $fileCount; $i++) {
+        if ($files['error'][$i] === UPLOAD_ERR_OK) {
+          require_once __DIR__ . '/../config/cloudinary.php';
+          $uploadedUrl = CloudinaryHelper::uploadImage($files['tmp_name'][$i]);
+          if ($uploadedUrl) {
+            $uploadedImageUrls[] = $uploadedUrl;
+          } else {
+            $uploadFailed = true;
+          }
+        }
       }
     }
 
@@ -54,27 +63,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->bind_param("isiisssi", $categoryId, $name, $price, $stock, $status, $publisher, $description, $id);
       $stmt->execute();
       $stmt->close();
-      
-      // Nếu có ảnh mới upload thành công
-      if ($uploadedImageUrl) {
+
+      // 1. Xử lý xóa ảnh được đánh dấu xóa
+      if (isset($_POST['delete_image_ids'])) {
+        $deleteIds = $_POST['delete_image_ids'];
+        foreach ($deleteIds as $delId) {
+          $delId = (int)$delId;
+          $delStmt = $conn->prepare("DELETE FROM image WHERE ImageID = ? AND ProductID = ?");
+          $delStmt->bind_param("ii", $delId, $id);
+          $delStmt->execute();
+          $delStmt->close();
+        }
+      }
+
+      // 2. Xử lý cập nhật ảnh đại diện (Thumbnail)
+      if (isset($_POST['thumbnail_image_id'])) {
+        $thumbId = (int)$_POST['thumbnail_image_id'];
+        
+        // Đặt tất cả ảnh của sản phẩm này về IsThumbnail = 0
+        $resetStmt = $conn->prepare("UPDATE image SET IsThumbnail = 0 WHERE ProductID = ?");
+        $resetStmt->bind_param("i", $id);
+        $resetStmt->execute();
+        $resetStmt->close();
+        
+        // Đặt ảnh được chọn làm IsThumbnail = 1
+        $setStmt = $conn->prepare("UPDATE image SET IsThumbnail = 1 WHERE ImageID = ? AND ProductID = ?");
+        $setStmt->bind_param("ii", $thumbId, $id);
+        $setStmt->execute();
+        $setStmt->close();
+      }
+
+      // 3. Nếu có ảnh mới upload thành công
+      if (!empty($uploadedImageUrls)) {
+        // Kiểm tra xem sản phẩm đã có ảnh đại diện chưa
         $checkStmt = $conn->prepare("SELECT ImageID FROM image WHERE ProductID = ? AND IsThumbnail = 1 LIMIT 1");
         $checkStmt->bind_param("i", $id);
         $checkStmt->execute();
-        $checkRes = $checkStmt->get_result();
-        if ($checkRes->num_rows > 0) {
-          $imgId = $checkRes->fetch_assoc()['ImageID'];
-          $updateImgStmt = $conn->prepare("UPDATE image SET ImageURL = ? WHERE ImageID = ?");
-          $updateImgStmt->bind_param("si", $uploadedImageUrl, $imgId);
-          $updateImgStmt->execute();
-          $updateImgStmt->close();
-        } else {
-          $altText = 'Bìa sách ' . $name;
-          $insertImgStmt = $conn->prepare("INSERT INTO image (ProductID, ImageURL, AltText, IsThumbnail, SortOrder) VALUES (?, ?, ?, 1, 1)");
-          $insertImgStmt->bind_param("iss", $id, $uploadedImageUrl, $altText);
+        $hasThumbnail = $checkStmt->get_result()->num_rows > 0;
+        $checkStmt->close();
+
+        foreach ($uploadedImageUrls as $index => $url) {
+          $isThumb = (!$hasThumbnail && $index === 0) ? 1 : 0;
+          $altText = 'Ảnh sản phẩm ' . $name;
+          $insertImgStmt = $conn->prepare("INSERT INTO image (ProductID, ImageURL, AltText, IsThumbnail, SortOrder) VALUES (?, ?, ?, ?, ?)");
+          $sortOrder = $index + 2;
+          $insertImgStmt->bind_param("issii", $id, $url, $altText, $isThumb, $sortOrder);
           $insertImgStmt->execute();
           $insertImgStmt->close();
+
+          if ($isThumb) {
+            $hasThumbnail = true;
+          }
         }
-        $checkStmt->close();
+      }
+
+      // Đảm bảo luôn có ít nhất 1 ảnh đại diện nếu sản phẩm còn ảnh
+      $checkThumbStmt = $conn->prepare("SELECT ImageID FROM image WHERE ProductID = ? AND IsThumbnail = 1 LIMIT 1");
+      $checkThumbStmt->bind_param("i", $id);
+      $checkThumbStmt->execute();
+      $hasThumb = $checkThumbStmt->get_result()->num_rows > 0;
+      $checkThumbStmt->close();
+
+      if (!$hasThumb) {
+        $fallbackStmt = $conn->prepare("SELECT ImageID FROM image WHERE ProductID = ? LIMIT 1");
+        $fallbackStmt->bind_param("i", $id);
+        $fallbackStmt->execute();
+        $fallbackRes = $fallbackStmt->get_result();
+        if ($fallbackRes->num_rows > 0) {
+          $fallbackId = $fallbackRes->fetch_assoc()['ImageID'];
+          $setFallbackStmt = $conn->prepare("UPDATE image SET IsThumbnail = 1 WHERE ImageID = ?");
+          $setFallbackStmt->bind_param("i", $fallbackId);
+          $setFallbackStmt->execute();
+          $setFallbackStmt->close();
+        }
+        $fallbackStmt->close();
       }
       
       if ($uploadFailed) {
@@ -90,12 +152,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->close();
       
       // Nếu có ảnh mới upload thành công
-      if ($uploadedImageUrl) {
-        $altText = 'Bìa sách ' . $name;
-        $insertImgStmt = $conn->prepare("INSERT INTO image (ProductID, ImageURL, AltText, IsThumbnail, SortOrder) VALUES (?, ?, ?, 1, 1)");
-        $insertImgStmt->bind_param("iss", $newId, $uploadedImageUrl, $altText);
-        $insertImgStmt->execute();
-        $insertImgStmt->close();
+      if (!empty($uploadedImageUrls)) {
+        foreach ($uploadedImageUrls as $index => $url) {
+          $isThumb = ($index === 0) ? 1 : 0; // Ảnh đầu tiên làm ảnh đại diện
+          $altText = 'Ảnh sản phẩm ' . $name;
+          $insertImgStmt = $conn->prepare("INSERT INTO image (ProductID, ImageURL, AltText, IsThumbnail, SortOrder) VALUES (?, ?, ?, ?, ?)");
+          $sortOrder = $index + 1;
+          $insertImgStmt->bind_param("issii", $newId, $url, $altText, $isThumb, $sortOrder);
+          $insertImgStmt->execute();
+          $insertImgStmt->close();
+        }
       }
       
       if ($uploadFailed) {
@@ -208,18 +274,37 @@ if ($resProds) {
               <textarea class="form-control" name="description" rows="3"><?= h($editProduct['Description'] ?? '') ?></textarea>
             </div>
           </div>
-          <div class="form-row" style="gap: 20px; align-items: flex-end;">
-            <?php if ($editProductImage): ?>
-              <div class="form-group" style="flex: 0 0 auto;">
-                <label class="form-label">Ảnh bìa hiện tại</label>
-                <?php $previewSrc = getProductImage($editProductImage); ?>
-                <img src="<?= $previewSrc ?>" style="max-height: 100px; max-width: 150px; object-fit: contain; border-radius: 4px; border: 1px solid var(--color-border); display: block; background: #f9f9f9; padding: 4px;">
+          <?php if (!empty($editProductImages)): ?>
+            <div class="form-row" style="margin-bottom: 20px;">
+              <div class="form-group" style="width: 100%;">
+                <label class="form-label" style="font-weight: bold; margin-bottom: 10px; display: block;">Danh sách hình ảnh hiện có</label>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; background: var(--color-background); padding: 15px; border-radius: var(--border-radius); border: 1px solid var(--color-border);">
+                  <?php foreach ($editProductImages as $img): ?>
+                    <div style="display: flex; flex-direction: column; align-items: center; background: var(--color-surface); padding: 8px; border-radius: 6px; border: 1px solid <?= $img['IsThumbnail'] ? 'var(--color-primary)' : 'var(--color-border)' ?>; position: relative;">
+                      <img src="<?= getProductImage($img['ImageURL']) ?>" style="height: 90px; width: 100%; object-fit: contain; margin-bottom: 8px; border-radius: 4px; background: #fafafa;">
+                      <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 4px; cursor: pointer; width: 100%; margin-bottom: 4px;">
+                        <input type="radio" name="thumbnail_image_id" value="<?= $img['ImageID'] ?>" <?= $img['IsThumbnail'] ? 'checked' : '' ?>>
+                        <span style="color: var(--color-text);">Đại diện</span>
+                      </label>
+                      <label style="font-size: 0.8rem; display: flex; align-items: center; gap: 4px; cursor: pointer; width: 100%;">
+                        <input type="checkbox" name="delete_image_ids[]" value="<?= $img['ImageID'] ?>">
+                        <span style="color: var(--color-danger);">Xóa ảnh</span>
+                      </label>
+                      <?php if ($img['IsThumbnail']): ?>
+                        <span style="position: absolute; top: -6px; right: -6px; background: var(--color-primary); color: white; font-size: 0.65rem; padding: 1px 5px; border-radius: 8px; font-weight: bold;">Bìa</span>
+                      <?php endif; ?>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
               </div>
-            <?php endif; ?>
-            <div class="form-group" style="flex: 1;">
-              <label class="form-label">Ảnh bìa sản phẩm (Tải lên Cloudinary)</label>
-              <input class="form-control" type="file" name="product_image" accept="image/*">
-              <small style="color: var(--color-text-light); margin-top: 4px; display: block;">Nếu không chọn ảnh bìa mới, ảnh cũ (nếu có) sẽ được giữ nguyên.</small>
+            </div>
+          <?php endif; ?>
+
+          <div class="form-row">
+            <div class="form-group" style="width: 100%;">
+              <label class="form-label">Tải lên hình ảnh sản phẩm mới (Có thể chọn nhiều ảnh)</label>
+              <input class="form-control" type="file" name="product_images[]" accept="image/*" multiple>
+              <small style="color: var(--color-text-light); margin-top: 4px; display: block;">Hỗ trợ tải lên nhiều file ảnh cùng lúc. Nếu không chọn, các ảnh cũ sẽ được giữ nguyên.</small>
             </div>
           </div>
           <div class="btn-group">
